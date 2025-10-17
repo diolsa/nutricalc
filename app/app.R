@@ -46,46 +46,66 @@ default_importance <- c(
 # ---- UI ----
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
-  titlePanel("NutriCalc — Nutrient Optimization"),
   tags$head(tags$style(HTML("
-    .form-group { margin-bottom: 6px; }
-    .shiny-input-container { margin-bottom: 6px; }
-    .irs { margin-top: -6px; }
-    .container-fluid { max-width: 1100px; }
+    body { font-size: 13px; }
+    .form-group { margin-bottom: 3px; }
+    .shiny-input-container { margin-bottom: 3px; }
+    .irs { margin-top: -8px; }
+    .container-fluid { max-width: 1300px; } /* slightly wider */
+    input.form-control { height: 26px; padding: 2px 4px; font-size: 12px; }
+    .irs-single, .irs-min, .irs-max { font-size: 10px; }
   "))),
-  tags$p("Enter target expressions (e.g. ", code('converte("P2O5","P",5)'),
-         ") and adjust importance (−2 to +2). Units: mmol/L (converted to mol/L for the solver)."),
+  titlePanel("NutriCalc — Nutrient Optimization"),
+
+  # Main two-column layout
   fluidRow(
-    column(12,
-           div(class = "card p-3",
-               fluidRow(
-                 column(3, strong("Nutrient")),
-                 column(4, strong("Target (R expression, mmol/L)")),
-                 column(5, strong("Importance (−2..2)"))
-               ),
-               tags$hr(style="margin:4px 0;"),
-               uiOutput("nutrient_rows")
-           )
-    )
-  ),
-  br(),
-  fluidRow(
+    # LEFT: inputs
     column(
-      12,
-      actionButton("reset", "Reset to defaults"),
-      span("  "),
-      actionButton("run", "Run optimize_nutrients()", class = "btn btn-primary"),
-      br(), br(),
-      uiOutput("status")
+      width = 6,
+      div(class = "card p-3",
+          tags$h5("🎯 Nutrient Targets & Importance"),
+          fluidRow(
+            column(3, strong("Nutrient")),
+            column(4, strong(textOutput("target_col_header"))),
+            column(5, strong("Importance (−2..2)"))
+          ),
+          tags$hr(style="margin:4px 0;"),
+          radioButtons(
+            "input_unit",
+            "Input unit for targets:",
+            choices = c("mmol/L", "mg/L"),
+            selected = "mmol/L",
+            inline = TRUE
+          ),
+          uiOutput("nutrient_rows"),
+          br(),
+          actionButton("reset", "Reset to defaults"),
+          span("  "),
+          actionButton("run", "Run optimize_nutrients()", class = "btn btn-primary"),
+          br(), br(),
+          uiOutput("status")
+      )
+    ),
+
+    # RIGHT: results
+    column(
+      width = 6,
+      div(class = "card p-3",
+          h5("⚗️ Results"),
+          uiOutput("results_ui")
+      )
     )
-  ),
-  hr(),
-  h4("Results"),
-  uiOutput("results_ui")
+  )
 )
 
 # ---- Server ----
 server <- function(input, output, session) {
+
+  # Header label reacts to unit selection
+  output$target_col_header <- renderText({
+    unit <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
+    sprintf("Target (R expression, %s)", unit)
+  })
 
   # build rows dynamically
   output$nutrient_rows <- renderUI({
@@ -117,18 +137,65 @@ server <- function(input, output, session) {
     }
   })
 
-  # evaluate target expressions
+  # evaluate target expressions -> numeric (in selected unit), then convert to mmol/L for solver
   eval_targets <- reactive({
     vals <- sapply(nutrients, function(nm) {
       txt <- input[[paste0("expr_", nm)]]
       val <- try(eval(parse(text = txt), envir = .GlobalEnv), silent = TRUE)
       if (inherits(val, "try-error") || !is.numeric(val) || length(val) != 1)
         stop(sprintf("Error evaluating target for %s: '%s'", nm, txt))
-      val
+      as.numeric(val)
     })
     names(vals) <- nutrients
-    vals / 1000  # mmol/L -> mol/L
+
+    unit_in <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
+
+    if (unit_in == "mg/L") {
+      validate(need(exists("convert_units", mode = "function"),
+                    "convert_units() not found (check R/converte_unit.R)."))
+      vals <- convert_units(vals, to = "mmol/L")  # mg/L -> mmol/L
+    }
+
+    vals  # mmol/L
   })
+
+  # Helper: ensure inputs exist before running conversion observer
+  inputs_ready <- reactive({
+    all(vapply(nutrients, function(nm) !is.null(input[[paste0("expr_", nm)]]), logical(1)))
+  })
+
+  # Convert all visible inputs when the unit toggle changes (mmol/L <-> mg/L)
+  observeEvent(input$input_unit, {
+    req(inputs_ready())
+    req(exists("convert_units", mode = "function"))
+    req(exists("nutrient_element_map", inherits = TRUE))
+    req(exists("element_molar_mass_df", inherits = TRUE))
+
+    to_unit <- input$input_unit
+
+    # Evaluate each cell (so expressions like converte("P2O5","P",5) work)
+    current_vals <- sapply(nutrients, function(nm) {
+      txt <- input[[paste0("expr_", nm)]]
+      val <- try(eval(parse(text = txt), envir = .GlobalEnv), silent = TRUE)
+      if (inherits(val, "try-error") || !is.numeric(val) || length(val) != 1) {
+        v2 <- suppressWarnings(as.numeric(txt))
+        if (is.na(v2)) v2 <- 0
+        val <- v2
+      }
+      as.numeric(val)
+    })
+    names(current_vals) <- nutrients
+
+    converted_vals <- try(convert_units(current_vals, to = to_unit), silent = TRUE)
+    if (inherits(converted_vals, "try-error")) return(NULL)
+
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("expr_", nm),
+        value = format(round(converted_vals[[nm]], 2), trim = TRUE, nsmall = 2)
+      )
+    }
+  }, ignoreInit = TRUE)
 
   importance_vec <- reactive({
     vals <- sapply(nutrients, function(nm) input[[paste0("imp_", nm)]])
@@ -138,12 +205,13 @@ server <- function(input, output, session) {
 
   # status check
   output$status <- renderUI({
-    miss <- setdiff(nutrients, rownames(nutrient_matrix))
-    if (length(miss))
+    miss <- setdiff(nutrients, colnames(nutrient_matrix))  # nutrients must be columns
+    if (length(miss)) {
       tags$p(class="text-danger",
-             paste("nutrient_matrix missing rows for:", paste(miss, collapse=", ")))
-    else
+             paste("nutrient_matrix missing *columns* for:", paste(miss, collapse=", ")))
+    } else {
       tags$p(class="text-success","✓ Ready.")
+    }
   })
 
   # run solver
@@ -189,7 +257,7 @@ server <- function(input, output, session) {
     )
     output$tbl_n <- renderTable(nd)
     blocks <- c(blocks, list(
-      tags$h5("🎯 Delivery vs target (mol/L)"),
+      tags$h5("🎯 Delivery vs target (mmol/L)"),
       tableOutput("tbl_n"),
       tags$p(strong("🧮 Total squared error: "), round(res$squared_error, 6))
     ))
