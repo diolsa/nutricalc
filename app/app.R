@@ -39,7 +39,7 @@ default_expr <- c(
 names(default_expr) <- nutrients
 
 default_importance <- c(
-  NO3_N = 1, NH4_N = 0, P = 0, K = 1, Ca = 0, Mg = 0, S = 0, Na = 0, Cl = 0,
+  NO3_N = 0, NH4_N = 0, P = 0, K = 0, Ca = 0, Mg = 0, S = 0, Na = 0, Cl = 0,
   Fe = 1, Mn = 1, Zn = 1, B = 1, Cu = 1, Mo = 1, Si = 1
 )
 
@@ -47,15 +47,32 @@ default_importance <- c(
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
   tags$head(tags$style(HTML("
-    body { font-size: 13px; }
-    .form-group { margin-bottom: 3px; }
-    .shiny-input-container { margin-bottom: 3px; }
-    .irs { margin-top: -8px; }
-    .container-fluid { max-width: 1300px; } /* slightly wider */
-    input.form-control { height: 26px; padding: 2px 4px; font-size: 12px; }
-    .irs-single, .irs-min, .irs-max { font-size: 10px; }
-  "))),
-  titlePanel("NutriCalc — Nutrient Optimization"),
+  body { font-size: 13px; }
+  .form-group { margin-bottom: 3px; }
+  .shiny-input-container { margin-bottom: 3px; }
+  .irs { margin-top: -8px; }
+  .container-fluid { max-width: 1300px; }
+  input.form-control { height: 26px; padding: 2px 4px; font-size: 12px; }
+  .irs-single, .irs-min, .irs-max { font-size: 10px; }
+
+  /* Move sliders slightly up for alignment */
+  .form-group.shiny-input-slider { margin-top: -8px; }
+
+  /* Hide value/min/max labels only for importance sliders */
+  .importance-slider .irs-min,
+  .importance-slider .irs-max,
+  .importance-slider .irs-single {
+    display: none !important;
+  }
+
+  /* Lift importance slider track a bit more */
+  .importance-slider .irs { margin-top: -16px; }
+ .importance-slider { margin-bottom: 10px; }
+
+")))
+  ,
+
+  titlePanel("NutriCalc 🌿 Nutrient Optimization"),
 
   # Main two-column layout
   fluidRow(
@@ -63,25 +80,34 @@ ui <- fluidPage(
     column(
       width = 6,
       div(class = "card p-3",
-          tags$h5("🎯 Nutrient Targets & Importance"),
+          tags$h5("⚗️ Nutrient Targets & Importance"),
           fluidRow(
             column(3, strong("Nutrient")),
-            column(4, strong(textOutput("target_col_header"))),
+            column(
+              4,
+              div(
+                strong(textOutput("target_col_header")),
+                radioButtons(
+                  "input_unit",
+                  label = NULL,
+                  choices = c("mmol/L", "mg/L"),
+                  selected = "mmol/L",
+                  inline = TRUE
+                )
+              )
+              ),
             column(5, strong("Importance (−2..2)"))
           ),
           tags$hr(style="margin:4px 0;"),
-          radioButtons(
-            "input_unit",
-            "Input unit for targets:",
-            choices = c("mmol/L", "mg/L"),
-            selected = "mmol/L",
-            inline = TRUE
-          ),
+
+
+
+
           uiOutput("nutrient_rows"),
           br(),
           actionButton("reset", "Reset to defaults"),
           span("  "),
-          actionButton("run", "Run optimize_nutrients()", class = "btn btn-primary"),
+          actionButton("run", "🧪 Results", class = "btn btn-primary"),
           br(), br(),
           uiOutput("status")
       )
@@ -91,7 +117,7 @@ ui <- fluidPage(
     column(
       width = 6,
       div(class = "card p-3",
-          h5("⚗️ Results"),
+          h5("🧪 Results"),
           uiOutput("results_ui")
       )
     )
@@ -104,7 +130,7 @@ server <- function(input, output, session) {
   # Header label reacts to unit selection
   output$target_col_header <- renderText({
     unit <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
-    sprintf("Target (R expression, %s)", unit)
+    sprintf("Target (%s)", unit)
   })
 
   # build rows dynamically
@@ -118,12 +144,19 @@ server <- function(input, output, session) {
             label = NULL,
             value = default_expr[[nm]]
           )),
-          column(5, sliderInput(
-            inputId = paste0("imp_", nm),
-            label = NULL,
-            min = -2, max = 2, step = 1,
-            value = default_importance[[nm]]
-          ))
+          column(
+            5,
+            div(
+              class = "importance-slider",
+              sliderInput(
+                inputId = paste0("imp_", nm),
+                label = NULL,
+                min = -2, max = 2, step = 1,
+                value = default_importance[[nm]]
+              )
+            )
+          )
+
         )
       })
     )
@@ -244,7 +277,7 @@ server <- function(input, output, session) {
         df_amt$`mg l⁻¹`  <- round(res$amounts[pos] * mm, 2)
       }
       output$tbl_amt <- renderTable(df_amt)
-      blocks <- c(blocks, list(tags$h5("🧪 Fertilizer amounts"), tableOutput("tbl_amt")))
+      blocks <- c(blocks, list(tags$h5("🧂 Fertilizer amounts"), tableOutput("tbl_amt")))
     }
 
     nd <- data.frame(
