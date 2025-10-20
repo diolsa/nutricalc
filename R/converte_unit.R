@@ -1,17 +1,21 @@
-# Nutrient → element mapping (keep this once in your package)
-nutrient_element_map <- list(
-  "NO3_N" = "N", "NH4_N" = "N", "P" = "P", "K" = "K", "Ca" = "Ca",
-  "Mg" = "Mg", "S" = "S", "Na" = "Na", "Cl" = "Cl", "Fe" = "Fe",
-  "Mn" = "Mn", "Zn" = "Zn", "B" = "B", "Cu" = "Cu", "Mo" = "Mo", "Si" = "Si"
-)
-
-# ---- Core converter ----
-# Works for a single element (use `element=`) OR a whole recipe (named vector).
-# to = "mg/L" or "mmol/L"
-convert_units <- function(x, element = NULL, to = c("mg/L","mmol/L")) {
+#' Convert nutrient concentrations between mmol/L and mg/L
+#'
+#' Converts numeric nutrient values (single element or named vector)
+#' between mmol/L and mg/L using molar masses in `element_molar_mass_df`.
+#'
+#' @param x Numeric scalar or named numeric vector of nutrient values.
+#'   If named, names should match those in `nutrient_element_map`.
+#' @param element Optional element symbol (e.g. "N", "P") when `x` is a scalar.
+#' @param to Target unit: "mg/L" or "mmol/L".
+#'
+#' @return Numeric vector (same length/names as `x`) in the target unit.
+#' @examples
+#' convert_units(c(NO3_N = 15, P = 1.5), to = "mg/L")
+#' convert_units(c(NO3_N = 210, P = 46), to = "mmol/L")
+#' @export
+convert_units <- function(x, element = NULL, to = c("mg/L", "mmol/L")) {
   to <- match.arg(to)
 
-  # convert one number given an element symbol
   convert_one <- function(value, element, to) {
     M <- element_molar_mass_df$MolarMass_g_per_mol[
       match(element, element_molar_mass_df$Element)
@@ -21,7 +25,7 @@ convert_units <- function(x, element = NULL, to = c("mg/L","mmol/L")) {
     if (to == "mmol/L") return(value / M)  # mg/L   → mmol/L
   }
 
-  # Recipe vector (named)
+  # Named recipe vector
   if (!is.null(names(x))) {
     out <- x
     for (nutrient in names(x)) {
@@ -32,29 +36,49 @@ convert_units <- function(x, element = NULL, to = c("mg/L","mmol/L")) {
     return(out)
   }
 
-  # Single number
+  # Single value
   if (!is.null(element)) return(convert_one(x, element, to))
 
   stop("If x is a scalar, please provide the `element` argument.")
 }
 
-# ---- Pretty summary table ----
-# `unit` tells me what unit your input recipe is in.
-# Returns a data.frame with both mmol/L and mg/L.
+# Nutrient → element mapping (internal)
+#' @keywords internal
+nutrient_element_map <- list(
+  "NO3_N" = "N", "NH4_N" = "N", "P" = "P", "K" = "K", "Ca" = "Ca",
+  "Mg" = "Mg", "S" = "S", "Na" = "Na", "Cl" = "Cl", "Fe" = "Fe",
+  "Mn" = "Mn", "Zn" = "Zn", "B" = "B", "Cu" = "Cu", "Mo" = "Mo", "Si" = "Si"
+)
+
+#' Create a summary table of nutrient concentrations in both units
+#'
+#' Given a named vector of nutrient concentrations and its unit,
+#' returns a data frame showing each nutrient's value in mmol/L and mg/L.
+#'
+#' @param recipe Named numeric vector of nutrient concentrations (e.g., NO3_N, P, K, ...).
+#' @param unit Current unit of the values: "mmol/L" or "mg/L".
+#'
+#' @return A data frame with columns `Nutrient`, `Element`, `mmol/L`, `mg/L`.
+#' @examples
+#' recipe_summary(c(NO3_N = 15, P = 1.5), unit = "mmol/L")
+#' recipe_summary(c(NO3_N = 210, P = 46), unit = "mg/L")
+#' @export
 recipe_summary <- function(recipe, unit = c("mmol/L","mg/L")) {
   unit <- match.arg(unit)
   if (is.null(names(recipe)))
-    stop("`recipe` must be a named vector (e.g., names like NO3_N, P, K, Ca, ...).")
+    stop("`recipe` must be a named vector (e.g., NO3_N, P, K, Ca, ...).")
 
   nutrients <- names(recipe)
-  elements  <- vapply(nutrients, function(n) nutrient_element_map[[n]] %||% NA_character_, character(1))
+  elements  <- vapply(
+    nutrients,
+    function(n) nutrient_element_map[[n]] %||% NA_character_,
+    character(1)
+  )
 
   # lookup molar masses aligned with elements
   M <- element_molar_mass_df$MolarMass_g_per_mol[
     match(elements, element_molar_mass_df$Element)
   ]
-
-  mmolL <- mgL <- rep(NA_real_, length(recipe))
 
   if (unit == "mmol/L") {
     mmolL <- as.numeric(recipe)
@@ -64,16 +88,16 @@ recipe_summary <- function(recipe, unit = c("mmol/L","mg/L")) {
     mmolL <- mgL / M
   }
 
-  df <- data.frame(
+  data.frame(
     Nutrient = nutrients,
     Element  = elements,
     `mmol/L` = round(mmolL, 4),
     `mg/L`   = round(mgL,   3),
-    check.names = FALSE
+    check.names = FALSE,
+    row.names = NULL
   )
-  rownames(df) <- NULL
-  df
 }
 
-# tiny helper for null-coalescing
+#' @keywords internal
 `%||%` <- function(a, b) if (is.null(a)) b else a
+

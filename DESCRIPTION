@@ -18,5 +18,6 @@ Depends:
     R (>= 3.5)
 Imports: 
     stringr,
-    nnls
+    nnls,
+    shiny
 RoxygenNote: 7.3.2

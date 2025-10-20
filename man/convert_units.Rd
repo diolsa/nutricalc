@@ -2,24 +2,26 @@
 % Please edit documentation in R/converte_unit.R
 \name{convert_units}
 \alias{convert_units}
-\title{Convert between mg/L and mmol/L for nutrients or elements}
+\title{Convert nutrient concentrations between mmol/L and mg/L}
 \usage{
-convert_units(x, names = NULL, from = "mmol/L", to = "mg/L")
+convert_units(x, element = NULL, to = c("mg/L", "mmol/L"))
 }
 \arguments{
-\item{x}{numeric, either a single value or a named numeric vector}
+\item{x}{Numeric scalar or named numeric vector of nutrient values.
+If named, names should match those in `nutrient_element_map`.}
 
-\item{names}{character, element symbol if x is a scalar (e.g. "N"),
-ignored if x is a named vector}
+\item{element}{Optional element symbol (e.g. "N", "P") when `x` is a scalar.}
 
-\item{from}{character, "mg/L" or "mmol/L"}
-
-\item{to}{character, "mg/L" or "mmol/L"}
+\item{to}{Target unit: "mg/L" or "mmol/L".}
 }
 \value{
-numeric value or named numeric vector in converted units
+Numeric vector (same length/names as `x`) in the target unit.
 }
 \description{
-Works with a single element (e.g. "N") or with a full recipe vector
-where names are nutrient codes like NO3_N, NH4_N, P, K, Ca, ...
+Converts numeric nutrient values (single element or named vector)
+between mmol/L and mg/L using molar masses in `element_molar_mass_df`.
+}
+\examples{
+convert_units(c(NO3_N = 15, P = 1.5), to = "mg/L")
+convert_units(c(NO3_N = 210, P = 46), to = "mmol/L")
 }
