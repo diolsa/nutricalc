@@ -1,39 +1,18 @@
 # app.R — interface to optimize_nutrients()
 # Each nutrient row has: Nutrient | Target expression | Importance slider (−2..2)
 
-# ---- packages ----
-pkgs <- c("shiny", "bslib")
-for (p in pkgs) if (!requireNamespace(p, quietly = TRUE)) install.packages(p)
-if (!requireNamespace("nnls", quietly = TRUE)) install.packages("nnls")
 
 library(shiny)
 library(bslib)
 
-# ---- load your code & data ----
-source_all_r <- function(dir = "R") {
-  if (dir.exists(dir)) {
-    r_files <- list.files(dir, pattern = "\\.[rR]$", full.names = TRUE)
-    for (f in r_files) try(source(f, chdir = TRUE), silent = TRUE)
-  }
-}
-load_all_data <- function(dir = "data") {
-  if (dir.exists(dir)) {
-    data_files <- list.files(dir, pattern = "\\.(rda|RData)$", full.names = TRUE)
-    for (f in data_files) try(load(f, envir = .GlobalEnv), silent = TRUE)
-  }
-}
-source_all_r("R")
-load_all_data("data")
 
-stopifnot(exists("optimize_nutrients", mode = "function"))
-stopifnot(exists("nutrient_matrix"))
 
 # ---- defaults ----
 nutrients <- c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
                "Fe","Mn","Zn","B","Cu","Mo","Si")
 
 default_expr <- c(
-  "14.96","1.25","converte(\"P2O5\",\"P\",5)","8.88","3.16","1.07","1.3","0","0",
+  "15","1.25","2.5","9","3","1.00","1.3","0","0",
   "0.015","0.01","0.005","0.015","0.00075","0.0005","0"
 )
 names(default_expr) <- nutrients
@@ -191,6 +170,7 @@ server <- function(input, output, session) {
 
     vals  # mmol/L
   })
+
 
   # Helper: ensure inputs exist before running conversion observer
   inputs_ready <- reactive({
