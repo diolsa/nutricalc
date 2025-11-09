@@ -7,15 +7,26 @@
 optimize_nutrients(nutrient_matrix, target, importance)
 }
 \arguments{
-\item{nutrient_matrix}{A matrix of nutrient contents [nutrient x compound].}
+\item{nutrient_matrix}{Matrix [compound x nutrient] with entries in mol of nutrient per mmol of compound
+(i.e., how many mmol of nutrient you get from 1 mmol of the compound).}
 
-\item{target}{A named numeric vector of target concentrations (mol/L).}
+\item{target}{Named numeric vector of target concentrations (mmol/L).}
 
-\item{importance}{A named numeric vector (-2 to +2) specifying nutrient importance.}
+\item{importance}{Named numeric vector (-2 to +2) specifying nutrient importance (weights).}
 }
 \value{
-An object of class 'nutrient_optimization_result'.
+An object of class 'nutrient_optimization_result' with elements:
+  \itemize{
+    \item amounts — named numeric (mmol/L) of each compound (same order as rownames of input)
+    \item achieved — named numeric (mmol/L) delivered per nutrient
+    \item target — named numeric (mmol/L) target per nutrient
+    \item abs_error — achieved - target (mmol/L)
+    \item percent_error — 100 * abs_error / target (NA when target == 0)
+    \item squared_error — sum(abs_error^2)
+    \item rel_squared_error — sum((abs_error/target)^2, na.rm = TRUE)
+  }
 }
 \description{
 Solves for optimal fertilizer amounts to meet target nutrient concentrations.
+Expects a compound-by-nutrient matrix: rows = salts/compounds, columns = nutrients.
 }

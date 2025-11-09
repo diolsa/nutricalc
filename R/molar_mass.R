@@ -31,7 +31,8 @@ parse_simple_formula <- function(formula) {
   elements <- matches[, 2]
   counts <- as.numeric(matches[, 3])
   counts[is.na(counts)] <- 1
-  setNames(counts, elements)
+  summed <- tapply(counts, elements, sum)
+  setNames(as.numeric(summed), names(summed))
 }
 
 # Internal: expand brackets like (NO3)2 -> N2O6
@@ -73,8 +74,12 @@ parse_formula <- function(formula) {
     core <- res[3]
 
     parsed_core <- parse_recursive(core)
-    for (el in names(parsed_core)) {
-      total_counts[[el]] <- sum(c(total_counts[[el]], mult * parsed_core[[el]]), na.rm = TRUE)
+
+    # iterate by position to respect duplicates
+    for (i in seq_along(parsed_core)) {
+      el <- names(parsed_core)[i]
+      val <- unname(parsed_core[i])
+      total_counts[[el]] <- sum(c(total_counts[[el]], mult * val), na.rm = TRUE)
     }
   }
 

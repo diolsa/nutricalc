@@ -21,14 +21,30 @@ nutrient_matrix <- matrix(c(
   0,  0, 0, 0,  0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0,  # C10H12N2O8FeNa·3H2O
   0,  0, 0, 0,  0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0,  # ZnSO4·6H2O
   0,  0, 0, 0,  0, 0, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0,  # Na2B4O7·10H2O
-  0,  0, 0, 0,  0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0   # C18H16N2O6FeNa
+  0,  0, 0, 0,  0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0,  # C18H16N2O6FeNa
+  0,  0, 0, 2,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,  # K2SiO3
+  0,  0, 0, 0,  0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,  # NaCl
+  0,  2, 1, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # (NH4)2HPO4
+  0,  0, 0, 0,  0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0,  # CuCl2
+  0,  6, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0,  # ((NH4)6)Mo7O24
+  0,  0, 0, 0,  0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0,  # ZnCl2
+  0,  0, 0, 0,  0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0   # MnCl2·4H2O
+
+
+
+
+
 ),
-nrow = 22,
+nrow = 29,
 byrow = TRUE,
 dimnames = list(
   c("Ca(NO3)2", "NH4NO3", "KH2PO4", "KNO3", "K2SO4", "MgSO4·7H2O", "CaCl2·2H2O", "KCl",
     "CaSO4·2H2O", "CuSO4·5H2O", "(NH4)2SO4", "H3BO3", "MnSO4·H2O", "Na2MoO4·2H2O",
     "ZnSO4·7H2O", "NH4H2PO4", "Ca(NO3)2·4H2O", "Mg(NO3)2·6H2O", "C10H12N2O8FeNa·3H2O",
-    "ZnSO4·6H2O", "Na2B4O7·10H2O", "C18H16N2O6FeNa"),
+    "ZnSO4·6H2O", "Na2B4O7·10H2O", "C18H16N2O6FeNa","K2SiO3","NaCl","(NH4)2HPO4","CuCl2",
+    "((NH4)6)Mo7O24","ZnCl2","MnCl2·4H2O"),
   c("NO3_N", "NH4_N", "P", "K", "Ca", "Mg", "S", "Na", "Cl", "Fe", "Mn", "Zn", "B", "Cu", "Mo", "Si")
 ))
+
+usethis::use_data(nutrient_matrix, overwrite = TRUE)
+
