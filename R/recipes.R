@@ -1,5 +1,3 @@
-# recipes.R
-# ------------------------------------------------------------------------------
 # Canonical nutrient order (mmol/L inside file)
 nutrients <- c(
   "NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
@@ -7,6 +5,22 @@ nutrients <- c(
 )
 
 # ------------------------------------------------------------------------------
+
+#' Nutrient solution recipes used by NutriCalc
+#'
+#' A named list of recipe definitions. Each element is a list with:
+#' \itemize{
+#'   \item{name}{Display name}
+#'   \item{category}{Category such as "Olericulture", "Fruticulture", ...}
+#'   \item{notes}{Free text notes / citation}
+#'   \item{unit}{Either "mmol/L" or "mg/L"}
+#'   \item{salts}{TRUE (all salts) or a character vector of salt formulas}
+#'   \item{targets}{Named numeric vector of nutrient targets}
+#' }
+#'
+#' @format A named list of recipe lists.
+#' @export
+
 
 recipes <- list(
 

@@ -2,28 +2,71 @@
 % Please edit documentation in R/ternary.R
 \name{plot_ternary}
 \alias{plot_ternary}
-\title{Steiner-style ternary plot (Target vs Achieved) using the Ternary package}
+\title{Steiner-style ternary plot (Target vs Achieved) with constant-component drops}
 \usage{
-plot_ternary(res, keys, title = "Ternary (ratios)", grid = TRUE, legend = TRUE)
+plot_ternary(
+  result,
+  keys,
+  title = "Ternary (ratios)",
+  show_legend = TRUE,
+  step_percent = 10,
+  lab_cex = 0.95,
+  axis_cex = 0.85,
+  padding = 0.08,
+  col_target = "black",
+  col_achieved = "firebrick",
+  pch_target = 16,
+  pch_achieved = 17,
+  cex_points = 1.25,
+  show_link = FALSE,
+  lty_link = 2,
+  lwd_link = 1,
+  legend_pos = "topright",
+  show_axis_drops = TRUE,
+  drop_col = "grey35",
+  drop_lwd = 1,
+  drop_lty = 1,
+  show_ratio = TRUE,
+  ratio_format = "percent",
+  ratio_digits = 1
+)
 }
 \arguments{
-\item{res}{List with numeric named vectors `target` and `achieved`
-(e.g., result of optimize_nutrients()).}
+\item{result}{List with numeric named vectors `target` and `achieved`.}
 
-\item{keys}{Character(3). Names of the three nutrients to plot, in axis order.
-Example anions: c("NO3_N","P","S"); cations: c("K","Ca","Mg").}
+\item{keys}{Character(3) giving axis order, e.g. c("K","Ca","Mg").}
 
-\item{title}{Character. Plot title.}
+\item{title}{Plot title.}
 
-\item{grid}{Logical. Draw background grid (default TRUE).}
+\item{show_legend}{Logical, show legend (default TRUE).}
 
-\item{legend}{Logical. Draw legend (default TRUE).}
+\item{step_percent}{Integer in [1, 50]; major grid step as percent. Default 10.}
+
+\item{lab_cex, axis_cex, padding}{Plot layout controls.}
+
+\item{col_target, col_achieved}{Colors.}
+
+\item{pch_target, pch_achieved}{Point symbols.}
+
+\item{cex_points}{Point size.}
+
+\item{lty_link, lwd_link}{Style for connector if shown.}
+
+\item{legend_pos}{Legend position.}
+
+\item{show_axis_drops}{Logical, draw constant-component drops from Achieved to sides.}
+
+\item{drop_col, drop_lwd, drop_lty}{Style for drop lines.}
+
+\item{show_ratio}{Logical, include "(A, B; C)" values in legend (default TRUE).}
+
+\item{ratio_format}{"percent" (default) or "proportion".}
+
+\item{ratio_digits}{Digits for numeric formatting.}
 }
 \value{
-(Invisibly) NULL; called for its plotting side effects.
+Invisibly returns NULL (draws the plot).
 }
 \description{
-Draws one ternary triangle for three nutrients, plotting the composition of
-Target and Achieved (each normalized to proportions) as points with a dashed
-connector. Works nicely inside Shiny's renderPlot().
+Steiner-style ternary plot (Target vs Achieved) with constant-component drops
 }
