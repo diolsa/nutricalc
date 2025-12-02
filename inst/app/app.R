@@ -1,6 +1,5 @@
 # app.R — NutriCalc with canonical
 
-library(nutrientcalc)
 library(shiny)
 library(bslib)
 library(Ternary)
