@@ -36,7 +36,7 @@
 #'                (filtered to non-zero if \code{drop_zero = TRUE}).}
 #'   \item{by_tank}{Named list of data frames (A, B, Micro, possibly others),
 #'                  each subset of \code{table}.}
-#'
+#'@export
 assign_salts_bak <- function(res,
                              nutrient_matrix,
                              micro_nutrients     = c("Fe", "Mn", "Zn", "B", "Cu", "Mo", "Si"),
