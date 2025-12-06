@@ -171,6 +171,58 @@ safe_chr1 <- function(x) {
   x
 }
 
+
+# - Only allows: 0–9, e/E, + - * / ^, parentheses, dot, whitespace
+safe_numeric_expr <- function(txt, default = 0) {
+  # normalize to a single character string
+  txt <- trimws(as.character(txt)[1L])
+  if (!nzchar(txt)) {
+    return(default)
+  }
+
+  # Allow ONLY numbers and basic arithmetic characters.
+  # Anything else → treat as invalid and return default.
+  if (!grepl("^[-0-9eE+*/().^ \t\r\n]*$", txt)) {
+
+    return(default)
+  }
+
+  # Parse safely
+  expr <- tryCatch(
+    parse(text = txt)[[1L]],
+    error = function(e) NULL
+  )
+  if (is.null(expr)) {
+    return(default)
+  }
+
+  # Tiny, whitelisted environment
+  safe_env <- list2env(
+    list(
+      `+` = `+`,
+      `-` = `-`,
+      `*` = `*`,
+      `/` = `/`,
+      `^` = `^`,
+      pi  = pi
+    ),
+    parent = emptyenv()
+  )
+
+  # Evaluate inside that safe environment
+  val <- tryCatch(
+    eval(expr, envir = safe_env),
+    error = function(e) NA_real_
+  )
+
+  if (!is.numeric(val) || length(val) != 1L || !is.finite(val)) {
+    return(default)
+  }
+
+  as.numeric(val)
+}
+
+
 pretty_nutrient_label_str <- function(nm) {
   switch(
     nm,
@@ -248,18 +300,25 @@ from_canonical_to_unit <- function(vals, unit_out) {
 parse_targets_from_inputs <- function(input, nutrients, unit_in) {
   vals <- sapply(nutrients, function(nm) {
     txt <- input[[paste0("expr_", nm)]]
-    val <- try(eval(parse(text = txt), envir = .GlobalEnv), silent = TRUE)
-    if (inherits(val, "try-error") || !is.numeric(val) || length(val) != 1) {
+
+    # 1) Try safe numeric expression (sandboxed)
+    val <- safe_numeric_expr(txt, default = NA_real_)
+
+    # 2) Fallback: plain numeric with 0 default (same behaviour as before)
+    if (is.na(val)) {
       v2 <- suppressWarnings(as.numeric(txt))
       if (is.na(v2)) v2 <- 0
       val <- v2
     }
+
     as.numeric(val)
   })
   names(vals) <- nutrients
 
   to_canonical_from_unit(vals, unit_in)
 }
+
+
 
 targets_for_display <- function(targets_mmol, unit_out) {
   from_canonical_to_unit(targets_mmol, unit_out)
@@ -373,10 +432,73 @@ ui <- fluidPage(
                                  class = "text-muted",
                                  "Pick a category, then a recipe. Applying a recipe will set the unit, fill targets, and (if defined) select defined salts."
                                )
+                      ),
+                      tabPanel("🧬 Tissue",
+                               fluidRow(
+                                 column(
+                                   width = 4,
+                                   h5("Tissue (%)"),
+                                   tags$small(class = "text-muted",
+                                              "Nutrient concentration in dry mass"),
+                                   br(),
+                                   # --- header row: Nutrient | Tissue % -------------------------------
+                                   fluidRow(
+                                     column(6, strong("Nutrient")),
+                                     column(6, strong("Tissue %"))
+                                   ),
+                                   tags$hr(style = "margin:4px 0;"),
+                                   tags$div(
+                                     lapply(nutrients, function(nm) {
+                                       fluidRow(
+                                         column(
+                                           width = 6,
+                                           tags$label(HTML(pretty_nutrient_label_str(nm)))
+                                         ),
+                                         column(
+                                           width = 6,
+                                           numericInput(
+                                             inputId = paste0("tissue_", nm),
+                                             label   = NULL,           # label handled in left column
+                                             value   = NA,
+                                             min     = 0,
+                                             step    = 0.01,
+                                             width   = "100%"
+                                           )
+                                         )
+                                       )
+                                     })
+                                   )
+                                 ),
+                                 column(
+                                   width = 3,
+                                   h5("Water Use Efficiency (WUE)"),
+                                   tags$small(class = "text-muted",
+                                              "WUE = plant dry mass / water transpired."),
+                                   numericInput("tissue_dm", "Plant dry mass (g)",
+                                                value = NA, min = 0, step = 0.1, width = "100%"),
+                                   numericInput("tissue_water", "Water transpired (L)",
+                                                value = NA, min = 0, step = 0.1, width = "100%"),
+                                   br(),
+                                   strong(textOutput("tissue_wue_text"))
+                                 ),
+                                 column(
+                                   width = 5,
+                                   h5("Nutrient solution"),
+                                   tags$small(class = "text-muted",
+                                              "Calculated mg L⁻¹ from tissue % × WUE."),
+                                   tableOutput("tissue_table"),
+                                   br(),
+                                   actionButton("tissue_apply", "Use as targets",
+                                                class = "btn btn-primary btn-sm")
+                                 )
+                               )
                       )
+
           )
       )
     ),
+
+
 
     # RIGHT: Result & Plots tabs
     column(
@@ -440,8 +562,8 @@ ui <- fluidPage(
           )
       )
     )
-  )
-)
+  ))
+
 
 # =========================================================
 # 5) SERVER
@@ -538,6 +660,69 @@ server <- function(input, output, session) {
     pmin(pmax(vals, -2), 2)
   })
 
+  # ---- Tissue Analysis: WUE and mg/L calculation --------------------------
+  tissue_wue <- reactive({
+    dm   <- input$tissue_dm   %||% NA_real_
+    wat  <- input$tissue_water %||% NA_real_
+    if (is.na(dm) || is.na(wat) || wat <= 0) return(NA_real_)
+    dm / wat  # g dry mass per L water
+  })
+
+  output$tissue_wue_text <- renderText({
+    w <- tissue_wue()
+    if (is.na(w)) return("WUE: —")
+    sprintf("WUE: %.2f g dry mass per L water", w)
+  })
+
+
+  tissue_mgL <- reactive({
+    w <- tissue_wue()
+    if (is.na(w)) {
+      out <- setNames(rep(0, length(nutrients)), nutrients)
+      return(out)
+    }
+
+    # % in tissue (g per 100 g dry mass)
+    perc <- sapply(nutrients, function(nm) {
+      val <- input[[paste0("tissue_", nm)]] %||% NA_real_
+      ifelse(is.na(val), 0, as.numeric(val))
+    })
+    names(perc) <- nutrients
+
+    # convert % -> mg/g : 1% = 10 mg/g
+    mg_per_g <- perc * 10
+
+    # mg/L = (mg/g) * (g/L)
+    mgL <- mg_per_g * w
+    names(mgL) <- nutrients
+    mgL
+  })
+
+  output$tissue_table <- renderTable({
+    w <- tissue_wue()
+
+
+    perc <- sapply(nutrients, function(nm) {
+      val <- input[[paste0("tissue_", nm)]] %||% NA_real_
+      ifelse(is.na(val), NA_real_, as.numeric(val))
+    })
+    names(perc) <- nutrients
+
+    mgL <- tissue_mgL()
+
+    data.frame(
+      Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
+      `Tissue %` = round(perc, 3),
+      `mg l⁻¹`   = round(mgL, 3),
+      check.names = FALSE
+    )
+  }, sanitize.text.function = function(x) x)
+
+
+
+
+
+  # ---- Salts --------------------------
   all_salts <- reactive(rownames(nutrient_matrix))
 
   filtered_salts <- reactive({
@@ -872,6 +1057,64 @@ server <- function(input, output, session) {
     }
   })
 
+  # When user switches to the Tissue tab, ensure unit is mg/L
+  observeEvent(input$input_tabs, {
+    if (identical(input$input_tabs, "🧬 Tissue")) {
+      if (!identical(normalize_unit(input$input_unit), "mg/L")) {
+        updateRadioButtons(session, "input_unit", selected = "mg/L")
+      }
+    }
+  })
+
+  # When the user clicks "Use as targets", copy mg/L into the target fields
+  observeEvent(input$tissue_apply, {
+    mgL <- tissue_mgL()
+
+    # helper to actually write values + update internal targets
+    apply_mgL <- function() {
+      # 1) first set all target inputs to 0 (in mg/L)
+      for (nm in nutrients) {
+        updateTextInput(
+          session,
+          paste0("expr_", nm),
+          value = "0"
+        )
+      }
+
+      # 2) then fill the target inputs with the calculated mg/L
+      for (nm in nutrients) {
+        updateTextInput(
+          session,
+          paste0("expr_", nm),
+          value = format(mgL[[nm]], trim = TRUE, scientific = FALSE)
+        )
+      }
+
+      # 3) update internal canonical targets (mmol/L) from mg/L
+      vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
+      targets_mmol(vals_mmol)
+
+      # 4) jump back to the Nutrient Targets tab
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+    }
+
+    # If unit is not mg/L, first switch unit,
+    # wait until all observers (input_unit) are done,
+    # THEN write our zeros + mg/L values.
+    if (!identical(normalize_unit(input$input_unit), "mg/L")) {
+      updateRadioButtons(session, "input_unit", selected = "mg/L")
+      session$onFlushed(function() {
+        apply_mgL()
+      }, once = TRUE)
+    } else {
+      # already in mg/L → just apply directly
+      apply_mgL()
+    }
+  })
+
+
+
+  # -------- OPTIMIZATION RESULT --------
   result <- eventReactive(run_trigger(), {
     sel <- selected_salts(); req(length(sel) > 0)
     nm_sub <- nutrient_matrix[sel, , drop = FALSE]
