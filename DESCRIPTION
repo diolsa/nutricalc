@@ -19,5 +19,7 @@ Depends:
 Imports: 
     stringr,
     nnls,
-    shiny
+    shiny,
+    bslib,
+    Ternary
 RoxygenNote: 7.3.2
