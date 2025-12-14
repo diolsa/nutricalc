@@ -335,15 +335,25 @@ ui <- fluidPage(
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
   .irs { margin-top: -8px; }
-  .container-fluid { max-width: 1300px; }
-  input.form-control { height: 26px; padding: 2px 4px; font-size: 13px; }
+  .container-fluid { max-width: 1300px; } input.form-control { height: 26px; padding: 2px 4px; font-size: 13px; }
   .irs-single, .irs-min, .irs-max { font-size: 10px; }
   .form-group.shiny-input-slider { margin-top: -8px; }
-  .importance-slider .irs-min, .importance-slider .irs-max, .importance-slider .irs-single { display: none !important; }
-  .importance-slider .irs { margin-top: -16px; }
-  .importance-slider { margin-bottom: 10px; }
-  #salt-search-row { margin-bottom: 6px; }
-  #selected_saltes { max-height: 666px; overflow-y: auto; padding: 6px 1px 1px; }
+ .importance-slider .irs-min,.importance-slider .irs-max {display: none !important;}
+ .importance-slider .irs-single {display: block !important;top: 20px !important;margin-top: 0
+ !important;background: transparent !important; color: #000000
+ !important; font-size: 10px; font-weight: bold;padding: 0;z-index: 5 !important;pointer-events: none;}
+ .importance-slider .irs-single:before { display: none !important;}
+ .importance-slider .irs { margin-top: -16px; height: 28px !important;}
+ .importance-slider { margin-bottom: 10px; }
+ .importance-slider .irs-grid {  height: 0 !important;  margin-top: -4px !important;}
+ .importance-slider .irs-grid-text { display: none !important;}
+
+ .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
+ .nutrient-row:last-child {border-bottom: none;}
+
+
+
+  #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
   #input_unit label { color: #6c757d !important; font-size: 0.9em !important; font-weight: normal !important; margin-right: 6px !important; }
   #input_unit .radio-inline { margin-right: 6px !important; }
   #select_all_visible, #deselect_all_salts, #clear_search { width: 30px !important; height: 30px !important; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; background-color: #e9ecef !important; border: 1px solid rgba(0,0,0,0.25) !important; border-radius: 4px !important; box-shadow: inset 0 1px 1px rgba(0,0,0,0.075); margin: 3px; }
@@ -352,7 +362,11 @@ ui <- fluidPage(
   .search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
   .search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
   #clear_search { height: 30px !important; padding: 0 10px !important; display: inline-flex; align-items: center; justify-content: center; }
-"))),
+")),
+
+
+
+            ),
 
   titlePanel("NutriCalc 🌿 Nutrient Optimization"),
 
@@ -382,11 +396,10 @@ ui <- fluidPage(
                                ),
                                tags$hr(style = "margin:4px 0;"),
                                uiOutput("nutrient_rows"),
-                               br(),
-                               actionButton("set_all_zero", "Set all to 0", class = "btn btn-light"),
-                               span("  "), actionButton("reset", "Reset to defaults"),
-                               span("  "), actionButton("run", "🧪 Result", class = "btn btn-primary"),
-                               br(), br(), uiOutput("status")
+
+
+
+
                       ),
                       tabPanel("🧂 Fertilizers",
                                fluidRow(column(10,
@@ -494,8 +507,48 @@ ui <- fluidPage(
                                )
                       )
 
-          )
-      )
+          ),
+          # ---- Global buttons (always visible under tabs) ----
+          tags$hr(style = "margin:6px 0;"),
+          fluidRow(
+            id = "button_row",
+            column(
+              width = 3,
+              actionButton(
+                "set_all_zero", "Set all to 0",
+                class = "btn btn-light btn-sm",
+                style = "width:100%; margin:0;"
+              )
+            ),
+            column(
+              width = 3,
+              actionButton(
+                "reset", "Reset to defaults",
+                class = "btn btn-light btn-sm",
+                style = "width:100%; margin:0;"
+              )
+            ),
+            column(
+              width = 3,
+              div(
+                style = "margin-top: 2px;",
+                checkboxInput("use_acid_base", "Use acids/bases", value = FALSE, width = "100%")
+              )
+            ),
+            column(
+              width = 3,
+              actionButton(
+                "run", "🧪 Result",
+                class = "btn btn-primary btn-sm",
+                style = "width:100%; margin:0;"
+              )
+            )
+          ),
+
+          br(),
+          uiOutput("status")
+
+ )
     ),
 
 
@@ -590,12 +643,14 @@ server <- function(input, output, session) {
 
   output$nutrient_rows <- renderUI({
     tagList(lapply(nutrients, function(nm) {
-      fluidRow(
+      div(
+        class = "nutrient-row",fluidRow(
         column(3, tags$label(HTML(pretty_nutrient_label_str(nm)))),
         column(4, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
         column(5, div(class = "importance-slider",
-                      sliderInput(inputId = paste0("imp_", nm), label = NULL, min = -2, max = 2, step = 1, value = default_importance[[nm]])))
-      )
+                      sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
+                                  , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
+      ))
     }))
   })
 
@@ -833,20 +888,37 @@ server <- function(input, output, session) {
       )
     })
 
-    # JS: send checked values to Shiny as input$salt_check_values
+
     js <- HTML("
     <script>
-      $(document).on('change', '.salt_check', function() {
-        var vals = [];
-        $('.salt_check:checked').each(function(){ vals.push($(this).val()); });
-        Shiny.setInputValue('salt_check_values', vals, {priority: 'event'});
-      });
+      (function(){
+        var scrollKey = 'saltPickerScrollTop';
+
+        // Persist scroll position across re-renders
+        var el = document.getElementById('selected_salts');
+        if (el) {
+          el.scrollTop = window[scrollKey] || 0;
+          el.addEventListener('scroll', function(){
+            window[scrollKey] = this.scrollTop;
+          });
+        }
+
+        // Track checkbox changes
+        $(document).off('change.saltCheck', '.salt_check');
+        $(document).on('change.saltCheck', '.salt_check', function() {
+          var vals = [];
+          $('.salt_check:checked').each(function(){ vals.push($(this).val()); });
+          Shiny.setInputValue('salt_check_values', vals, {priority: 'event'});
+        });
+      })();
+
+
     </script>
   ")
 
-    # wrap table in #selected_saltes so your existing CSS (max-height, scroll) still works
+    # wrap table in #selected_salts so your existing CSS (max-height, scroll) still works
     tags$div(
-      id = "selected_saltes",
+      id = "selected_salts",
       tags$table(
         class = "table table-sm",
         style = "width:100%; font-size:13px;",
@@ -1117,20 +1189,64 @@ server <- function(input, output, session) {
   # -------- OPTIMIZATION RESULT --------
   result <- eventReactive(run_trigger(), {
     sel <- selected_salts(); req(length(sel) > 0)
-    nm_sub <- nutrient_matrix[sel, , drop = FALSE]
-    used_dummy <- FALSE; dummy_name <- ".DUMMY_ZERO_SALT"
 
+    # Determine whether acids/bases are allowed
+    use_acid <- isTRUE(input$use_acid_base)
+
+    # Get acid/base flag for selected salts
+    is_acid_base_sel <- salt_info$is_acid_base[match(sel, salt_info$salt)]
+    is_acid_base_sel[is.na(is_acid_base_sel)] <- FALSE
+
+    # Effective selection depending on toggle
+    if (use_acid) {
+      sel_effective <- sel
+    } else {
+      # Drop acid/base salts when toggle is OFF
+      sel_effective <- sel[!is_acid_base_sel]
+    }
+
+    # Need at least one usable salt
+    req(length(sel_effective) > 0)
+
+    nm_sub <- nutrient_matrix[sel_effective, , drop = FALSE]
+
+    used_dummy <- FALSE
+    dummy_name <- ".DUMMY_ZERO_SALT"
+
+    # Pad to 2 rows if needed (nnls quirk)
     if (nrow(nm_sub) == 1) {
-      zero_row <- matrix(0, nrow = 1, ncol = ncol(nm_sub), dimnames = list(dummy_name, colnames(nm_sub)))
-      nm_pad <- rbind(nm_sub, zero_row); used_dummy <- TRUE
-    } else nm_pad <- nm_sub
+      zero_row <- matrix(
+        0,
+        nrow = 1,
+        ncol = ncol(nm_sub),
+        dimnames = list(dummy_name, colnames(nm_sub))
+      )
+      nm_pad <- rbind(nm_sub, zero_row)
+      used_dummy <- TRUE
+    } else {
+      nm_pad <- nm_sub
+    }
 
-    out <- optimize_nutrients(nutrient_matrix = nm_pad,
-                              target = eval_targets(),
-                              importance = importance_vec())
+    # Choose solver depending on toggle
+    if (use_acid) {
+      out <- two_stage_optimize_nutrients(
+        nutrient_matrix = nm_pad,
+        target          = eval_targets(),
+        importance      = importance_vec()
+      )
+    } else {
+      out <- optimize_nutrients(
+        nutrient_matrix = nm_pad,
+        target          = eval_targets(),
+        importance      = importance_vec()
+      )
+    }
 
+    # Clean dummy
     if (!is.null(out$amounts)) {
-      if (is.null(names(out$amounts))) names(out$amounts) <- rownames(nm_pad)
+      if (is.null(names(out$amounts))) {
+        names(out$amounts) <- rownames(nm_pad)
+      }
       if (used_dummy && dummy_name %in% names(out$amounts)) {
         out$amounts <- out$amounts[setdiff(names(out$amounts), dummy_name)]
       }
@@ -1139,6 +1255,181 @@ server <- function(input, output, session) {
     out$salt_names <- rownames(nm_sub)
     out
   }, ignoreInit = TRUE)
+
+  #---------Second Solver------------
+  two_stage_optimize_nutrients <- function(
+    nutrient_matrix,
+    target,
+    importance,
+    tol_abs = 0.01,  # absolute tol in mmol/L
+    tol_rel = 0.01   # relative tol (1%)
+  ) {
+    rn <- rownames(nutrient_matrix)
+
+    # ----- 1) Split neutrals vs acids/bases using salt_info flag -----
+    is_acid_base <- salt_info$is_acid_base[match(rn, salt_info$salt)]
+    is_acid_base[is.na(is_acid_base)] <- FALSE
+
+    acid_idx    <- which(is_acid_base)
+    neutral_idx <- which(!is_acid_base)
+
+    nm_neutral  <- nutrient_matrix[neutral_idx, , drop = FALSE]
+    nm_acid     <- nutrient_matrix[acid_idx,    , drop = FALSE]
+
+    # If no neutral salts at all -> fall back to one-step solve with everything
+    if (nrow(nm_neutral) == 0L) {
+      return(
+        optimize_nutrients(
+          nutrient_matrix = nutrient_matrix,
+          target          = target,
+          importance      = importance
+        )
+      )
+    }
+
+    # ----- 2) Stage 1: salts-only optimization -----
+    res_salts <- optimize_nutrients(
+      nutrient_matrix = nm_neutral,
+      target          = target,
+      importance      = importance
+    )
+
+    achieved_salts <- res_salts$achieved
+    residual       <- target - achieved_salts   # positive = missing
+
+    # ----- 3) Which nutrients can acids/bases actually change? -----
+    if (nrow(nm_acid) > 0L) {
+      acid_sub   <- nm_acid[, names(target), drop = FALSE]
+      can_change <- colSums(acid_sub != 0) > 0
+      fixable    <- names(target)[can_change]
+    } else {
+      fixable <- character(0)
+    }
+
+    need_big <- residual > pmax(tol_abs, tol_rel * target, na.rm = TRUE)
+    need_fix_fixable <- need_big & (names(target) %in% fixable)
+
+    # ----- 4) If no fixable nutrient is off by much → skip acids/bases -----
+    if (!any(need_fix_fixable)) {
+      full_amounts <- numeric(nrow(nutrient_matrix))
+      names(full_amounts) <- rn
+      full_amounts[neutral_idx] <- res_salts$amounts
+      full_amounts[acid_idx]    <- 0
+
+      A_full <- t(nutrient_matrix[, names(target), drop = FALSE])
+      achieved_full <- as.vector(A_full %*% full_amounts)
+      names(achieved_full) <- names(target)
+
+      abs_error <- achieved_full - target
+      percent_error <- abs_error / target * 100
+      percent_error[is.nan(percent_error) | !is.finite(percent_error)] <- NA
+
+      rel_error <- abs_error / target
+      rel_error[is.nan(rel_error) | !is.finite(rel_error)] <- NA
+
+      # clean tiny noise
+      full_amounts   <- drop_tiny(full_amounts)
+      achieved_full  <- drop_tiny(achieved_full)
+      abs_error      <- drop_tiny(abs_error)
+      percent_error  <- drop_tiny(percent_error)
+
+      res <- list(
+        amounts           = full_amounts,
+        achieved          = achieved_full,
+        target            = target,
+        abs_error         = abs_error,
+        percent_error     = percent_error,
+        squared_error     = sum(abs_error^2, na.rm = TRUE),
+        rel_squared_error = sum(rel_error^2, na.rm = TRUE)
+      )
+      class(res) <- "nutrient_optimization_result"
+      return(res)
+    }
+
+    # ----- 5) Stage 2: acids/bases fill residuals (only for fixable nutrients) -----
+    residual_target <- residual
+    residual_target[residual_target < 0] <- 0
+    residual_target[!names(residual_target) %in% fixable] <- 0
+
+    # If for some reason we have no acid/base rows, just fall back
+    if (nrow(nm_acid) == 0L) {
+      full_amounts <- numeric(nrow(nutrient_matrix))
+      names(full_amounts) <- rn
+      full_amounts[neutral_idx] <- res_salts$amounts
+      full_amounts[acid_idx]    <- 0
+
+      A_full <- t(nutrient_matrix[, names(target), drop = FALSE])
+      achieved_full <- as.vector(A_full %*% full_amounts)
+      names(achieved_full) <- names(target)
+
+      abs_error <- achieved_full - target
+      percent_error <- abs_error / target * 100
+      percent_error[is.nan(percent_error) | !is.finite(percent_error)] <- NA
+
+      rel_error <- abs_error / target
+      rel_error[is.nan(rel_error) | !is.finite(rel_error)] <- NA
+
+      full_amounts   <- drop_tiny(full_amounts)
+      achieved_full  <- drop_tiny(achieved_full)
+      abs_error      <- drop_tiny(abs_error)
+      percent_error  <- drop_tiny(percent_error)
+
+      res <- list(
+        amounts           = full_amounts,
+        achieved          = achieved_full,
+        target            = target,
+        abs_error         = abs_error,
+        percent_error     = percent_error,
+        squared_error     = sum(abs_error^2, na.rm = TRUE),
+        rel_squared_error = sum(rel_error^2, na.rm = TRUE)
+      )
+      class(res) <- "nutrient_optimization_result"
+      return(res)
+    }
+
+    res_acid <- optimize_nutrients(
+      nutrient_matrix = nm_acid,
+      target          = residual_target,
+      importance      = importance
+    )
+
+    amounts_salts <- res_salts$amounts
+    amounts_acid  <- res_acid$amounts
+
+    full_amounts <- numeric(nrow(nutrient_matrix))
+    names(full_amounts) <- rn
+    full_amounts[neutral_idx] <- amounts_salts
+    full_amounts[acid_idx]    <- amounts_acid
+
+    A_full <- t(nutrient_matrix[, names(target), drop = FALSE])
+    achieved_full <- as.vector(A_full %*% full_amounts)
+    names(achieved_full) <- names(target)
+
+    abs_error <- achieved_full - target
+    percent_error <- abs_error / target * 100
+    percent_error[is.nan(percent_error) | !is.finite(percent_error)] <- NA
+
+    rel_error <- abs_error / target
+    rel_error[is.nan(rel_error) | !is.finite(rel_error)] <- NA
+
+    full_amounts   <- drop_tiny(full_amounts)
+    achieved_full  <- drop_tiny(achieved_full)
+    abs_error      <- drop_tiny(abs_error)
+    percent_error  <- drop_tiny(percent_error)
+
+    res <- list(
+      amounts           = full_amounts,
+      achieved          = achieved_full,
+      target            = target,
+      abs_error         = abs_error,
+      percent_error     = percent_error,
+      squared_error     = sum(abs_error^2, na.rm = TRUE),
+      rel_squared_error = sum(rel_error^2, na.rm = TRUE)
+    )
+    class(res) <- "nutrient_optimization_result"
+    res
+  }
+
 
   # -------- DELIVERY TAB UI --------
   output$delivery_ui <- renderUI({

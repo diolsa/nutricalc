@@ -685,6 +685,19 @@ statice_rockwool = list(
     Na = 0, Cl = 0, Fe = 0.015, Mn = 0.01, Zn = 0.005,
     B = 0.0025, Cu = 0.00075, Mo = 0.0005, Si = 0
   )
+),
+
+dicots = list(
+  name  = "Bugbee [Dicots]",
+  category = "Standard Formulations",
+  notes = "Water use efficiency 3 g l-1 (ambient 44ppm Co2); from: (Bugbee, ????). o.1 µmmol/l Ni has to be added and N +1 mmol as ph control",
+  unit  = "mmol/L",
+  salts = TRUE,
+  targets = c(
+    NO3_N = 6, NH4_N = 0, P = 0.4, K = 3.6, Ca = 1.5, Mg = 0.8, S = 0.8,
+    Na = 0.021, Cl = 0.0062, Fe = 0.007, Mn = 0.003, Zn = 0.003,
+    B = 0.040, Cu = 0.004, Mo = 0.0001, Si = 0.6
+  )
 )
 )
 
