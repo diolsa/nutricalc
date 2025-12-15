@@ -163,3 +163,129 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   cat("📊 Total squared error (relative):", round(x$rel_squared_error, 6), "\n")
   if (vol > 1) cat("🧴 Volume used for totals:", vol, "L\n")
 }
+
+#---------Second Solver------------
+
+#' Two-stage nutrient optimization separating neutral salts from acids/bases
+#'
+#' Runs an initial NNLS optimization on neutral salts, then uses acids/bases to
+#' fill remaining deficiencies (when they can affect the off-target nutrients).
+#'
+#' @param nutrient_matrix Matrix [compound x nutrient] with entries in mol of nutrient per mmol of compound.
+#' @param target Named numeric vector of target concentrations (mmol/L).
+#' @param importance Named numeric vector (-2 to +2) specifying nutrient importance (weights).
+#' @param tol_abs Absolute tolerance (mmol/L) below which residuals are ignored for acid/base correction.
+#' @param tol_rel Relative tolerance (fraction of target) below which residuals are ignored for acid/base correction.
+#'
+#' @return A 'nutrient_optimization_result' object.
+#' @export
+two_stage_optimize_nutrients <- function(
+    nutrient_matrix,
+    target,
+    importance,
+    tol_abs = 0.01,
+    tol_rel = 0.01
+) {
+  rn <- rownames(nutrient_matrix)
+
+  # Helper to build the final result list consistently across exit paths
+  assemble_result <- function(amounts_salts, amounts_acid) {
+    full_amounts <- numeric(nrow(nutrient_matrix))
+    names(full_amounts) <- rn
+    full_amounts[neutral_idx] <- amounts_salts
+    full_amounts[acid_idx] <- amounts_acid
+
+    A_full <- t(nutrient_matrix[, names(target), drop = FALSE])
+    achieved_full <- as.vector(A_full %*% full_amounts)
+    names(achieved_full) <- names(target)
+
+    abs_error <- achieved_full - target
+    percent_error <- abs_error / target * 100
+    percent_error[is.nan(percent_error) | !is.finite(percent_error)] <- NA
+
+    rel_error <- abs_error / target
+    rel_error[is.nan(rel_error) | !is.finite(rel_error)] <- NA
+
+    tol <- 1e-9
+    zero_tgt <- target == 0
+    percent_error[zero_tgt & abs(achieved_full) < tol] <- 0
+
+    full_amounts <- drop_tiny(full_amounts)
+    achieved_full <- drop_tiny(achieved_full)
+    abs_error <- drop_tiny(abs_error)
+    percent_error <- drop_tiny(percent_error)
+
+    res <- list(
+      amounts = full_amounts,
+      achieved = achieved_full,
+      target = target,
+      abs_error = abs_error,
+      percent_error = percent_error,
+      squared_error = sum(abs_error^2, na.rm = TRUE),
+      rel_squared_error = sum(rel_error^2, na.rm = TRUE)
+    )
+    class(res) <- "nutrient_optimization_result"
+    res
+  }
+
+  # ----- 1) Split neutrals vs acids/bases using salt_info flag -----
+  is_acid_base <- salt_info$is_acid_base[match(rn, salt_info$salt)]
+  is_acid_base[is.na(is_acid_base)] <- FALSE
+
+  acid_idx <- which(is_acid_base)
+  neutral_idx <- which(!is_acid_base)
+
+  nm_neutral <- nutrient_matrix[neutral_idx, , drop = FALSE]
+  nm_acid <- nutrient_matrix[acid_idx, , drop = FALSE]
+
+  # If no neutral salts at all -> fall back to one-step solve with everything
+  if (nrow(nm_neutral) == 0L) {
+    return(
+      optimize_nutrients(
+        nutrient_matrix = nutrient_matrix,
+        target = target,
+        importance = importance
+      )
+    )
+  }
+
+  # ----- 2) Stage 1: salts-only optimization -----
+  res_salts <- optimize_nutrients(
+    nutrient_matrix = nm_neutral,
+    target = target,
+    importance = importance
+  )
+
+  achieved_salts <- res_salts$achieved
+  residual <- target - achieved_salts # positive = missing
+
+  # ----- 3) Which nutrients can acids/bases actually change? -----
+  if (nrow(nm_acid) > 0L) {
+    acid_sub <- nm_acid[, names(target), drop = FALSE]
+    can_change <- colSums(acid_sub != 0) > 0
+    fixable <- names(target)[can_change]
+  } else {
+    fixable <- character(0)
+  }
+
+  need_big <- residual > pmax(tol_abs, tol_rel * target, na.rm = TRUE)
+  need_fix_fixable <- need_big & (names(target) %in% fixable)
+
+  # ----- 4) If no fixable nutrient is off by much → skip acids/bases -----
+  if (!any(need_fix_fixable)) {
+    return(assemble_result(res_salts$amounts, amounts_acid = numeric(length(acid_idx))))
+  }
+
+  # ----- 5) Stage 2: acids/bases fill residuals (only for fixable nutrients) -----
+  residual_target <- residual
+  residual_target[residual_target < 0] <- 0
+  residual_target[!names(residual_target) %in% fixable] <- 0
+
+  res_acid <- optimize_nutrients(
+    nutrient_matrix = nm_acid,
+    target = residual_target,
+    importance = importance
+  )
+
+  assemble_result(res_salts$amounts, res_acid$amounts)
+}
