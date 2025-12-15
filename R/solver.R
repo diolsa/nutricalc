@@ -29,23 +29,19 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
   importance <- pmin(pmax(importance, -2), 2)
   weights <- rescale_weights(importance)
 
-  # protect zero targets during normalization (see note below)
-  safe_target <- target
-  safe_target[safe_target == 0] <- -1
+  # Normalize rows using target, but avoid division-by-zero.
+  # When target == 0, use 1 so RHS becomes 0 (target/row_scale), not a sign flip.
+  row_scale <- target
+  row_scale[row_scale == 0] <- 1
 
-  # NOTE about zero targets:
-  # We normalize each nutrient row of the design matrix by the target.
-  # For zero targets we use -1 as a placeholder to avoid division by zero.
-  # NNLS non-negativity plus weighting then discourages supplying those nutrients.
-
-  # Build design matrix A_sub (nutrients x compounds), normalized by target
-  # nutrient_matrix is [compounds x nutrients] -> transpose -> [nutrients x compounds]
-  A_sub <- t(nutrient_matrix[, names(target), drop = FALSE]) / safe_target
+  # Build design matrix A_sub (nutrients x compounds), normalized by row_scale
+  A_sub <- t(nutrient_matrix[, names(target), drop = FALSE]) / row_scale
 
   # Apply importance weights
   W <- diag(sqrt(weights[names(target)]), nrow = length(target))
   A_weighted <- W %*% A_sub
-  target_weighted <- W %*% rep(1, length(target))
+  target_weighted <- W %*% (target / row_scale)
+
 
   # NNLS fit
   fit <- nnls::nnls(A_weighted, target_weighted)
@@ -61,6 +57,10 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
   abs_error <- achieved - target
   percent_error <- abs_error / target * 100
   percent_error[is.nan(percent_error) | is.infinite(percent_error)] <- NA
+
+  tol <- 1e-9
+  zero_tgt <- target == 0
+  percent_error[zero_tgt & abs(achieved) < tol] <- 0
 
   rel_error <- abs_error / target
   rel_error[is.nan(rel_error) | is.infinite(rel_error)] <- NA
