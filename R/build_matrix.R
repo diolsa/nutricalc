@@ -111,6 +111,3 @@ acid_base_compounds <- c("HNO3", "H2SO4", "KOH", "HCL", "H3PO4", "NaOH", "NH4OH"
 
 salt_info$is_acid_base <- salt_info$salt %in% acid_base_compounds
 
-
-usethis::use_data(nutrient_matrix, salt_info, overwrite = TRUE)
-
