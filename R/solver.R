@@ -65,6 +65,13 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
   rel_error <- abs_error / target
   rel_error[is.nan(rel_error) | is.infinite(rel_error)] <- NA
 
+  # Clamp tiny numerical noise
+  amounts       <- drop_tiny(amounts)
+  achieved      <- drop_tiny(achieved)
+  abs_error     <- drop_tiny(abs_error)
+  percent_error <- drop_tiny(percent_error)
+  rel_error     <- drop_tiny(rel_error)
+
   structure(
     list(
       amounts = amounts,                 # mmol L^-1 per compound
@@ -144,10 +151,10 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
 
   nutrients_df <- data.frame(
     Nutrient      = names(x$target),
-    Target        = round(x$target, 3),
-    Achieved      = round(as.vector(x$achieved), 3),
-    Abs_Error     = round(as.vector(x$abs_error), 3),
-    Percent_Error = round(as.vector(x$percent_error), 2),
+    Target        = round(drop_tiny(as.vector(x$target)), 3),
+    Achieved      = round(drop_tiny(as.vector(x$achieved)), 3),
+    Abs_Error     = round(drop_tiny(as.vector(x$abs_error)), 3),
+    Percent_Error = round(drop_tiny(as.vector(x$percent_error)), 2),
     check.names   = FALSE
   )
   print(nutrients_df, row.names = FALSE)

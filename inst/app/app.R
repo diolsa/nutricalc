@@ -1,4 +1,4 @@
-# app.R — NutriCalc with canonical
+# app.R — NutriCalc
 
 library(shiny)
 library(bslib)
@@ -7,155 +7,7 @@ library(Ternary)
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 # =========================================================
-# 1) SMALL NUMERICAL HELPER
-# =========================================================
-
-drop_tiny <- function(x, tol = 1e-9) {
-  x[abs(x) < tol] <- 0
-  x
-}
-
-# =========================================================
-# 2) SOLVER + PRINT METHOD
-# =========================================================
-
-# Optimize Nutrient Solution Using NNLS
-optimize_nutrients <- function(nutrient_matrix, target, importance) {
-  # weight scaling: map [-2,2] to [relaxed_weight, strict_weight] on a smooth curve
-  rescale_weights <- function(x, relaxed_weight = 0.1, strict_weight = 100) {
-    relaxed_weight * (strict_weight / relaxed_weight) ^ x
-  }
-
-  # clamp importance range and compute weights
-  importance <- pmin(pmax(importance, -2), 2)
-  weights <- rescale_weights(importance)
-
-
-  # Normalize rows while keeping zero targets meaningful:
-  # use 1 when target is 0 so RHS becomes 0 (target/row_scale),
-
-  row_scale <- target
-  row_scale[row_scale == 0] <- 1
-
-  A_sub <- t(nutrient_matrix[, names(target), drop = FALSE]) / row_scale
-
-  W <- diag(sqrt(weights[names(target)]), nrow = length(target))
-  A_weighted <- W %*% A_sub
-  target_weighted <- W %*% (target / row_scale)
-
-
-  # NNLS fit
-  fit <- nnls::nnls(A_weighted, target_weighted)
-  amounts <- fit$x
-  names(amounts) <- colnames(A_sub)  # compound names
-
-  # Achieved nutrient delivery at the optimum (mmol/L)
-  achieved <- t(nutrient_matrix[, names(target), drop = FALSE]) %*% amounts
-  achieved <- as.vector(achieved)
-  names(achieved) <- names(target)
-
-  # Errors
-  abs_error <- achieved - target
-  percent_error <- abs_error / target * 100
-  percent_error[is.nan(percent_error) | is.infinite(percent_error)] <- NA
-
-  tol <- 1e-9
-  zero_tgt <- target == 0
-  percent_error[zero_tgt & abs(achieved) < tol] <- 0
-
-  rel_error <- abs_error / target
-  rel_error[is.nan(rel_error) | is.infinite(rel_error)] <- NA
-
-  # Clamp tiny numerical noise
-  amounts       <- drop_tiny(amounts)
-  achieved      <- drop_tiny(achieved)
-  abs_error     <- drop_tiny(abs_error)
-  percent_error <- drop_tiny(percent_error)
-  rel_error     <- drop_tiny(rel_error)
-
-  squared_error     <- sum(abs_error^2, na.rm = TRUE)
-  rel_squared_error <- sum(rel_error^2, na.rm = TRUE)
-
-  structure(
-    list(
-      amounts = amounts,                 # mmol L^-1 per compound
-      achieved = achieved,               # mmol L^-1 per nutrient
-      target = target,                   # mmol L^-1 per nutrient
-      abs_error = abs_error,             # mmol L^-1
-      percent_error = percent_error,     # %
-      squared_error = squared_error,
-      rel_squared_error = rel_squared_error
-    ),
-    class = "nutrient_optimization_result"
-  )
-}
-
-# Pretty-print the optimization result
-print.nutrient_optimization_result <- function(x, vol = 1, ...) {
-  if (!is.numeric(vol) || length(vol) != 1 || is.na(vol) || vol <= 0) {
-    stop("`vol` must be a single positive number.", call. = FALSE)
-  }
-
-  cat("🧪 Fertilizer amounts:\n")
-
-  # Keep only positive amounts
-  amounts <- x$amounts[x$amounts > 0]
-  formulas <- names(amounts)
-
-  has_mm <- exists("compute_molar_mass", mode = "function")
-
-  if (length(amounts) == 0L) {
-    print(data.frame(Message = "All amounts are zero.", check.names = FALSE))
-  } else if (has_mm) {
-    molar_masses <- sapply(formulas, compute_molar_mass)  # g mol⁻¹
-    mg_l <- amounts * molar_masses                        # mg L⁻¹
-    df <- data.frame(
-      Formula    = formulas,
-      "mmol l⁻¹" = round(amounts, 3),
-      "g mol⁻¹"  = round(molar_masses, 2),
-      "mg l⁻¹"   = round(mg_l, 2),
-      row.names  = NULL,
-      check.names = FALSE
-    )
-
-    if (vol > 1) {
-      g_total <- mg_l * vol / 1000
-      vol_label <- if (abs(vol - round(vol)) < 1e-9) as.integer(vol) else vol
-      g_colname <- sprintf("g %s l⁻¹", vol_label)
-      df[[g_colname]] <- round(g_total, 3)
-    }
-
-    print(df)
-  } else {
-    df <- data.frame(
-      Formula    = formulas,
-      "mmol l⁻¹" = round(amounts, 3),
-      row.names  = NULL,
-      check.names = FALSE
-    )
-    print(df)
-    cat("\nℹ️ Tip: define compute_molar_mass(formula) to show mg L⁻¹ and gram totals.\n")
-  }
-
-  cat("\n🎯 Nutrient delivery vs. target (per liter):\n")
-
-  nutrients_df <- data.frame(
-    Nutrient      = names(x$target),
-    Target        = round(drop_tiny(as.vector(x$target)), 3),
-    Achieved      = round(drop_tiny(as.vector(x$achieved)), 3),
-    Abs_Error     = round(drop_tiny(as.vector(x$abs_error)), 3),
-    Percent_Error = round(drop_tiny(as.vector(x$percent_error)), 2),
-    check.names   = FALSE
-  )
-  print(nutrients_df, row.names = FALSE)
-
-  cat("\n🧮 Total squared error:", round(x$squared_error, 6), "\n")
-  cat("📊 Total squared error (relative):", round(x$rel_squared_error, 6), "\n")
-  if (vol > 1) cat("🧴 Volume used for totals:", vol, "L\n")
-}
-
-# =========================================================
-# 3) UI HELPERS & CONSTANTS
+# 1) UI HELPERS & CONSTANTS
 # =========================================================
 
 format_formula_html <- function(x) {
@@ -331,7 +183,7 @@ targets_for_display <- function(targets_mmol, unit_out) {
 }
 
 # =========================================================
-# 4) UI
+# 2) UI
 # =========================================================
 
 ui <- fluidPage(
@@ -625,7 +477,7 @@ ui <- fluidPage(
 
 
 # =========================================================
-# 5) SERVER
+# 3) SERVER
 # =========================================================
 
 server <- function(input, output, session) {
