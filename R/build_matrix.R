@@ -1,3 +1,24 @@
+#' Canonical fertilizer-to-nutrient stoichiometry matrix
+#'
+#' A compound-by-nutrient matrix used by the nutrient solvers. Rows are fertilizer
+#' compounds (salts/acids/bases) and columns are nutrients. Each entry is the
+#' amount of nutrient delivered by 1 mmol of the compound (mmol nutrient per mmol
+#' compound).
+#'
+#' @format A numeric matrix with n rows (compounds) and 16 columns (nutrients).
+#' Row names are chemical formulas; column names are nutrient keys:
+#' `NO3_N`, `NH4_N`, `P`, `K`, `Ca`, `Mg`, `S`, `Na`, `Cl`, `Fe`, `Mn`, `Zn`,
+#' `B`, `Cu`, `Mo`, `Si`.
+#'
+#' @details
+#' The matrix entries are stoichiometric coefficients in mmol/mmol. For example,
+#' calcium nitrate (`Ca(NO3)2`) contributes 2 mmol `NO3_N` and 1 mmol `Ca` per
+#' 1 mmol of salt.
+#'
+#' @usage data(nutrient_matrix)
+"nutrient_matrix"
+
+
 nutrient_matrix <- matrix(c(
 #NO3 NH4 P  K   Ca Mg S  Na Cl Fe Mn Zn B  Cu Mo SI
   2,  0, 0, 0,  1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # Ca(NO3)2
@@ -56,6 +77,23 @@ dimnames = list(
     "HNO3","KOH","H2SO4", "HCL","H3PO4","NaOH","NH4OH","Ca(OH)2"),
   c("NO3_N", "NH4_N", "P", "K", "Ca", "Mg", "S", "Na", "Cl", "Fe", "Mn", "Zn", "B", "Cu", "Mo", "Si")
 ))
+
+#' Metadata for fertilizer compounds
+#'
+#' Descriptive metadata for each compound in \code{\link{nutrient_matrix}},
+#' including a human-readable category name and whether the compound is treated
+#' as an acid/base in the two-stage solver.
+#'
+#' @format A data frame with n rows and 3 columns:
+#' \describe{
+#'   \item{salt}{Chemical formula key matching \code{rownames(nutrient_matrix)}.}
+#'   \item{category}{Human-readable compound name/category.}
+#'   \item{is_acid_base}{Logical flag; \code{TRUE} for acids/bases.}
+#' }
+#'
+#' @usage data(salt_info)
+"salt_info"
+
 
 salt_names <- rownames(nutrient_matrix)
 

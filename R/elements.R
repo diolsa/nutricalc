@@ -1,3 +1,19 @@
+#' Atomic molar masses used for formula parsing
+#'
+#' A lookup table of elemental (atomic) molar masses in grams per mole (g/mol).
+#' Used by molar-mass and unit-conversion helpers (e.g., when computing the molar
+#' mass of a chemical formula from its elemental composition).
+#'
+#' @format A data frame with 23 rows and 2 columns:
+#' \describe{
+#'   \item{Element}{Element symbol (character), e.g. \code{"C"}, \code{"O"}, \code{"Fe"}.}
+#'   \item{MolarMass_g_per_mol}{Atomic molar mass in g/mol (numeric).}
+#' }
+#'
+#' @usage data(element_molar_mass_df)
+"element_molar_mass_df"
+
+
 element_molar_mass_df <- data.frame(
   Element = c("C", "O",   "H",    "N",    "P",     "K",     "Mg",    "S",     "Ca",
               "B",   "Cu",   "Cl",   "Fe",    "Mn",    "Ni",    "Zn",    "Mo",
