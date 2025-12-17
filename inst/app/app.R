@@ -246,11 +246,10 @@ ui <- fluidPage(
                       tabPanel("🎯 Nutrient Targets",
                                fluidRow(
                                  column(3, strong("Nutrient")),
-                                 column(6,
-                                        div(
-                                          class = "d-flex justify-content-between align-items-center",
-                                          div(strong(textOutput("target_col_header"))),
-                                          div(strong("Water"))
+                                 column(4,
+                                        fluidRow(
+                                          column(6, strong(textOutput("target_col_header"))),
+                                          column(6, strong("Water"))
                                         ),
                                         div(
                                           radioButtons("input_unit", label = NULL,
@@ -258,7 +257,7 @@ ui <- fluidPage(
                                                        selected = "mmol/L", inline = TRUE),
                                         )
                                  ),
-                                 column(3,
+                                 column(5,
                                         div(strong("Priority"),
                                             tags$br(),
                                             tags$small(class = "text-muted", "Weight for target matching"))
@@ -517,9 +516,9 @@ server <- function(input, output, session) {
       div(
         class = "nutrient-row",fluidRow(
           column(3, tags$label(HTML(pretty_nutrient_label_str(nm)))),
-          column(3, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
-          column(3, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
-          column(3, div(class = "importance-slider",
+          column(2, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
+          column(2, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
+          column(5, div(class = "importance-slider",
                         sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
                                     , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
         ))
