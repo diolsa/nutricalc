@@ -256,7 +256,6 @@ ui <- fluidPage(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
                                                        selected = "mmol/L", inline = TRUE),
-                                          tags$small(class = "text-muted", "Unit applies to Target & Water")
                                         )
                                  ),
                                  column(3,
