@@ -94,6 +94,8 @@ fetch_bwb_mittelwert <- function(plz) {
     }
   }
 
+  mmol_values <- round(mmol_values, 2)
+
   mmol_values
 }
 
