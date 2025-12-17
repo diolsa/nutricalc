@@ -246,16 +246,19 @@ ui <- fluidPage(
                       tabPanel("🎯 Nutrient Targets",
                                fluidRow(
                                  column(3, strong("Nutrient")),
-                                 column(3,
+                                 column(6,
                                         div(
-                                          strong(textOutput("target_col_header")),
+                                          class = "d-flex justify-content-between align-items-center",
+                                          div(strong(textOutput("target_col_header"))),
+                                          div(strong("Water"))
+                                        ),
+                                        div(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
                                                        selected = "mmol/L", inline = TRUE),
                                           tags$small(class = "text-muted", "Unit applies to Target & Water")
                                         )
                                  ),
-                                 column(3, strong("Water")),
                                  column(3,
                                         div(strong("Priority"),
                                             tags$br(),
