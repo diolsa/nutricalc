@@ -1,5 +1,11 @@
 # Shiny modules for NutriCalc UI and server logic
 
+# Helper to avoid hard dependency on app.R scoping when rendering labels
+pretty_label <- function(nm) {
+  fn <- get0("pretty_nutrient_label_str", ifnotfound = NULL, inherits = TRUE)
+  if (is.function(fn)) fn(nm) else nm
+}
+
 input_panel_ui <- function(id) {
   ns <- NS(id)
   column(
@@ -114,7 +120,7 @@ input_panel_ui <- function(id) {
                     fluidRow(
                       column(
                         width = 6,
-                        tags$label(HTML(pretty_nutrient_label_str(nm)))
+                        tags$label(HTML(pretty_label(nm)))
                       ),
                       column(
                         width = 6,
@@ -265,7 +271,7 @@ input_panel_server <- function(id) {
         div(
           class = "nutrient-row",
           fluidRow(
-            column(3, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+            column(3, tags$label(HTML(pretty_label(nm)))),
             column(4, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
             column(
               5,
@@ -392,7 +398,7 @@ input_panel_server <- function(id) {
       mgL <- tissue_mgL()
 
       data.frame(
-        Nutrient = vapply(nutrients, pretty_nutrient_label_str, character(1)),
+        Nutrient = vapply(nutrients, pretty_label, character(1)),
         `Tissue %` = round(perc, 3),
         `mg l⁻¹` = round(mgL, 3),
         check.names = FALSE
@@ -731,7 +737,7 @@ results_panel_server <- function(id, inputs) {
       )
       nd$Nutrient <- vapply(
         nd$Nutrient,
-        function(s) pretty_nutrient_label_str(safe_chr1(s)),
+        function(s) pretty_label(safe_chr1(s)),
         character(1)
       )
 
