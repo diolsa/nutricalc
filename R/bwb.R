@@ -9,7 +9,8 @@
 #'
 #' @return A named numeric vector of length 16 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, limited to the decimal precision
+#'   provided by the source values.
 #' @export
 #'
 
@@ -68,6 +69,7 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
