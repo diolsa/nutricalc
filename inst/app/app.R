@@ -592,8 +592,13 @@ server <- function(input, output, session) {
 
   eval_targets <- reactive({
     vals <- targets_mmol()
-    validate(need(!is.null(vals), "Targets not initialized yet."))
-    vals
+    water_vals <- water_mmol()
+    validate(
+      need(!is.null(vals), "Targets not initialized yet."),
+      need(!is.null(water_vals), "Water not initialized yet.")
+    )
+
+    vals - water_vals
   })
 
   importance_vec <- reactive({
