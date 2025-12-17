@@ -55,9 +55,11 @@ fetch_bwb_mittelwert <- function(plz) {
     cols <- tolower(trimws(names(tbl)))
     param_col <- names(tbl)[match("parameter", cols)]
     value_col <- names(tbl)[match("mittelwert", cols)]
+    unit_col  <- names(tbl)[match("einheit", cols)]
     data.frame(
       Parameter = tbl[[param_col]],
       Mittelwert = tbl[[value_col]],
+      Einheit = if (!is.na(unit_col)) tbl[[unit_col]] else NA_character_,
       stringsAsFactors = FALSE,
       check.names = FALSE
     )
@@ -66,19 +68,26 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
 
-  mg_values <- empty_result
+  mmol_values <- empty_result
   for (nm in target_names) {
-    vals <- combined$Mittelwert_num[combined$Target == nm]
-    if (length(vals)) {
-      mg_values[nm] <- mean(vals, na.rm = TRUE)
-      if (is.nan(mg_values[nm])) mg_values[nm] <- NA_real_
-    }
+    rows <- combined[combined$Target == nm, , drop = FALSE]
+    if (!nrow(rows)) next
+
+    mmol <- mapply(
+      function(val, unit) convert_mittelwert(val, unit, nm),
+      rows$Mittelwert_num,
+      rows$Einheit_clean
+    )
+
+    mmol_values[nm] <- mean(mmol, na.rm = TRUE)
+    if (is.nan(mmol_values[nm])) mmol_values[nm] <- NA_real_
   }
 
-  convert_units(mg_values, to = "mmol/L")
+  mmol_values
 }
 
 parse_html_table <- function(tbl) {
@@ -136,6 +145,36 @@ map_parameter_to_nutrient <- function(param) {
   if (grepl("^molybd", clean)) return("Mo")
   if (grepl("^silicium", clean)) return("Si")
   ""
+}
+
+normalize_unit <- function(unit) {
+  u <- tolower(trimws(gsub("\u00a0", "", as.character(unit), fixed = TRUE)))
+  u <- gsub(",", ".", u, fixed = TRUE)
+  if (!nzchar(u)) return(NA_character_)
+
+  u <- sub("^ug/l$", "\u00b5g/l", u)  # normalize plain 'ug/l' to 'µg/l'
+  switch(u,
+         "mmol/l" = "mmol/L",
+         "mg/l" = "mg/L",
+         "\u00b5g/l" = "µg/L",
+         NA_character_)
+}
+
+convert_mittelwert <- function(value, unit, nutrient) {
+  if (is.na(value) || is.na(unit)) return(NA_real_)
+
+  if (identical(unit, "mmol/L")) return(value)
+
+  if (identical(unit, "mg/L")) {
+    return(convert_units(stats::setNames(value, nutrient), to = "mmol/L")[[1]])
+  }
+
+  if (identical(unit, "µg/L")) {
+    mg_value <- value / 1000
+    return(convert_units(stats::setNames(mg_value, nutrient), to = "mmol/L")[[1]])
+  }
+
+  NA_real_
 }
 
 to_lower_ascii <- function(x) {
