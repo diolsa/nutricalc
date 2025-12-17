@@ -182,6 +182,16 @@ to_lower_ascii <- function(x) {
 }
 
 strip_trailing_zeros_numeric <- function(x) {
-  formatted <- format(x, scientific = FALSE, trim = TRUE, digits = 22)
-  suppressWarnings(as.numeric(formatted))
+  formatted <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  out <- suppressWarnings(as.numeric(formatted))
+  names(out) <- names(x)
+  class(out) <- c("bwb_mittelwert", class(out))
+  out
+}
+
+print.bwb_mittelwert <- function(x, ...) {
+  vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  names(vals) <- names(x)
+  print(noquote(vals), ...)
+  invisible(x)
 }
