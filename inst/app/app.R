@@ -594,7 +594,7 @@ server <- function(input, output, session) {
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    vals - water_vals
+    pmax(vals - water_vals, 0)
   })
 
   importance_vec <- reactive({
