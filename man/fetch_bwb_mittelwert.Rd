@@ -17,6 +17,6 @@ A named numeric vector of length 16 in mmol/L with names
 }
 \description{
 Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given German
-postal code and returns the mean Mittelwert values (aggregated across
-potential supply zones) for selected parameters as mmol/L.
+postal code and returns the Mittelwert values (first available entry per
+parameter) for selected parameters as mmol/L.
 }

@@ -1,8 +1,8 @@
 #' Fetch BWB "In aller Tiefe" Mittelwerte by postal code
 #'
 #' Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given German
-#' postal code and returns the mean Mittelwert values (aggregated across
-#' potential supply zones) for selected parameters as mmol/L.
+#' postal code and returns the Mittelwert values (first available entry per
+#' parameter) for selected parameters as mmol/L.
 #'
 #' @param plz Character or numeric vector of length one with a five digit
 #'   German postal code.
@@ -83,8 +83,8 @@ fetch_bwb_mittelwert <- function(plz) {
       rows$Einheit_clean
     )
 
-    mmol_values[nm] <- mean(mmol, na.rm = TRUE)
-    if (is.nan(mmol_values[nm])) mmol_values[nm] <- NA_real_
+    first_valid <- which(!is.na(mmol))[1]
+    mmol_values[nm] <- if (!is.na(first_valid)) mmol[first_valid] else NA_real_
   }
 
   mmol_values
@@ -125,7 +125,6 @@ parse_mittelwert <- function(x) {
   val <- suppressWarnings(as.numeric(x_chr))
   if (is.na(val)) NA_real_ else val
 }
-
 map_parameter_to_nutrient <- function(param) {
   clean <- trimws(to_lower_ascii(param))
   if (grepl("nitrat", clean)) return("NO3_N")
