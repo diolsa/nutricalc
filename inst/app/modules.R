@@ -20,6 +20,13 @@ default_targets_or_empty <- function() {
   vals
 }
 
+# Helper to obtain canonical unit with a safe fallback
+canonical_unit_or_default <- function() {
+  cu <- get0("canonical_unit", ifnotfound = NULL, inherits = TRUE)
+  if (is.null(cu) || is.na(cu) || !nzchar(cu)) return("mmol/L")
+  cu
+}
+
 input_panel_ui <- function(id) {
   ns <- NS(id)
   column(
@@ -267,7 +274,7 @@ input_panel_server <- function(id) {
     run_trigger <- reactiveVal(0)
     default_targets <- default_targets_or_empty()
     targets_mmol <- reactiveVal(default_targets)
-    current_input_unit <- reactiveVal(canonical_unit)
+    current_input_unit <- reactiveVal(canonical_unit_or_default())
     selected_salts <- reactiveVal(rownames(nutrient_matrix))
 
     recipe_categories <- vapply(
@@ -277,7 +284,7 @@ input_panel_server <- function(id) {
     )
 
     output$target_col_header <- renderText({
-      unit <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
+      unit <- if (is.null(input$input_unit)) canonical_unit_or_default() else input$input_unit
       sprintf("Target (%s)", unit)
     })
 
@@ -318,7 +325,7 @@ input_panel_server <- function(id) {
         updateSliderInput(session, paste0("imp_", nm), value = default_importance[[nm]])
       }
       targets_mmol(default_targets)
-      current_input_unit(input$input_unit %||% canonical_unit)
+      current_input_unit(input$input_unit %||% canonical_unit_or_default())
     })
 
     observeEvent(input$set_all_zero, {
@@ -330,7 +337,7 @@ input_panel_server <- function(id) {
 
     observeEvent(input$run, {
       req(inputs_ready())
-      unit_in <- input$input_unit %||% canonical_unit
+      unit_in <- input$input_unit %||% canonical_unit_or_default()
       vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in)
       targets_mmol(vals_mmol)
       run_trigger(isolate(run_trigger()) + 1L)
@@ -339,8 +346,8 @@ input_panel_server <- function(id) {
     observeEvent(input$input_unit, {
       req(inputs_ready())
 
-      new_unit <- input$input_unit %||% canonical_unit
-      old_unit <- current_input_unit() %||% canonical_unit
+      new_unit <- input$input_unit %||% canonical_unit_or_default()
+      old_unit <- current_input_unit() %||% canonical_unit_or_default()
 
       vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit)
       targets_mmol(vals_mmol)
@@ -568,7 +575,7 @@ input_panel_server <- function(id) {
               }
             }
 
-            unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
+            unit_rec <- normalize_unit(rec$unit %||% canonical_unit_or_default())
             vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
             for (nm in nutrients) {
               if (!is.null(rec$targets[[nm]])) {
@@ -592,7 +599,7 @@ input_panel_server <- function(id) {
             }
           }
 
-          unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
+          unit_rec <- normalize_unit(rec$unit %||% canonical_unit_or_default())
           vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
           for (nm in nutrients) {
             if (!is.null(rec$targets[[nm]])) {
