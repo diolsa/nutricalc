@@ -56,7 +56,7 @@ nutrient_matrix <- matrix(c(
   1,  0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # HNO3
   0,  0, 0, 1,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # KOH
   0,  0, 0, 0,  0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # H2SO4
-  0,  0, 0, 0,  0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,  # HCL
+  0,  0, 0, 0,  0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,  # HCl
   0,  0, 1, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # H3PO4
   0,  0, 0, 0,  0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,  # NaOH
   0,  1, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  # NH4OH
@@ -74,7 +74,7 @@ dimnames = list(
     "ZnSO4·7H2O", "NH4H2PO4", "Ca(NO3)2·4H2O", "Mg(NO3)2·6H2O", "C10H12N2O8FeNa·3H2O",
     "ZnSO4·6H2O", "Na2B4O7·10H2O", "C18H16N2O6FeNa","K2SiO3","NaCl","(NH4)2HPO4","CuCl2",
     "((NH4)6)Mo7O24·4H2O","ZnCl2","MnCl2·4H2O","NH4Cl","NaNO3","5Ca(NO3)2·NH4NO3·10H2O",
-    "HNO3","KOH","H2SO4", "HCL","H3PO4","NaOH","NH4OH","Ca(OH)2"),
+    "HNO3","KOH","H2SO4", "HCl","H3PO4","NaOH","NH4OH","Ca(OH)2"),
   c("NO3_N", "NH4_N", "P", "K", "Ca", "Mg", "S", "Na", "Cl", "Fe", "Mn", "Zn", "B", "Cu", "Mo", "Si")
 ))
 
@@ -138,7 +138,7 @@ salt_info$category[salt_info$salt == "5Ca(NO3)2·NH4NO3·10H2O"] <- "Calcium nit
 salt_info$category[salt_info$salt == "HNO3"]                   <- "Nitric acid"
 salt_info$category[salt_info$salt == "KOH"]                    <- "Potassium hydroxide"
 salt_info$category[salt_info$salt == "H2SO4"]                  <- "Sulfuric acid"
-salt_info$category[salt_info$salt == "HCL"]                    <- "Hydrochloric acid"
+salt_info$category[salt_info$salt == "HCl"]                    <- "Hydrochloric acid"
 salt_info$category[salt_info$salt == "H3PO4"]                  <- "Phosphoric acid"
 salt_info$category[salt_info$salt == "NaOH"]                   <- "Sodium hydroxide"
 salt_info$category[salt_info$salt == "NH4OH"]                  <- "Ammonium hydroxide"

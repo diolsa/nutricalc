@@ -13,6 +13,7 @@
 #' convert_units(c(NO3_N = 15, P = 1.5), to = "mg/L")
 #' convert_units(c(NO3_N = 210, P = 46), to = "mmol/L")
 #' @export
+
 convert_units <- function(x, element = NULL, to = c("mg/L", "mmol/L")) {
   to <- match.arg(to)
 
