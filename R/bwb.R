@@ -9,7 +9,7 @@
 #'
 #' @return A named numeric vector of length 16 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, rounded to two decimal places.
 #' @export
 #'
 
@@ -86,6 +86,8 @@ fetch_bwb_mittelwert <- function(plz) {
     mmol_values[nm] <- mean(mmol, na.rm = TRUE)
     if (is.nan(mmol_values[nm])) mmol_values[nm] <- NA_real_
   }
+
+  mmol_values <- round(mmol_values, 2)
 
   mmol_values
 }
