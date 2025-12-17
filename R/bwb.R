@@ -87,7 +87,7 @@ fetch_bwb_mittelwert <- function(plz) {
     mmol_values[nm] <- if (!is.na(first_valid)) mmol[first_valid] else NA_real_
   }
 
-  mmol_values
+  strip_trailing_zeros_numeric(mmol_values)
 }
 
 parse_html_table <- function(tbl) {
@@ -179,4 +179,9 @@ convert_mittelwert <- function(value, unit, nutrient) {
 to_lower_ascii <- function(x) {
   out <- tolower(iconv(x, to = "ASCII//TRANSLIT"))
   ifelse(is.na(out), tolower(as.character(x)), out)
+}
+
+strip_trailing_zeros_numeric <- function(x) {
+  formatted <- format(x, scientific = FALSE, trim = TRUE, digits = 22)
+  suppressWarnings(as.numeric(formatted))
 }
