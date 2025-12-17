@@ -112,6 +112,14 @@ default_targets_mmol <- {
   v
 }
 
+default_water_expr <- setNames(rep("0", length(nutrients)), nutrients)
+
+default_water_mmol <- {
+  v <- as.numeric(default_water_expr)
+  names(v) <- nutrients
+  v
+}
+
 normalize_unit <- function(u) {
   if (is.null(u) || is.na(u) || !nzchar(u)) return(canonical_unit)
   u <- trimws(u)
@@ -155,9 +163,9 @@ from_canonical_to_unit <- function(vals, unit_out) {
   }
 }
 
-parse_targets_from_inputs <- function(input, nutrients, unit_in) {
+parse_targets_from_inputs <- function(input, nutrients, unit_in, prefix = "expr_") {
   vals <- sapply(nutrients, function(nm) {
-    txt <- input[[paste0("expr_", nm)]]
+    txt <- input[[paste0(prefix, nm)]]
 
     # 1) Try safe numeric expression (sandboxed)
     val <- safe_numeric_expr(txt, default = NA_real_)
@@ -237,20 +245,23 @@ ui <- fluidPage(
           tabsetPanel(id = "input_tabs", type = "tabs",
                       tabPanel("🎯 Nutrient Targets",
                                fluidRow(
-                                 column(3, strong("Nutrient")),
-                                 column(4,
-                                        div(
-                                          strong(textOutput("target_col_header")),
+          column(2, strong("Nutrient")),
+          column(4,
+                fluidRow(
+                  column(6, strong(textOutput("target_col_header"))),
+                  column(6, strong("Water"))
+                ),
+                div(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
-                                                       selected = "mmol/L", inline = TRUE)
+                                                       selected = "mmol/L", inline = TRUE),
                                         )
                                  ),
-                                 column(5,
-                                        div(strong("Priority"),
-                                            tags$br(),
-                                            tags$small(class = "text-muted", "Weight for target matching"))
-                                 )
+          column(6,
+                div(strong("Priority"),
+                    tags$br(),
+                    tags$small(class = "text-muted", "Weight for target matching"))
+          )
                                ),
                                tags$hr(style = "margin:4px 0;"),
                                uiOutput("nutrient_rows"),
@@ -485,6 +496,7 @@ server <- function(input, output, session) {
   run_trigger <- reactiveVal(0)
 
   targets_mmol <- reactiveVal(default_targets_mmol)
+  water_mmol <- reactiveVal(default_water_mmol)
   current_input_unit <- reactiveVal(canonical_unit)
   selected_salts <- reactiveVal(rownames(nutrient_matrix))
 
@@ -495,17 +507,17 @@ server <- function(input, output, session) {
   )
 
   output$target_col_header <- renderText({
-    unit <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
-    sprintf("Target (%s)", unit)
+    "Target"
   })
 
   output$nutrient_rows <- renderUI({
     tagList(lapply(nutrients, function(nm) {
       div(
         class = "nutrient-row",fluidRow(
-          column(3, tags$label(HTML(pretty_nutrient_label_str(nm)))),
-          column(4, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
-          column(5, div(class = "importance-slider",
+          column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+          column(2, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
+          column(2, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
+          column(6, div(class = "importance-slider",
                         sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
                                     , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
         ))
@@ -513,7 +525,10 @@ server <- function(input, output, session) {
   })
 
   inputs_ready <- reactive({
-    all(vapply(nutrients, function(nm) !is.null(input[[paste0("expr_", nm)]]), logical(1)))
+    all(vapply(nutrients, function(nm) {
+      !is.null(input[[paste0("expr_", nm)]]) &&
+        !is.null(input[[paste0("water_expr_", nm)]])
+    }, logical(1)))
   })
 
   observeEvent(input$reset, {
@@ -535,8 +550,10 @@ server <- function(input, output, session) {
   observeEvent(input$run, {
     req(inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
-    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in)
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
+    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
     targets_mmol(vals_mmol)
+    water_mmol(vals_water_mmol)
     run_trigger(isolate(run_trigger()) + 1L)
   })
 
@@ -546,15 +563,23 @@ server <- function(input, output, session) {
     new_unit <- input$input_unit %||% canonical_unit
     old_unit <- current_input_unit() %||% canonical_unit
 
-    vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit)
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "expr_")
+    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water_expr_")
     targets_mmol(vals_mmol)
+    water_mmol(vals_water_mmol)
 
     display_vals <- targets_for_display(vals_mmol, new_unit)
+    display_water <- targets_for_display(vals_water_mmol, new_unit)
 
     for (nm in nutrients) {
       updateTextInput(
         session, paste0("expr_", nm),
         value = format(display_vals[[nm]], trim = TRUE, scientific = FALSE)
+      )
+
+      updateTextInput(
+        session, paste0("water_expr_", nm),
+        value = format(display_water[[nm]], trim = TRUE, scientific = FALSE)
       )
     }
 
@@ -563,8 +588,13 @@ server <- function(input, output, session) {
 
   eval_targets <- reactive({
     vals <- targets_mmol()
-    validate(need(!is.null(vals), "Targets not initialized yet."))
-    vals
+    water_vals <- water_mmol()
+    validate(
+      need(!is.null(vals), "Targets not initialized yet."),
+      need(!is.null(water_vals), "Water not initialized yet.")
+    )
+
+    pmax(vals - water_vals, 0)
   })
 
   importance_vec <- reactive({
