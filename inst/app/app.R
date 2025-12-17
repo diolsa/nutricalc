@@ -245,23 +245,23 @@ ui <- fluidPage(
           tabsetPanel(id = "input_tabs", type = "tabs",
                       tabPanel("🎯 Nutrient Targets",
                                fluidRow(
-                                 column(3, strong("Nutrient")),
-                                 column(4,
-                                        fluidRow(
-                                          column(6, strong(textOutput("target_col_header"))),
-                                          column(6, strong("Water"))
-                                        ),
-                                        div(
+          column(2, strong("Nutrient")),
+          column(4,
+                fluidRow(
+                  column(6, strong(textOutput("target_col_header"))),
+                  column(6, strong("Water"))
+                ),
+                div(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
                                                        selected = "mmol/L", inline = TRUE),
                                         )
                                  ),
-                                 column(5,
-                                        div(strong("Priority"),
-                                            tags$br(),
-                                            tags$small(class = "text-muted", "Weight for target matching"))
-                                 )
+          column(6,
+                div(strong("Priority"),
+                    tags$br(),
+                    tags$small(class = "text-muted", "Weight for target matching"))
+          )
                                ),
                                tags$hr(style = "margin:4px 0;"),
                                uiOutput("nutrient_rows"),
@@ -507,18 +507,17 @@ server <- function(input, output, session) {
   )
 
   output$target_col_header <- renderText({
-    unit <- if (is.null(input$input_unit)) "mmol/L" else input$input_unit
-    sprintf("Target (%s)", unit)
+    "Target"
   })
 
   output$nutrient_rows <- renderUI({
     tagList(lapply(nutrients, function(nm) {
       div(
         class = "nutrient-row",fluidRow(
-          column(3, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+          column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
           column(2, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
           column(2, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
-          column(5, div(class = "importance-slider",
+          column(6, div(class = "importance-slider",
                         sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
                                     , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
         ))
