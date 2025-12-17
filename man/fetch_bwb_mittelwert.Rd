@@ -13,12 +13,10 @@ German postal code.}
 \value{
 A named numeric vector of length 16 in mmol/L with names
   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-  "Fe","Mn","Zn","B","Cu","Mo","Si")`, rounded to match the decimal
-  precision reported on the BWB site (post conversion).
+  "Fe","Mn","Zn","B","Cu","Mo","Si")`.
 }
 \description{
 Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given German
 postal code and returns the Mittelwert values (first available entry per
-parameter) for selected parameters as mmol/L, rounded to the number of
-decimal places reported by BWB (after unit conversion when needed).
+parameter) for selected parameters as mmol/L.
 }
