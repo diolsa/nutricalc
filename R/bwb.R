@@ -9,7 +9,8 @@
 #'
 #' @return A named numeric vector of length 16 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, limited to the decimal precision
+#'   provided by the source values.
 #' @export
 #'
 
@@ -68,6 +69,7 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
@@ -87,7 +89,7 @@ fetch_bwb_mittelwert <- function(plz) {
     mmol_values[nm] <- if (!is.na(first_valid)) mmol[first_valid] else NA_real_
   }
 
-  mmol_values
+  strip_trailing_zeros_numeric(mmol_values)
 }
 
 parse_html_table <- function(tbl) {
@@ -179,4 +181,19 @@ convert_mittelwert <- function(value, unit, nutrient) {
 to_lower_ascii <- function(x) {
   out <- tolower(iconv(x, to = "ASCII//TRANSLIT"))
   ifelse(is.na(out), tolower(as.character(x)), out)
+}
+
+strip_trailing_zeros_numeric <- function(x) {
+  formatted <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  out <- suppressWarnings(as.numeric(formatted))
+  names(out) <- names(x)
+  class(out) <- c("bwb_mittelwert", class(out))
+  out
+}
+
+print.bwb_mittelwert <- function(x, ...) {
+  vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  names(vals) <- names(x)
+  print(noquote(vals), ...)
+  invisible(x)
 }
