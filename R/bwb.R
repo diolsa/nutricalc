@@ -86,16 +86,7 @@ fetch_bwb_mittelwert <- function(plz) {
     )
 
     first_valid <- which(!is.na(mmol))[1]
-    if (!is.na(first_valid)) {
-      mmol_values[nm] <- mmol[first_valid]
-      max_digits <- suppressWarnings(max(rows$Mittelwert_digits, na.rm = TRUE))
-      if (is.infinite(max_digits)) max_digits <- NA_integer_
-      if (!is.na(max_digits)) {
-        mmol_values[nm] <- round(mmol_values[nm], max_digits)
-      }
-    } else {
-      mmol_values[nm] <- NA_real_
-    }
+    mmol_values[nm] <- if (!is.na(first_valid)) mmol[first_valid] else NA_real_
   }
 
   strip_trailing_zeros_numeric(mmol_values)
@@ -135,17 +126,6 @@ parse_mittelwert <- function(x) {
   x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
   val <- suppressWarnings(as.numeric(x_chr))
   if (is.na(val)) NA_real_ else val
-}
-
-count_decimal_places <- function(x) {
-  x_chr <- trimws(as.character(x))
-  x_chr <- sub("^<\\s*", "", x_chr)
-  x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
-  if (!grepl("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$", x_chr)) return(NA_integer_)
-  if (!grepl("\\.", x_chr)) return(0L)
-  fractional <- sub("^[^\\.]*\\.([^eE]*).*", "\\1", x_chr)
-  fractional <- sub("[eE].*$", "", fractional)
-  nchar(fractional)
 }
 map_parameter_to_nutrient <- function(param) {
   clean <- trimws(to_lower_ascii(param))
