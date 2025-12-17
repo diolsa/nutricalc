@@ -534,21 +534,17 @@ server <- function(input, output, session) {
   observeEvent(input$reset, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
-      updateTextInput(session, paste0("water_expr_", nm), value = default_water_expr[[nm]])
       updateSliderInput(session, paste0("imp_", nm), value = default_importance[[nm]])
     }
     targets_mmol(default_targets_mmol)
-    water_mmol(default_water_mmol)
     current_input_unit(input$input_unit %||% canonical_unit)
   })
 
   observeEvent(input$set_all_zero, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = "0")
-      updateTextInput(session, paste0("water_expr_", nm), value = "0")
     }
     targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
-    water_mmol(setNames(rep(0, length(nutrients)), nutrients))
   })
 
   observeEvent(input$run, {
@@ -968,22 +964,18 @@ server <- function(input, output, session) {
             val <- rec$targets[[nm]]
             if (!is.null(val)) {
               updateTextInput(session, paste0("expr_", nm), value = format(val, trim = TRUE))
-              updateTextInput(session, paste0("water_expr_", nm), value = format(val, trim = TRUE))
             }
           }
 
           unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
           vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
-          vals_water_rec <- vals_rec
           for (nm in nutrients) {
             if (!is.null(rec$targets[[nm]])) {
               vals_rec[[nm]] <- rec$targets[[nm]]
-              vals_water_rec[[nm]] <- rec$targets[[nm]]
             }
           }
           vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
           targets_mmol(vals_mmol)
-          water_mmol(to_canonical_from_unit(vals_water_rec, unit_rec))
         }
 
         apply_salts(rec)
@@ -996,22 +988,18 @@ server <- function(input, output, session) {
           val <- rec$targets[[nm]]
           if (!is.null(val)) {
             updateTextInput(session, paste0("expr_", nm), value = format(val, trim = TRUE))
-            updateTextInput(session, paste0("water_expr_", nm), value = format(val, trim = TRUE))
           }
         }
 
         unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
         vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
-        vals_water_rec <- vals_rec
         for (nm in nutrients) {
           if (!is.null(rec$targets[[nm]])) {
             vals_rec[[nm]] <- rec$targets[[nm]]
-            vals_water_rec[[nm]] <- rec$targets[[nm]]
           }
         }
         vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
         targets_mmol(vals_mmol)
-        water_mmol(to_canonical_from_unit(vals_water_rec, unit_rec))
       }
 
       apply_salts(rec)
@@ -1051,11 +1039,6 @@ server <- function(input, output, session) {
           paste0("expr_", nm),
           value = "0"
         )
-        updateTextInput(
-          session,
-          paste0("water_expr_", nm),
-          value = "0"
-        )
       }
 
       # 2) then fill the target inputs with the calculated mg/L
@@ -1065,17 +1048,11 @@ server <- function(input, output, session) {
           paste0("expr_", nm),
           value = format(mgL[[nm]], trim = TRUE, scientific = FALSE)
         )
-        updateTextInput(
-          session,
-          paste0("water_expr_", nm),
-          value = format(mgL[[nm]], trim = TRUE, scientific = FALSE)
-        )
       }
 
       # 3) update internal canonical targets (mmol/L) from mg/L
       vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
       targets_mmol(vals_mmol)
-      water_mmol(vals_mmol)
 
       # 4) jump back to the Nutrient Targets tab
       updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
