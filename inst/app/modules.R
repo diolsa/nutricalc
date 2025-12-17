@@ -6,6 +6,20 @@ pretty_label <- function(nm) {
   if (is.function(fn)) fn(nm) else nm
 }
 
+# Helper to safely obtain the default target vector even if globals are missing
+default_targets_or_empty <- function() {
+  existing <- get0("default_targets_mmol", ifnotfound = NULL, inherits = TRUE)
+  if (!is.null(existing)) return(existing)
+
+  exprs <- get0("default_expr", ifnotfound = NULL, inherits = TRUE)
+  nutrient_keys <- get0("nutrients", ifnotfound = NULL, inherits = TRUE)
+  if (is.null(exprs) || is.null(nutrient_keys)) return(numeric(0))
+
+  vals <- suppressWarnings(as.numeric(exprs))
+  names(vals) <- nutrient_keys
+  vals
+}
+
 input_panel_ui <- function(id) {
   ns <- NS(id)
   column(
@@ -251,7 +265,8 @@ input_panel_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     run_trigger <- reactiveVal(0)
-    targets_mmol <- reactiveVal(default_targets_mmol)
+    default_targets <- default_targets_or_empty()
+    targets_mmol <- reactiveVal(default_targets)
     current_input_unit <- reactiveVal(canonical_unit)
     selected_salts <- reactiveVal(rownames(nutrient_matrix))
 
@@ -302,7 +317,7 @@ input_panel_server <- function(id) {
         updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
         updateSliderInput(session, paste0("imp_", nm), value = default_importance[[nm]])
       }
-      targets_mmol(default_targets_mmol)
+      targets_mmol(default_targets)
       current_input_unit(input$input_unit %||% canonical_unit)
     })
 
