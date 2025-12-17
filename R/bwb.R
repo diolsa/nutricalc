@@ -9,7 +9,8 @@
 #'
 #' @return A named numeric vector of length 16 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, rounded to two decimal places.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, limited to the decimal precision
+#'   provided by the source values.
 #' @export
 #'
 
@@ -68,6 +69,7 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
@@ -85,6 +87,11 @@ fetch_bwb_mittelwert <- function(plz) {
 
     mmol_values[nm] <- mean(mmol, na.rm = TRUE)
     if (is.nan(mmol_values[nm])) mmol_values[nm] <- NA_real_
+    max_digits <- suppressWarnings(max(rows$Mittelwert_digits, na.rm = TRUE))
+    if (is.infinite(max_digits)) max_digits <- NA_integer_
+    if (!is.na(max_digits)) {
+      mmol_values[nm] <- round(mmol_values[nm], max_digits)
+    }
   }
 
   mmol_values <- round(mmol_values, 2)
@@ -126,6 +133,17 @@ parse_mittelwert <- function(x) {
   x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
   val <- suppressWarnings(as.numeric(x_chr))
   if (is.na(val)) NA_real_ else val
+}
+
+count_decimal_places <- function(x) {
+  x_chr <- trimws(as.character(x))
+  x_chr <- sub("^<\\s*", "", x_chr)
+  x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
+  if (!grepl("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$", x_chr)) return(NA_integer_)
+  if (!grepl("\\.", x_chr)) return(0L)
+  fractional <- sub("^[^\\.]*\\.([^eE]*).*", "\\1", x_chr)
+  fractional <- sub("[eE].*$", "", fractional)
+  nchar(fractional)
 }
 
 map_parameter_to_nutrient <- function(param) {
