@@ -9,7 +9,8 @@
 #'
 #' @return A named numeric vector of length 16 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, limited to the decimal precision
+#'   provided by the source values.
 #' @export
 #'
 
