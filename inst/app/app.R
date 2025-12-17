@@ -1122,7 +1122,7 @@ server <- function(input, output, session) {
     target   <- as.numeric(res$target)
     achieved <- drop_tiny(as.numeric(res$achieved))
     abs_err  <- drop_tiny(as.numeric(res$abs_error))
-    pct_err  <- drop_tiny(as.numeric(res$percent_error))
+    pct_err  <- as.numeric(res$percent_error)
 
     nd <- data.frame(
       Nutrient          = names(res$target),

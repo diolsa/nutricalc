@@ -154,7 +154,7 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
     Target        = round(drop_tiny(as.vector(x$target)), 3),
     Achieved      = round(drop_tiny(as.vector(x$achieved)), 3),
     Abs_Error     = round(drop_tiny(as.vector(x$abs_error)), 3),
-    Percent_Error = round(drop_tiny(as.vector(x$percent_error)), 2),
+    Percent_Error = round((x$percent_error), 2),
     check.names   = FALSE
   )
   print(nutrients_df, row.names = FALSE)
@@ -258,6 +258,20 @@ two_stage_optimize_nutrients <- function(
 
   achieved_salts <- res_salts$achieved
   residual <- target - achieved_salts # positive = missing
+
+  # Zero-out tiny residuals when the percent error from stage 1 is below the
+  # relative tolerance (expressed in %). This keeps stage 2 from nudging acids
+  # or bases when we're already within the configured relative tolerance.
+  percent_error_salts <- abs(res_salts$percent_error)
+  percent_error_salts[is.na(percent_error_salts)] <- 0
+  residual[percent_error_salts < (tol_rel * 100)] <- 0
+
+  # If every nutrient is already within the relative tolerance, stop after
+  # stage 1. This prevents minute acid/base additions when percent errors are
+  # effectively zero across the board.
+  if (all(percent_error_salts < (tol_rel * 100))) {
+    return(assemble_result(res_salts$amounts, amounts_acid = numeric(length(acid_idx))))
+  }
 
   # ----- 3) Which nutrients can acids/bases actually change? -----
   if (nrow(nm_acid) > 0L) {
