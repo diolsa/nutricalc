@@ -1,0 +1,75 @@
+body { font-size: 13px; }
+.form-group { margin-bottom: 3px; }
+.shiny-input-container { margin-bottom: 3px; }
+.irs { margin-top: -8px; }
+.container-fluid { max-width: 1300px; }
+input.form-control { height: 26px; padding: 2px 4px; font-size: 13px; }
+.irs-single, .irs-min, .irs-max { font-size: 10px; }
+.form-group.shiny-input-slider { margin-top: -8px; }
+.importance-slider .irs-min, .importance-slider .irs-max { display: none !important; }
+.importance-slider .irs-single {
+  display: block !important;
+  top: 20px !important;
+  margin-top: 0 !important;
+  background: transparent !important;
+  color: #000000 !important;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 0;
+  z-index: 5 !important;
+  pointer-events: none;
+}
+.importance-slider .irs-single:before { display: none !important; }
+.importance-slider .irs { margin-top: -16px; height: 28px !important; }
+.importance-slider { margin-bottom: 10px; }
+.importance-slider .irs-grid { height: 0 !important; margin-top: -4px !important; }
+.importance-slider .irs-grid-text { display: none !important; }
+
+.nutrient-row {
+  border-bottom: 1px solid #dee2e6;
+  padding: 2px 0 4px 0;
+  margin-bottom: 2px;
+}
+.nutrient-row:last-child { border-bottom: none; }
+
+[id$="selected_salts"] {
+  max-height: 590px;
+  overflow-y: auto;
+  padding: 6px 1px 1px;
+}
+[id$="input_unit"] label {
+  color: #6c757d !important;
+  font-size: 0.9em !important;
+  font-weight: normal !important;
+  margin-right: 6px !important;
+}
+[id$="input_unit"] .radio-inline { margin-right: 6px !important; }
+[id$="select_all_visible"], [id$="deselect_all_salts"], [id$="clear_search"] {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9ecef !important;
+  border: 1px solid rgba(0, 0, 0, 0.25) !important;
+  border-radius: 4px !important;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  margin: 3px;
+}
+[id$="select_all_visible"] i, [id$="deselect_all_salts"] i, [id$="clear_search"] i {
+  color: #212529 !important;
+  font-size: 16px;
+  line-height: 1;
+  margin: 3px;
+}
+[id$="select_all_visible"]:hover, [id$="deselect_all_salts"]:hover, [id$="clear_search"]:hover { background-color: #dee2e6 !important; }
+.search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
+.search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
+[id$="clear_search"] {
+  height: 30px !important;
+  padding: 0 10px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
