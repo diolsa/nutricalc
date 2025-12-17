@@ -21,5 +21,6 @@ Imports:
     nnls,
     shiny,
     bslib,
-    Ternary
+    Ternary,
+    xml2
 RoxygenNote: 7.3.2
