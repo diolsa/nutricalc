@@ -14,3 +14,16 @@ drop_tiny <- function(x, tol = 1e-9) {
   x[abs(x) < tol] <- 0
   x
 }
+
+
+#' Remove negative zeros introduced by rounding
+#'
+#' Ensures rounded values like -0.00 are displayed as 0.
+#'
+#' @param x Numeric vector or matrix.
+#'
+#' @keywords internal
+strip_negative_zero <- function(x) {
+  x[x == 0] <- 0
+  x
+}

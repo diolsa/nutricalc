@@ -1119,17 +1119,17 @@ server <- function(input, output, session) {
     res <- result()
     if (is.null(res)) return(tags$p("No result yet."))
 
-    target   <- as.numeric(res$target)
-    achieved <- drop_tiny(as.numeric(res$achieved))
-    abs_err  <- drop_tiny(as.numeric(res$abs_error))
-    pct_err  <- as.numeric(res$percent_error)
+    target   <- strip_negative_zero(round(drop_tiny(as.numeric(res$target)),   6))
+    achieved <- strip_negative_zero(round(drop_tiny(as.numeric(res$achieved)), 6))
+    abs_err  <- strip_negative_zero(round(drop_tiny(as.numeric(res$abs_error)), 6))
+    pct_err  <- strip_negative_zero(round(as.numeric(res$percent_error), 2))
 
     nd <- data.frame(
       Nutrient          = names(res$target),
-      Target            = round(target,   6),
-      Achieved          = round(achieved, 6),
-      "Absolute Error"  = round(abs_err,  6),
-      "Percent Error"   = round(pct_err,  2),
+      Target            = target,
+      Achieved          = achieved,
+      "Absolute Error"  = abs_err,
+      "Percent Error"   = pct_err,
       stringsAsFactors  = FALSE,
       check.names       = FALSE
     )

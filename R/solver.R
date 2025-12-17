@@ -151,10 +151,10 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
 
   nutrients_df <- data.frame(
     Nutrient      = names(x$target),
-    Target        = round(drop_tiny(as.vector(x$target)), 3),
-    Achieved      = round(drop_tiny(as.vector(x$achieved)), 3),
-    Abs_Error     = round(drop_tiny(as.vector(x$abs_error)), 3),
-    Percent_Error = round((x$percent_error), 2),
+    Target        = strip_negative_zero(round(drop_tiny(as.vector(x$target)), 3)),
+    Achieved      = strip_negative_zero(round(drop_tiny(as.vector(x$achieved)), 3)),
+    Abs_Error     = strip_negative_zero(round(drop_tiny(as.vector(x$abs_error)), 3)),
+    Percent_Error = strip_negative_zero(round((x$percent_error), 2)),
     check.names   = FALSE
   )
   print(nutrients_df, row.names = FALSE)
