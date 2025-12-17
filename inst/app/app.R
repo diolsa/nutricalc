@@ -112,7 +112,7 @@ default_targets_mmol <- {
   v
 }
 
-default_water_expr <- default_expr
+default_water_expr <- setNames(rep("0", length(nutrients)), nutrients)
 
 default_water_mmol <- {
   v <- as.numeric(default_water_expr)
