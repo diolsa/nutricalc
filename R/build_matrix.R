@@ -145,7 +145,7 @@ salt_info$category[salt_info$salt == "NH4OH"]                  <- "Ammonium hydr
 salt_info$category[salt_info$salt == "Ca(OH)2"]                <- "Calcium hydroxide"
 
 
-acid_base_compounds <- c("HNO3", "H2SO4", "KOH", "HCL", "H3PO4", "NaOH", "NH4OH", "Ca(OH)2")
+acid_base_compounds <- c("HNO3", "H2SO4", "KOH", "HCl", "H3PO4", "NaOH", "NH4OH", "Ca(OH)2")
 
 salt_info$is_acid_base <- salt_info$salt %in% acid_base_compounds
 
