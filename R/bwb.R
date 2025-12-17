@@ -1,8 +1,8 @@
 #' Fetch BWB "In aller Tiefe" Mittelwerte by postal code
 #'
 #' Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given German
-#' postal code and returns the mean Mittelwert values (aggregated across
-#' potential supply zones) for selected parameters as mmol/L.
+#' postal code and returns the Mittelwert values (first available entry per
+#' parameter) for selected parameters as mmol/L.
 #'
 #' @param plz Character or numeric vector of length one with a five digit
 #'   German postal code.
@@ -68,6 +68,7 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
@@ -83,11 +84,20 @@ fetch_bwb_mittelwert <- function(plz) {
       rows$Einheit_clean
     )
 
-    mmol_values[nm] <- mean(mmol, na.rm = TRUE)
-    if (is.nan(mmol_values[nm])) mmol_values[nm] <- NA_real_
+    first_valid <- which(!is.na(mmol))[1]
+    if (!is.na(first_valid)) {
+      mmol_values[nm] <- mmol[first_valid]
+      max_digits <- suppressWarnings(max(rows$Mittelwert_digits, na.rm = TRUE))
+      if (is.infinite(max_digits)) max_digits <- NA_integer_
+      if (!is.na(max_digits)) {
+        mmol_values[nm] <- round(mmol_values[nm], max_digits)
+      }
+    } else {
+      mmol_values[nm] <- NA_real_
+    }
   }
 
-  mmol_values
+  strip_trailing_zeros_numeric(mmol_values)
 }
 
 parse_html_table <- function(tbl) {
@@ -126,6 +136,16 @@ parse_mittelwert <- function(x) {
   if (is.na(val)) NA_real_ else val
 }
 
+count_decimal_places <- function(x) {
+  x_chr <- trimws(as.character(x))
+  x_chr <- sub("^<\\s*", "", x_chr)
+  x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
+  if (!grepl("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$", x_chr)) return(NA_integer_)
+  if (!grepl("\\.", x_chr)) return(0L)
+  fractional <- sub("^[^\\.]*\\.([^eE]*).*", "\\1", x_chr)
+  fractional <- sub("[eE].*$", "", fractional)
+  nchar(fractional)
+}
 map_parameter_to_nutrient <- function(param) {
   clean <- trimws(to_lower_ascii(param))
   if (grepl("nitrat", clean)) return("NO3_N")
@@ -180,4 +200,19 @@ convert_mittelwert <- function(value, unit, nutrient) {
 to_lower_ascii <- function(x) {
   out <- tolower(iconv(x, to = "ASCII//TRANSLIT"))
   ifelse(is.na(out), tolower(as.character(x)), out)
+}
+
+strip_trailing_zeros_numeric <- function(x) {
+  formatted <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  out <- suppressWarnings(as.numeric(formatted))
+  names(out) <- names(x)
+  class(out) <- c("bwb_mittelwert", class(out))
+  out
+}
+
+print.bwb_mittelwert <- function(x, ...) {
+  vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  names(vals) <- names(x)
+  print(noquote(vals), ...)
+  invisible(x)
 }
