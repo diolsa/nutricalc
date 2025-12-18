@@ -228,23 +228,21 @@ ui <- fluidPage(
   .search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
   .search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
   #clear_search { height: 30px !important; padding: 0 10px !important; display: inline-flex; align-items: center; justify-content: center; }
- /* Bootstrap 5 uses .nav-link/.nav-item; keep Bootstrap 3 selector for older themes. */
-  #input_tabs .nav-tabs>li>a,
-  #input_tabs .nav-tabs .nav-link {
-    padding: 4px 6px !important;
-    font-size: 12px !important;
-    border-radius: 2px 2px 0 0 !important;
-    white-space: nowrap;
-  }
-  #input_tabs .nav-tabs>li,
-  #input_tabs .nav-tabs .nav-item {
-    margin-right: 1px !important;
-  }
-  /* Prevent wrapping of the tab list in Bootstrap 3 and 5. */
-  #input_tabs .nav-tabs,
-  #input_tabs .nav {
-    flex-wrap: nowrap !important;
-  }
+
+#input_tabs{
+  --bs-nav-link-padding-y: 10px;
+  --bs-nav-link-padding-x: 18px;
+  --bs-nav-link-font-size: 14px;
+}
+
+#input_tabs > ul.nav.nav-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+}
+
+
+
 ")),
 
 
@@ -260,7 +258,7 @@ ui <- fluidPage(
       div(class = "card p-3",
           h5("⚗️ Nutrient Targets & Fertilizers"),
           tabsetPanel(id = "input_tabs", type = "tabs",
-                      tabPanel("🎯 Targets",
+                      tabPanel("🎯 Nutrient Targets",
                                fluidRow(
           column(2, strong("Nutrient")),
           column(4,
@@ -299,7 +297,7 @@ ui <- fluidPage(
                                         tags$small(class = "text-muted", "Values respect the current unit selection above."))
                                )
                       ),
-                      tabPanel("🧂 Salts",
+                      tabPanel("🧂 Fertilizers",
                                fluidRow(column(10,
                                                div(class = "search-inline", style = "display:flex; align-items:center; gap:6px;",
                                                    textInput("salt_search", label = NULL, placeholder = "Search salts...", width = "100%"),
