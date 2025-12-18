@@ -4,7 +4,7 @@
 \alias{converte}
 \title{Convert amount of one compound to another using molar mass and element counts}
 \usage{
-converte(from, to, value = 1)
+converte(from, to, value = 1, element = NULL)
 }
 \arguments{
 \item{from}{A character string representing the source formula or element (e.g., "Ca", "NaCl", "SO4").}
@@ -12,6 +12,10 @@ converte(from, to, value = 1)
 \item{to}{A character string representing the target formula or element.}
 
 \item{value}{A numeric value to convert (default is 1). Represents the quantity of `from`.}
+
+\item{element}{Optional element symbol to anchor the stoichiometric conversion when
+multiple elements are shared between \code{from} and \code{to}. If omitted and more than one
+element is shared, an error is raised to avoid ambiguous conversions.}
 }
 \value{
 A numeric value representing the equivalent amount of `to`, adjusted by molar mass and atom ratio.
@@ -26,5 +30,6 @@ converte("SO4", "S")        # Convert sulfate to elemental sulfur
 converte("Na", "NaCl")      # Convert sodium to sodium chloride
 converte("P2O5", "P")       # Convert phosphorus pentoxide to elemental phosphorus
 converte("Ca", "CaCl2·2H2O", 10)  # Convert 10 mmol of Ca to CaCl2·2H2O
+converte("CaCO3", "CaCl2", element = "Ca")  # Disambiguate using Ca as the anchor
 
 }
