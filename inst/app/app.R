@@ -228,6 +228,21 @@ ui <- fluidPage(
   .search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
   .search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
   #clear_search { height: 30px !important; padding: 0 10px !important; display: inline-flex; align-items: center; justify-content: center; }
+
+#input_tabs{
+  --bs-nav-link-padding-y: 10px;
+  --bs-nav-link-padding-x: 18px;
+  --bs-nav-link-font-size: 14px;
+}
+
+#input_tabs > ul.nav.nav-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+}
+
+
+
 ")),
 
 
@@ -269,6 +284,18 @@ ui <- fluidPage(
 
 
 
+                      ),
+                      tabPanel("💦 Water",
+                               fluidRow(
+                                 column(6,
+                                        textInput("bwb_plz", "BWB postal code", placeholder = "e.g. 10115", width = "100%"),
+                                        tags$small(class = "text-muted", "Fetch Berliner Wasserbetriebe Mittelwert data and fill water inputs under Targets.")),
+                                 column(6,
+                                        br(),
+                                        actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm"),
+                                        tags$br(), tags$br(),
+                                        tags$small(class = "text-muted", "Values respect the current unit selection above."))
+                               )
                       ),
                       tabPanel("🧂 Fertilizers",
                                fluidRow(column(10,
@@ -545,6 +572,40 @@ server <- function(input, output, session) {
       updateTextInput(session, paste0("expr_", nm), value = "0")
     }
     targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
+  })
+
+  observeEvent(input$apply_bwb, {
+    plz <- input$bwb_plz %||% ""
+    plz <- trimws(plz)
+    if (!nzchar(plz)) {
+      showNotification("Please enter a postal code.", type = "error")
+      return()
+    }
+
+    vals_mmol <- tryCatch(
+      fetch_bwb_mittelwert(plz),
+      error = function(e) {
+        showNotification(conditionMessage(e), type = "error")
+        NULL
+      }
+    )
+
+    if (is.null(vals_mmol)) return()
+
+    vals_mmol[is.na(vals_mmol)] <- 0
+    water_mmol(vals_mmol)
+
+    unit_out <- current_input_unit() %||% canonical_unit
+    display_water <- targets_for_display(vals_mmol, unit_out)
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("water_expr_", nm),
+        value = format(display_water[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+
+    showNotification("BWB water values applied.", type = "message")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
   })
 
   observeEvent(input$run, {
@@ -979,7 +1040,7 @@ server <- function(input, output, session) {
         }
 
         apply_salts(rec)
-        updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+        updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
       }, once = TRUE)
 
     } else {
@@ -1003,7 +1064,7 @@ server <- function(input, output, session) {
       }
 
       apply_salts(rec)
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
     }
 
   })
@@ -1054,8 +1115,8 @@ server <- function(input, output, session) {
       vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
       targets_mmol(vals_mmol)
 
-      # 4) jump back to the Nutrient Targets tab
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      # 4) jump back to the Targets tab
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
     }
 
     # If unit is not mg/L, first switch unit,
