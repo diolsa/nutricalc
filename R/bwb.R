@@ -69,7 +69,6 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
-  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
@@ -191,6 +190,13 @@ strip_trailing_zeros_numeric <- function(x) {
   out
 }
 
+#' Pretty-print BWB Mittelwerte
+#'
+#' @param x A `bwb_mittelwert` numeric vector.
+#' @param ... Additional arguments passed to `print`.
+#'
+#' @return The input `bwb_mittelwert` object, invisibly.
+#' @export
 print.bwb_mittelwert <- function(x, ...) {
   vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
   names(vals) <- names(x)
