@@ -69,11 +69,13 @@ fetch_bwb_mittelwert <- function(plz) {
   combined <- do.call(rbind, extracted)
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
+  combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
   combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
 
   mmol_values <- empty_result
+  result_digits <- stats::setNames(rep(NA_integer_, length(target_names)), target_names)
   for (nm in target_names) {
     rows <- combined[combined$Target == nm, , drop = FALSE]
     if (!nrow(rows)) next
@@ -85,10 +87,21 @@ fetch_bwb_mittelwert <- function(plz) {
     )
 
     first_valid <- which(!is.na(mmol))[1]
-    mmol_values[nm] <- if (!is.na(first_valid)) mmol[first_valid] else NA_real_
+    if (!is.na(first_valid)) {
+      chosen_unit <- rows$Einheit_clean[first_valid]
+      digits <- rows$Mittelwert_digits[first_valid]
+      value <- mmol[first_valid]
+      if (!is.na(chosen_unit) && identical(chosen_unit, "mmol/L")) {
+        value <- round(value, digits = digits)
+        result_digits[nm] <- digits
+      }
+      mmol_values[nm] <- value
+    } else {
+      mmol_values[nm] <- NA_real_
+    }
   }
 
-  strip_trailing_zeros_numeric(mmol_values)
+  finalize_bwb_mittelwert(mmol_values, result_digits)
 }
 
 parse_html_table <- function(tbl) {
@@ -125,6 +138,15 @@ parse_mittelwert <- function(x) {
   x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
   val <- suppressWarnings(as.numeric(x_chr))
   if (is.na(val)) NA_real_ else val
+}
+
+count_decimal_places <- function(x) {
+  x_chr <- trimws(as.character(x))
+  x_chr <- sub("^<\\s*", "", x_chr)
+  x_chr <- gsub(",", ".", x_chr, fixed = TRUE)
+  if (!grepl("\\.", x_chr, fixed = FALSE)) return(0L)
+  decimal_part <- sub("^[^.]*\\.([0-9]+).*", "\\1", x_chr, perl = TRUE)
+  nchar(decimal_part)
 }
 map_parameter_to_nutrient <- function(param) {
   clean <- trimws(to_lower_ascii(param))
@@ -182,12 +204,10 @@ to_lower_ascii <- function(x) {
   ifelse(is.na(out), tolower(as.character(x)), out)
 }
 
-strip_trailing_zeros_numeric <- function(x) {
-  formatted <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
-  out <- suppressWarnings(as.numeric(formatted))
-  names(out) <- names(x)
-  class(out) <- c("bwb_mittelwert", class(out))
-  out
+finalize_bwb_mittelwert <- function(x, digits) {
+  attr(x, "bwb_digits") <- digits
+  class(x) <- c("bwb_mittelwert", class(x))
+  x
 }
 
 #' Pretty-print BWB Mittelwerte
@@ -198,7 +218,20 @@ strip_trailing_zeros_numeric <- function(x) {
 #' @return The input `bwb_mittelwert` object, invisibly.
 #' @export
 print.bwb_mittelwert <- function(x, ...) {
-  vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
+  digits <- attr(x, "bwb_digits")
+  if (is.null(digits)) {
+    digits <- rep(NA_integer_, length(x))
+  }
+
+  vals <- mapply(function(val, dig) {
+    if (is.na(val)) return(NA_character_)
+    if (!is.na(dig)) {
+      formatC(val, format = "f", digits = dig, drop0trailing = FALSE)
+    } else {
+      formatC(val, format = "fg", digits = 22, drop0trailing = TRUE)
+    }
+  }, x, digits, USE.NAMES = FALSE)
+
   names(vals) <- names(x)
   print(noquote(vals), ...)
   invisible(x)
