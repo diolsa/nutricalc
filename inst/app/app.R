@@ -1013,6 +1013,7 @@ server <- function(input, output, session) {
   observeEvent(input$apply_recipe, {
     req(input$recipe_pick)
     rec <- recipes[[input$recipe_pick]]
+    recipe_label <- rec$name %||% input$recipe_pick
 
     flip_needed <- !is.null(rec$unit) && normalize_unit(rec$unit) %in% c("mmol/L", "mg/L", "µmol/L") &&
       !identical(normalize_unit(input$input_unit), normalize_unit(rec$unit))
@@ -1041,6 +1042,7 @@ server <- function(input, output, session) {
 
         apply_salts(rec)
         updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+        showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
       }, once = TRUE)
 
     } else {
@@ -1065,6 +1067,7 @@ server <- function(input, output, session) {
 
       apply_salts(rec)
       updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+      showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
     }
 
   })
