@@ -3,6 +3,7 @@
 library(shiny)
 library(bslib)
 library(Ternary)
+library(xml2)
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
@@ -200,14 +201,18 @@ ui <- fluidPage(
   body { font-size: 13px; }
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
-  .irs { margin-top: -8px; }
+
   .container-fluid { max-width: 1300px; } input.form-control { height: 26px; padding: 2px 4px; font-size: 13px; }
   .irs-single, .irs-min, .irs-max { font-size: 10px; }
-  .form-group.shiny-input-slider { margin-top: -8px; }
+
  .importance-slider .irs-min,.importance-slider .irs-max {display: none !important;}
- .importance-slider .irs-single {display: block !important;top: 20px !important;margin-top: 0
- !important;background: transparent !important; color: #000000
- !important; font-size: 10px; font-weight: bold;padding: 0;z-index: 5 !important;pointer-events: none;}
+
+.importance-slider .irs-single { display: block !important; top: auto
+!important; transform: translateY(12px); margin-top: 0 !important;
+ background: transparent !important; color: #000000 !important; font-size: 10px;
+  font-weight: bold;  padding: 0; z-index: 5 !important; pointer-events: none;}
+
+
  .importance-slider .irs-single:before { display: none !important;}
  .importance-slider .irs { margin-top: -16px; height: 28px !important;}
  .importance-slider { margin-bottom: 10px; }
