@@ -14,7 +14,7 @@ converte(from, to, value = 1, element = NULL)
 \item{value}{A numeric value to convert (default is 1). Represents the quantity of `from`.}
 
 \item{element}{Optional element symbol to anchor the stoichiometric conversion when
-multiple elements are shared between \code{from} and \code{to}. If omitted and more than one
+multiple elements are shared between `from` and `to`. If omitted and more than one
 element is shared, an error is raised to avoid ambiguous conversions.}
 }
 \value{
@@ -30,6 +30,6 @@ converte("SO4", "S")        # Convert sulfate to elemental sulfur
 converte("Na", "NaCl")      # Convert sodium to sodium chloride
 converte("P2O5", "P")       # Convert phosphorus pentoxide to elemental phosphorus
 converte("Ca", "CaCl2·2H2O", 10)  # Convert 10 mmol of Ca to CaCl2·2H2O
-converte("CaCO3", "CaCl2", element = "Ca")  # Disambiguate using Ca as the anchor
+converte("(NH4)2HPO4", "NH4H2PO4", element = "P")  # Disambiguate using P as the anchor
 
 }
