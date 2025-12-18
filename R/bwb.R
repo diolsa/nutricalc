@@ -191,6 +191,13 @@ strip_trailing_zeros_numeric <- function(x) {
   out
 }
 
+#' Pretty-print BWB Mittelwerte
+#'
+#' @param x A `bwb_mittelwert` numeric vector.
+#' @param ... Additional arguments passed to `print`.
+#'
+#' @return The input `bwb_mittelwert` object, invisibly.
+#' @export
 print.bwb_mittelwert <- function(x, ...) {
   vals <- formatC(x, format = "fg", digits = 22, drop0trailing = TRUE)
   names(vals) <- names(x)
