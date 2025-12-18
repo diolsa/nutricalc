@@ -243,14 +243,11 @@ ui <- fluidPage(
       div(class = "card p-3",
           h5("⚗️ Nutrient Targets & Fertilizers"),
           tabsetPanel(id = "input_tabs", type = "tabs",
-                      tabPanel("🎯 Nutrient Targets",
+                      tabPanel("🎯 Targets",
                                fluidRow(
           column(2, strong("Nutrient")),
           column(4,
-                fluidRow(
-                  column(6, strong(textOutput("target_col_header"))),
-                  column(6, strong("Water"))
-                ),
+                strong(textOutput("target_col_header")),
                 div(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
@@ -269,6 +266,18 @@ ui <- fluidPage(
 
 
 
+                      ),
+                      tabPanel("💦 Water",
+                               fluidRow(
+                                 column(2, strong("Nutrient")),
+                                 column(10,
+                                        strong("Water"),
+                                        tags$br(),
+                                        tags$small(class = "text-muted", "Water concentration to subtract from targets (shares unit selection above).")
+                                 )
+                               ),
+                               tags$hr(style = "margin:4px 0;"),
+                               uiOutput("water_rows")
                       ),
                       tabPanel("🧂 Fertilizers",
                                fluidRow(column(10,
@@ -515,11 +524,20 @@ server <- function(input, output, session) {
       div(
         class = "nutrient-row",fluidRow(
           column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
-          column(2, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
-          column(2, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
+          column(4, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
           column(6, div(class = "importance-slider",
                         sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
                                     , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
+        ))
+    }))
+  })
+
+  output$water_rows <- renderUI({
+    tagList(lapply(nutrients, function(nm) {
+      div(
+        class = "nutrient-row",fluidRow(
+          column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+          column(10, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]], width = "100%"))
         ))
     }))
   })
@@ -979,7 +997,7 @@ server <- function(input, output, session) {
         }
 
         apply_salts(rec)
-        updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+        updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
       }, once = TRUE)
 
     } else {
@@ -1003,7 +1021,7 @@ server <- function(input, output, session) {
       }
 
       apply_salts(rec)
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
     }
 
   })
@@ -1054,8 +1072,8 @@ server <- function(input, output, session) {
       vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
       targets_mmol(vals_mmol)
 
-      # 4) jump back to the Nutrient Targets tab
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      # 4) jump back to the Targets tab
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
     }
 
     # If unit is not mg/L, first switch unit,
