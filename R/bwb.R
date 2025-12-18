@@ -1,6 +1,6 @@
 #' Fetch BWB "In aller Tiefe" Mittelwerte by postal code
 #'
-#' Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given German
+#' Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given Berlin
 #' postal code and returns the Mittelwert values (first available entry per
 #' parameter) for selected parameters as mmol/L.
 #'
