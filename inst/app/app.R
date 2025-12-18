@@ -228,10 +228,7 @@ ui <- fluidPage(
   .search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
   .search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
   #clear_search { height: 30px !important; padding: 0 10px !important; display: inline-flex; align-items: center; justify-content: center; }
-
-
-
-
+ /* Bootstrap 5 uses .nav-link/.nav-item; keep Bootstrap 3 selector for older themes. */
   #input_tabs .nav-tabs>li>a,
   #input_tabs .nav-tabs .nav-link {
     padding: 4px 6px !important;
@@ -243,7 +240,11 @@ ui <- fluidPage(
   #input_tabs .nav-tabs .nav-item {
     margin-right: 1px !important;
   }
-
+  /* Prevent wrapping of the tab list in Bootstrap 3 and 5. */
+  #input_tabs .nav-tabs,
+  #input_tabs .nav {
+    flex-wrap: nowrap !important;
+  }
 ")),
 
 
