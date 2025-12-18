@@ -247,7 +247,10 @@ ui <- fluidPage(
                                fluidRow(
           column(2, strong("Nutrient")),
           column(4,
-                strong(textOutput("target_col_header")),
+                fluidRow(
+                  column(6, strong(textOutput("target_col_header"))),
+                  column(6, strong("Water"))
+                ),
                 div(
                                           radioButtons("input_unit", label = NULL,
                                                        choices = c("mmol/L", "µmol/L", "mg/L"),
@@ -269,15 +272,15 @@ ui <- fluidPage(
                       ),
                       tabPanel("💦 Water",
                                fluidRow(
-                                 column(2, strong("Nutrient")),
-                                 column(10,
-                                        strong("Water"),
-                                        tags$br(),
-                                        tags$small(class = "text-muted", "Water concentration to subtract from targets (shares unit selection above).")
-                                 )
-                               ),
-                               tags$hr(style = "margin:4px 0;"),
-                               uiOutput("water_rows")
+                                 column(6,
+                                        textInput("bwb_plz", "BWB postal code", placeholder = "e.g. 10115", width = "100%"),
+                                        tags$small(class = "text-muted", "Fetch Berliner Wasserbetriebe Mittelwert data and fill water inputs under Targets.")),
+                                 column(6,
+                                        br(),
+                                        actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm"),
+                                        tags$br(), tags$br(),
+                                        tags$small(class = "text-muted", "Values respect the current unit selection above."))
+                               )
                       ),
                       tabPanel("🧂 Fertilizers",
                                fluidRow(column(10,
@@ -524,20 +527,11 @@ server <- function(input, output, session) {
       div(
         class = "nutrient-row",fluidRow(
           column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
-          column(4, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
+          column(2, textInput(inputId = paste0("expr_", nm), label = NULL, value = default_expr[[nm]])),
+          column(2, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]])),
           column(6, div(class = "importance-slider",
                         sliderInput(inputId = paste0("imp_", nm), label = NULL ,ticks   = TRUE
                                     , min = -2, max = 2, step = 1, value = default_importance[[nm]])))
-        ))
-    }))
-  })
-
-  output$water_rows <- renderUI({
-    tagList(lapply(nutrients, function(nm) {
-      div(
-        class = "nutrient-row",fluidRow(
-          column(2, tags$label(HTML(pretty_nutrient_label_str(nm)))),
-          column(10, textInput(inputId = paste0("water_expr_", nm), label = NULL, value = default_water_expr[[nm]], width = "100%"))
         ))
     }))
   })
@@ -563,6 +557,40 @@ server <- function(input, output, session) {
       updateTextInput(session, paste0("expr_", nm), value = "0")
     }
     targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
+  })
+
+  observeEvent(input$apply_bwb, {
+    plz <- input$bwb_plz %||% ""
+    plz <- trimws(plz)
+    if (!nzchar(plz)) {
+      showNotification("Please enter a postal code.", type = "error")
+      return()
+    }
+
+    vals_mmol <- tryCatch(
+      fetch_bwb_mittelwert(plz),
+      error = function(e) {
+        showNotification(conditionMessage(e), type = "error")
+        NULL
+      }
+    )
+
+    if (is.null(vals_mmol)) return()
+
+    vals_mmol[is.na(vals_mmol)] <- 0
+    water_mmol(vals_mmol)
+
+    unit_out <- current_input_unit() %||% canonical_unit
+    display_water <- targets_for_display(vals_mmol, unit_out)
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("water_expr_", nm),
+        value = format(display_water[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+
+    showNotification("BWB water values applied.", type = "message")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
   })
 
   observeEvent(input$run, {
