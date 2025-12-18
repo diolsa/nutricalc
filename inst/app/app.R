@@ -228,6 +228,8 @@ ui <- fluidPage(
   .search-inline .shiny-input-container { margin-bottom: 0 !important; flex: 1; }
   .search-inline .form-control { height: 30px !important; padding: 4px 8px !important; line-height: 1.2 !important; }
   #clear_search { height: 30px !important; padding: 0 10px !important; display: inline-flex; align-items: center; justify-content: center; }
+  #input_tabs .nav-tabs>li>a { padding: 6px 10px !important; font-size: 13px !important; border-radius: 2px 2px 0 0 !important; white-space: nowrap; }
+  #input_tabs .nav-tabs>li { margin-right: 2px !important; }
 ")),
 
 
