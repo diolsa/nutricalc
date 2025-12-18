@@ -240,6 +240,11 @@ ui <- fluidPage(
   #input_tabs .nav-tabs .nav-item {
     margin-right: 1px !important;
   }
+  /* Prevent wrapping of the tab list in Bootstrap 3 and 5. */
+  #input_tabs .nav-tabs,
+  #input_tabs .nav {
+    flex-wrap: nowrap !important;
+  }
 ")),
 
 
