@@ -463,6 +463,9 @@ ui <- fluidPage(
                       tabPanel("🗒Result",
                                uiOutput("delivery_ui")
                       ),
+                      tabPanel("🧪 pH",
+                               uiOutput("ph_ui")
+                      ),
                       tabPanel("🛢️ Solution",
                                fluidRow(
                                  column(
@@ -1258,6 +1261,38 @@ server <- function(input, output, session) {
       tags$details(
         tags$summary("Show raw print() output"),
         verbatimTextOutput("raw_print")
+      )
+    )
+  })
+
+  # -------- pH TAB UI --------
+  output$ph_ui <- renderUI({
+    res <- result()
+    if (is.null(res)) return(tags$p("No result yet."))
+    if (!exists("ph_from_achieved", mode = "function")) {
+      return(tags$p("pH calculation not available."))
+    }
+
+    ph_res <- tryCatch(
+      ph_from_achieved(res$achieved),
+      error = function(e) e
+    )
+
+    if (inherits(ph_res, "error")) {
+      return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
+    }
+
+    tags$div(
+      tags$h5("🧪 Estimated pH"),
+      tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
+      tags$p(strong("Ionic strength (mol/L):"), sprintf("%.4f", ph_res$I)),
+      tags$p(
+        strong("Charge balance residual (meq/L):"),
+        sprintf("%.6f", ph_res$charge_meq[["residual"]])
+      ),
+      tags$p(
+        class = "text-muted",
+        "Estimated at 25°C with Davies activity correction; no carbonate or complexation assumed."
       )
     )
   })
