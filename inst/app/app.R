@@ -1288,6 +1288,46 @@ server <- function(input, output, session) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
     }
 
+    output$ph_fixed_cations <- renderTable({
+      data.frame(
+        Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
+        `meq/L` = unname(ph_res$charge_breakdown$fixed_cations_meq),
+        check.names = FALSE
+      )
+    })
+
+    output$ph_fixed_anions <- renderTable({
+      data.frame(
+        Ion = names(ph_res$charge_breakdown$fixed_anions_meq),
+        `meq/L` = unname(ph_res$charge_breakdown$fixed_anions_meq),
+        check.names = FALSE
+      )
+    })
+
+    output$ph_variable <- renderTable({
+      data.frame(
+        Component = names(ph_res$charge_breakdown$variable_meq),
+        `meq/L` = unname(ph_res$charge_breakdown$variable_meq),
+        check.names = FALSE
+      )
+    })
+
+    output$ph_species <- renderTable({
+      data.frame(
+        Species = names(ph_res$charge_breakdown$species_mM),
+        `mmol/L` = unname(ph_res$charge_breakdown$species_mM),
+        check.names = FALSE
+      )
+    })
+
+    output$ph_totals <- renderTable({
+      data.frame(
+        Total = names(ph_res$charge_breakdown$totals_meq),
+        `meq/L` = unname(ph_res$charge_breakdown$totals_meq),
+        check.names = FALSE
+      )
+    })
+
     tags$div(
       tags$h5("🧪 Estimated pH"),
       tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
@@ -1296,6 +1336,17 @@ server <- function(input, output, session) {
         strong("Charge balance residual (meq/L):"),
         sprintf("%.6f", ph_res$charge_meq[["residual"]])
       ),
+      tags$hr(),
+      tags$h6("Fixed cations (meq/L)"),
+      tableOutput("ph_fixed_cations"),
+      tags$h6("Fixed anions (meq/L)"),
+      tableOutput("ph_fixed_anions"),
+      tags$h6("Variable components (meq/L)"),
+      tableOutput("ph_variable"),
+      tags$h6("Species concentrations (mmol/L)"),
+      tableOutput("ph_species"),
+      tags$h6("Charge totals (meq/L)"),
+      tableOutput("ph_totals"),
       tags$p(
         class = "text-muted",
         "Estimated at 25°C with Davies activity correction; no carbonate or complexation assumed."
