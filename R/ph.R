@@ -22,6 +22,50 @@ ph_from_achieved <- function(
   max_iter = 200,
   inner_max_iter = 50
 ) {
+  normalize_nutrient_names <- function(x) {
+    x <- gsub("[–-]", "_", x)
+    x <- gsub("\\s+", "", x)
+    x
+  }
+
+  to_named_numeric <- function(x) {
+    if (is.data.frame(x)) {
+      if (!all(c("Nutrient", "Achieved") %in% names(x))) {
+        stop("Data frame must have columns 'Nutrient' and 'Achieved'.", call. = FALSE)
+      }
+      nm <- as.character(x$Nutrient)
+      vals <- x$Achieved
+      names(vals) <- nm
+      x <- vals
+    }
+
+    if (is.null(names(x))) {
+      stop("achieved must be a named numeric vector or a data.frame with Nutrient/Achieved columns.", call. = FALSE)
+    }
+
+    vals <- x
+    if (is.character(vals)) {
+      vals[vals == ""] <- NA
+      vals <- suppressWarnings(as.numeric(vals))
+    }
+
+    if (!is.numeric(vals)) {
+      vals <- suppressWarnings(as.numeric(vals))
+    }
+
+    names(vals) <- normalize_nutrient_names(names(vals))
+
+    na_idx <- is.na(vals)
+    if (any(na_idx)) {
+      bad <- names(vals)[na_idx]
+      bad <- unique(bad[!is.na(bad) & nzchar(bad)])
+      stop(sprintf("achieved has NA values for: %s", paste(bad, collapse = ", ")), call. = FALSE)
+    }
+
+    vals
+  }
+
+  achieved <- to_named_numeric(achieved)
   stopifnot(is.numeric(achieved), !is.null(names(achieved)))
   if (temp_C != 25) stop("This simple implementation currently assumes 25C")
 
@@ -227,13 +271,16 @@ ph_from_achieved <- function(
     PO4 = sp$PO4 * 1e3
   )
 
+  expected_species <- c("H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4")
+  stopifnot(all(expected_species %in% names(species_mM)))
+
   # charge check
   pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 2 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
   neg_fix_meq <- NO3 + Cl + 2 * Mo
-  pos_meq <- pos_fix_meq + species_mM["H"] + species_mM["NH4"]
-  neg_meq <- neg_fix_meq + species_mM["OH"] +
-    (species_mM["HSO4"] + 2 * species_mM["SO4"]) +
-    (species_mM["H2PO4"] + 2 * species_mM["HPO4"] + 3 * species_mM["PO4"])
+  pos_meq <- pos_fix_meq + species_mM[["H"]] + species_mM[["NH4"]]
+  neg_meq <- neg_fix_meq + species_mM[["OH"]] +
+    (species_mM[["HSO4"]] + 2 * species_mM[["SO4"]]) +
+    (species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]])
 
   list(
     pH = as.numeric(pH),
