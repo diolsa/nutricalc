@@ -1320,9 +1320,17 @@ server <- function(input, output, session) {
     }, sanitize.text.function = function(x) x)
 
     output$ph_species <- renderTable({
+      species_vals <- ph_res$charge_breakdown$species_mM
+      if ("B" %in% names(res$achieved)) {
+        species_vals <- c(species_vals, B = as.numeric(res$achieved[["B"]]))
+      }
+      if ("Si" %in% names(res$achieved)) {
+        species_vals <- c(species_vals, Si = as.numeric(res$achieved[["Si"]]))
+      }
+
       data.frame(
-        Species = names(ph_res$charge_breakdown$species_mM),
-        `mmol/L` = fmt_small(unname(ph_res$charge_breakdown$species_mM)),
+        Species = names(species_vals),
+        `mmol/L` = fmt_small(unname(species_vals)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
