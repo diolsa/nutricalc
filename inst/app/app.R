@@ -1288,53 +1288,66 @@ server <- function(input, output, session) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
     }
 
+    fmt_small <- function(x) {
+      ifelse(abs(x) < 0.001, format(signif(x, 6), scientific = TRUE), format(signif(x, 6), trim = TRUE))
+    }
+    fmt_total <- function(x) {
+      format(round(x, 6), nsmall = 4, trim = TRUE)
+    }
+
     output$ph_fixed_cations <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
-        `meq/L` = unname(ph_res$charge_breakdown$fixed_cations_meq),
+        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_cations_meq)),
         check.names = FALSE
       )
-    })
+    }, sanitize.text.function = function(x) x)
 
     output$ph_fixed_anions <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_anions_meq),
-        `meq/L` = unname(ph_res$charge_breakdown$fixed_anions_meq),
+        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_anions_meq)),
         check.names = FALSE
       )
-    })
+    }, sanitize.text.function = function(x) x)
 
     output$ph_variable <- renderTable({
       data.frame(
         Component = names(ph_res$charge_breakdown$variable_meq),
-        `meq/L` = unname(ph_res$charge_breakdown$variable_meq),
+        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$variable_meq)),
         check.names = FALSE
       )
-    })
+    }, sanitize.text.function = function(x) x)
 
     output$ph_species <- renderTable({
       data.frame(
         Species = names(ph_res$charge_breakdown$species_mM),
-        `mmol/L` = unname(ph_res$charge_breakdown$species_mM),
+        `mmol/L` = fmt_small(unname(ph_res$charge_breakdown$species_mM)),
         check.names = FALSE
       )
-    })
+    }, sanitize.text.function = function(x) x)
 
     output$ph_totals <- renderTable({
       data.frame(
         Total = names(ph_res$charge_breakdown$totals_meq),
-        `meq/L` = unname(ph_res$charge_breakdown$totals_meq),
+        `meq/L` = fmt_total(unname(ph_res$charge_breakdown$totals_meq)),
         check.names = FALSE
       )
-    })
+    }, sanitize.text.function = function(x) x)
 
     tags$div(
       tags$h5("🧪 Estimated pH"),
       tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
+      tags$p(strong("pHc:"), sprintf("%.4f", ph_res$pHc)),
+      tags$p(strong("γ_H (Davies):"), format(signif(ph_res$gammas$H, 6), scientific = TRUE)),
+      tags$p(
+        strong("Check: pH - (pHc - log10(γ_H)) ="),
+        format(signif(ph_res$pH - (ph_res$pHc - log10(ph_res$gammas$H)), 6), scientific = TRUE)
+      ),
       tags$p(strong("Ionic strength (mol/L):"), sprintf("%.4f", ph_res$I)),
       tags$p(
         strong("Charge balance residual (meq/L):"),
-        sprintf("%.6f", ph_res$charge_meq[["residual"]])
+        fmt_total(ph_res$charge_meq[["residual"]])
       ),
       tags$hr(),
       tags$h6("Fixed cations (meq/L)"),
