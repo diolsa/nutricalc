@@ -1279,10 +1279,10 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-    ph_res <- tryCatch(
-      ph_fn(res$achieved),
-      error = function(e) e
-    )
+  ph_res <- tryCatch(
+    ph_fn(res$achieved, phc_bracket = c(1, 13)),
+    error = function(e) e
+  )
 
     if (inherits(ph_res, "error")) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
