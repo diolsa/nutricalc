@@ -287,16 +287,16 @@ ph_from_achieved <- function(
   # unpack species in mM
   sp <- out$species
   species_mM <- c(
-    H = sp$H * 1e3,
-    OH = sp$OH * 1e3,
-    NH4 = sp$NH4 * 1e3,
-    NH3 = sp$NH3 * 1e3,
-    HSO4 = sp$HSO4 * 1e3,
-    SO4 = sp$SO4 * 1e3,
-    H3PO4 = sp$H3PO4 * 1e3,
-    H2PO4 = sp$H2PO4 * 1e3,
-    HPO4 = sp$HPO4 * 1e3,
-    PO4 = sp$PO4 * 1e3
+    H = as.numeric(sp$H) * 1e3,
+    OH = as.numeric(sp$OH) * 1e3,
+    NH4 = as.numeric(sp$NH4) * 1e3,
+    NH3 = as.numeric(sp$NH3) * 1e3,
+    HSO4 = as.numeric(sp$HSO4) * 1e3,
+    SO4 = as.numeric(sp$SO4) * 1e3,
+    H3PO4 = as.numeric(sp$H3PO4) * 1e3,
+    H2PO4 = as.numeric(sp$H2PO4) * 1e3,
+    HPO4 = as.numeric(sp$HPO4) * 1e3,
+    PO4 = as.numeric(sp$PO4) * 1e3
   )
 
   expected_species <- c("H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4")
