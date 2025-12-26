@@ -274,13 +274,45 @@ ph_from_achieved <- function(
   expected_species <- c("H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4")
   stopifnot(all(expected_species %in% names(species_mM)))
 
-  # charge check
-  pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 2 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
-  neg_fix_meq <- NO3 + Cl + 2 * Mo
-  pos_meq <- pos_fix_meq + species_mM[["H"]] + species_mM[["NH4"]]
-  neg_meq <- neg_fix_meq + species_mM[["OH"]] +
-    (species_mM[["HSO4"]] + 2 * species_mM[["SO4"]]) +
-    (species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]])
+  fixed_cations_meq <- c(
+    K = KT,
+    Na = Na,
+    `2Ca` = 2 * Ca,
+    `2Mg` = 2 * Mg,
+    `2Fe` = 2 * Fe,
+    `2Mn` = 2 * Mn,
+    `2Zn` = 2 * Zn,
+    `2Cu` = 2 * Cu
+  )
+  fixed_anions_meq <- c(
+    NO3 = NO3,
+    Cl = Cl,
+    `2Mo` = 2 * Mo
+  )
+
+  variable_meq <- c(
+    H_plus = species_mM[["H"]],
+    OH_minus = species_mM[["OH"]],
+    NH4_plus = species_mM[["NH4"]],
+    sulfate_total_meq = species_mM[["HSO4"]] + 2 * species_mM[["SO4"]],
+    phosphate_total_meq = species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]]
+  )
+
+  pos_meq <- sum(fixed_cations_meq) + variable_meq[["H_plus"]] + variable_meq[["NH4_plus"]]
+  neg_meq <- sum(fixed_anions_meq) + variable_meq[["OH_minus"]] +
+    variable_meq[["sulfate_total_meq"]] + variable_meq[["phosphate_total_meq"]]
+
+  charge_breakdown <- list(
+    fixed_cations_meq = fixed_cations_meq,
+    fixed_anions_meq = fixed_anions_meq,
+    variable_meq = variable_meq,
+    species_mM = species_mM,
+    totals_meq = c(
+      pos_total_meq = as.numeric(pos_meq),
+      neg_total_meq = as.numeric(neg_meq),
+      residual_meq = as.numeric(pos_meq - neg_meq)
+    )
+  )
 
   list(
     pH = as.numeric(pH),
@@ -293,6 +325,7 @@ ph_from_achieved <- function(
       pos = as.numeric(pos_meq),
       neg = as.numeric(neg_meq),
       residual = as.numeric(pos_meq - neg_meq)
-    )
+    ),
+    charge_breakdown = charge_breakdown
   )
 }
