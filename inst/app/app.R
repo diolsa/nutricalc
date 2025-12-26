@@ -1269,12 +1269,18 @@ server <- function(input, output, session) {
   output$ph_ui <- renderUI({
     res <- result()
     if (is.null(res)) return(tags$p("No result yet."))
-    if (!exists("ph_from_achieved", mode = "function")) {
+    ph_fn <- NULL
+    if (exists("ph_from_achieved", mode = "function")) {
+      ph_fn <- ph_from_achieved
+    } else if (requireNamespace("nutricalc", quietly = TRUE)) {
+      ph_fn <- nutricalc::ph_from_achieved
+    }
+    if (is.null(ph_fn)) {
       return(tags$p("pH calculation not available."))
     }
 
     ph_res <- tryCatch(
-      ph_from_achieved(res$achieved),
+      ph_fn(res$achieved),
       error = function(e) e
     )
 
