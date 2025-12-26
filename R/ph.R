@@ -65,6 +65,11 @@ ph_from_achieved <- function(
     vals
   }
 
+  if (!is.numeric(inner_max_iter) || length(inner_max_iter) != 1 || is.na(inner_max_iter) ||
+      inner_max_iter < 1 || inner_max_iter %% 1 != 0) {
+    stop("inner_max_iter must be a single numeric value >= 1.", call. = FALSE)
+  }
+
   achieved <- to_named_numeric(achieved)
   stopifnot(is.numeric(achieved), !is.null(names(achieved)))
   if (temp_C != 25) stop("This simple implementation currently assumes 25C")
@@ -206,6 +211,29 @@ ph_from_achieved <- function(
       I <- I_new
     }
 
+    expected_species_full <- c(
+      "H", "OH", "NH4", "NH3", "HSO4", "SO4", "H3PO4", "H2PO4", "HPO4", "PO4"
+    )
+    missing_species <- setdiff(expected_species_full, names(species))
+    if (length(missing_species) > 0) {
+      stop(
+        sprintf(
+          "Speciation failed: missing species [%s]. Present: [%s].",
+          paste(missing_species, collapse = ", "),
+          paste(names(species), collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+    non_finite <- vapply(species, function(x) !is.finite(x), logical(1))
+    if (any(non_finite)) {
+      bad <- names(species)[non_finite]
+      stop(
+        sprintf("Speciation failed: non-finite values for [%s].", paste(bad, collapse = ", ")),
+        call. = FALSE
+      )
+    }
+
     # ---- charge balance in meq/L (use concentrations) ----
     pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 2 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
     neg_fix_meq <- NO3 + Cl + 2 * Mo
@@ -272,7 +300,17 @@ ph_from_achieved <- function(
   )
 
   expected_species <- c("H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4")
-  stopifnot(all(expected_species %in% names(species_mM)))
+  missing <- setdiff(expected_species, names(species_mM))
+  if (length(missing) > 0) {
+    stop(
+      sprintf(
+        "species_mM missing expected names [%s]. Present: [%s].",
+        paste(missing, collapse = ", "),
+        paste(names(species_mM), collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
 
   fixed_cations_meq <- c(
     K = KT,
