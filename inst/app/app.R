@@ -463,7 +463,7 @@ ui <- fluidPage(
                       tabPanel("🗒Result",
                                uiOutput("delivery_ui")
                       ),
-                      tabPanel("🧪 pH",
+                      tabPanel("🧪 pH & EC",
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -1279,10 +1279,10 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-  ph_res <- tryCatch(
-    ph_fn(res$achieved, phc_bracket = c(1, 13)),
-    error = function(e) e
-  )
+    ph_res <- tryCatch(
+      ph_fn(res$achieved, phc_bracket = c(1, 13)),
+      error = function(e) e
+    )
 
     if (inherits(ph_res, "error")) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
@@ -1343,15 +1343,31 @@ server <- function(input, output, session) {
       )
     }, sanitize.text.function = function(x) x)
 
+    ec_res <- NULL
+    ec_fn <- NULL
+    if (exists("ec_from_ph", mode = "function")) {
+      ec_fn <- ec_from_ph
+    } else if (requireNamespace("nutricalc", quietly = TRUE)) {
+      ec_fn <- nutricalc::ec_from_ph
+    }
+    if (!is.null(ec_fn)) {
+      ec_res <- tryCatch(
+        ec_fn(res$achieved, ph_res, method = "standard"),
+        error = function(e) e
+      )
+    }
+
+    output$ec_contrib <- renderTable({
+      if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
+      df <- ec_res$contributions
+      df$kappa_mS_cm <- fmt_small(df$kappa_mS_cm)
+      df$c_mM <- fmt_small(df$c_mM)
+      df
+    }, sanitize.text.function = function(x) x)
+
     tags$div(
-      tags$h5("🧪 Estimated pH"),
+      tags$h5("🧪 pH & EC"),
       tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
-      tags$p(strong("pHc:"), sprintf("%.4f", ph_res$pHc)),
-      tags$p(strong("γ_H (Davies):"), format(signif(ph_res$gammas$H, 6), scientific = TRUE)),
-      tags$p(
-        strong("Check: pH - (pHc - log10(γ_H)) ="),
-        format(signif(ph_res$pH - (ph_res$pHc - log10(ph_res$gammas$H)), 6), scientific = TRUE)
-      ),
       tags$p(strong("Ionic strength (mol/L):"), sprintf("%.4f", ph_res$I)),
       tags$p(
         strong("Charge balance residual (meq/L):"),
@@ -1368,6 +1384,20 @@ server <- function(input, output, session) {
       tableOutput("ph_species"),
       tags$h6("Charge totals (meq/L)"),
       tableOutput("ph_totals"),
+      tags$hr(),
+      tags$h6("Estimated EC (25°C)"),
+      if (inherits(ec_res, "error")) {
+        tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
+      } else if (is.null(ec_res)) {
+        tags$p("EC calculation not available.")
+      } else {
+        tagList(
+          tags$p(strong("EC (mS/cm):"), format(signif(ec_res$EC_mS_cm, 6), scientific = TRUE)),
+          tags$p(strong("EC (µS/cm):"), format(signif(ec_res$EC_uS_cm, 6), scientific = TRUE)),
+          tags$h6("EC contributions"),
+          tableOutput("ec_contrib")
+        )
+      },
       tags$p(
         class = "text-muted",
         "Estimated at 25°C with Davies activity correction; no carbonate or complexation assumed."
