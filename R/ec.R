@@ -11,7 +11,7 @@ ion_lambda0_25C <- function() {
       "H+", "OH-",
       "K+", "Na+", "NH4+",
       "Ca2+", "Mg2+",
-      "Fe2+", "Mn2+", "Zn2+", "Cu2+",
+      "Fe2+", "Fe3+", "Mn2+", "Zn2+", "Cu2+",
       "Cl-", "NO3-",
       "HSO4-", "SO4-2",
       "H2PO4-", "HPO4-2", "PO4-3",
@@ -21,7 +21,7 @@ ion_lambda0_25C <- function() {
       +1, -1,
       +1, +1, +1,
       +2, +2,
-      +2, +2, +2, +2,
+      +2, +3, +2, +2, +2,
       -1, -1,
       -1, -2,
       -1, -2, -3,
@@ -32,7 +32,7 @@ ion_lambda0_25C <- function() {
       349.81, 198.5,
       73.48, 50.11, 73.5,
       59.47, 53.06,
-      53.1, 53.5, 52.8, 53.6,
+      53.1, 68.0, 53.5, 52.8, 53.6,
       76.35, 71.45,
       50.1, 80.0,
       36.0, 57.0, 92.8,
@@ -156,11 +156,15 @@ make_ec_ions <- function(achieved, ph_res) {
 #'
 #' @return A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
 #' @export
-ec_from_ph <- function(achieved, ph_res, method = c("standard", "divide_z")) {
-  method <- match.arg(method)
+ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
+  fe_state <- match.arg(fe_state)
 
   tab <- ion_lambda0_25C()
   c_mM <- make_ec_ions(achieved, ph_res)
+  if (fe_state == "Fe3+") {
+    c_mM[["Fe3+"]] <- c_mM[["Fe2+"]]
+    c_mM[["Fe2+"]] <- 0
+  }
 
   ions <- intersect(names(c_mM), tab$ion)
   if (length(ions) == 0) stop("No overlapping ions between concentrations and lookup table.", call. = FALSE)
@@ -173,11 +177,7 @@ ec_from_ph <- function(achieved, ph_res, method = c("standard", "divide_z")) {
     all.y = FALSE
   )
 
-  if (method == "standard") {
-    df$kappa_mS_cm <- df$c_mM * abs(df$z) * df$Lambda0_eq / 1000
-  } else {
-    df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / abs(df$z) / 1000
-  }
+  df$kappa_mS_cm <- df$c_mM * abs(df$z) * df$Lambda0_eq / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000

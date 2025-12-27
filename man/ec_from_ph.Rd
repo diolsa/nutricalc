@@ -4,7 +4,7 @@
 \alias{ec_from_ph}
 \title{Compute EC from achieved composition and pH speciation}
 \usage{
-ec_from_ph(achieved, ph_res, method = c("standard", "divide_z"))
+ec_from_ph(achieved, ph_res, fe_state = c("Fe2+", "Fe3+"))
 }
 \arguments{
 \item{achieved}{Named numeric vector (mmol/L) or data.frame with columns
@@ -12,7 +12,7 @@ Nutrient and Achieved.}
 
 \item{ph_res}{Result list from \code{ph_from_achieved()} containing \code{species_mM}.}
 
-\item{method}{One of "standard" or "divide_z".}
+\item{fe_state}{One of "Fe2+" or "Fe3+" to select the Fe oxidation state.}
 }
 \value{
 A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
