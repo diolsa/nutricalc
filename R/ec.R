@@ -177,7 +177,7 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.y = FALSE
   )
 
-  df$kappa_mS_cm <- df$c_mM * abs(df$z) * df$Lambda0_eq / 1000
+  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
