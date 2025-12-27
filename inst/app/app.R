@@ -1368,11 +1368,7 @@ server <- function(input, output, session) {
     tags$div(
       tags$h5("🧪 pH & EC"),
       tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
-      tags$p(strong("Ionic strength (mol/L):"), sprintf("%.4f", ph_res$I)),
-      tags$p(
-        strong("Charge balance residual (meq/L):"),
-        fmt_total(ph_res$charge_meq[["residual"]])
-      ),
+      tags$p(strong("Ionic strength (mol/L):"), sprintf("%.2f", ph_res$I)),
       tags$hr(),
       tags$h6("Fixed cations (meq/L)"),
       tableOutput("ph_fixed_cations"),
@@ -1380,8 +1376,6 @@ server <- function(input, output, session) {
       tableOutput("ph_fixed_anions"),
       tags$h6("Variable components (meq/L)"),
       tableOutput("ph_variable"),
-      tags$h6("Species concentrations (mmol/L)"),
-      tableOutput("ph_species"),
       tags$h6("Charge totals (meq/L)"),
       tableOutput("ph_totals"),
       tags$hr(),
@@ -1392,8 +1386,8 @@ server <- function(input, output, session) {
         tags$p("EC calculation not available.")
       } else {
         tagList(
-          tags$p(strong("EC (mS/cm):"), format(signif(ec_res$EC_mS_cm, 6), scientific = TRUE)),
-          tags$p(strong("EC (µS/cm):"), format(signif(ec_res$EC_uS_cm, 6), scientific = TRUE)),
+          tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
+          tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
           tags$h6("EC contributions"),
           tableOutput("ec_contrib")
         )
