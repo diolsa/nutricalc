@@ -115,7 +115,7 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
-  Alk_mM <- if ("Alkalinity" %in% names(achieved)) {
+  CT_mM <- if ("Alkalinity" %in% names(achieved)) {
     achieved[["Alkalinity"]]
   } else if ("HCO3" %in% names(achieved)) {
     achieved[["HCO3"]]
@@ -152,9 +152,6 @@ ph_from_achieved <- function(
     I <- 0.03 # initial guess
     gam <- list()
     species <- list()
-    ct_raw_neg <- FALSE
-    CT_raw <- NA_real_
-    Alk_eq <- Alk_mM * 1e-3
 
     for (k in seq_len(inner_max_iter)) {
       # gammas by charge state (Davies)
@@ -197,28 +194,17 @@ ph_from_achieved <- function(
       HPO4 <- mM_to_M(PT) * (K1c * K2c * H / D)
       PO4 <- mM_to_M(PT) * (K1c * K2c * K3c / D)
 
-      # carbonate speciation from alkalinity
+      # carbonate speciation from CT (total inorganic carbon)
       K1c_C <- Ka1_C / (gam$H * gam$HCO3)
       K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
       D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
       a0 <- H^2 / D_c
       a1 <- (K1c_C * H) / D_c
       a2 <- (K1c_C * K2c_C) / D_c
-      use_alk <- is.finite(Alk_eq) && Alk_eq > 0
-      denom <- a1 + 2 * a2
-      if (!use_alk) {
-        CT <- 0
-        CO2 <- 0
-        HCO3 <- 0
-        CO3 <- 0
-      } else {
-        CT_raw <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
-        ct_raw_neg <- !is.finite(CT_raw) || CT_raw < 0
-        CT <- if (ct_raw_neg) 0 else CT_raw
-        CO2 <- a0 * CT
-        HCO3 <- a1 * CT
-        CO3 <- a2 * CT
-      }
+      CT <- mM_to_M(CT_mM)
+      CO2 <- a0 * CT
+      HCO3 <- a1 * CT
+      CO3 <- a2 * CT
 
       # ionic strength recompute
       I_new <- 0
@@ -299,19 +285,11 @@ ph_from_achieved <- function(
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
       (HCO3_mM + 2 * CO3_mM)
 
-    f0 <- pos - neg
-    if (use_alk && ct_raw_neg) {
-      f0 <- NA_real_
-    }
-
     list(
-      f = f0,
+      f = pos - neg,
       I = I,
       gam = gam,
       species = species,
-      ct_raw_neg = ct_raw_neg,
-      CT_raw = CT_raw,
-      Alk_eq = Alk_eq,
       H_mM = H_mM,
       OH_mM = OH_mM,
       pos_fix_meq = pos_fix_meq,
@@ -325,7 +303,7 @@ ph_from_achieved <- function(
   find_bracket <- function(a_in, b_in) {
     fa_in <- residual_meq(a_in)$f
     fb_in <- residual_meq(b_in)$f
-    if (fa_in * fb_in <= 0) {
+    if (is.finite(fa_in) && is.finite(fb_in) && fa_in * fb_in <= 0) {
       return(list(a = a_in, b = b_in, fa = fa_in, fb = fb_in))
     }
 
@@ -338,7 +316,7 @@ ph_from_achieved <- function(
       phc_f <- phc_grid[finite_idx]
       f_f <- f_grid[finite_idx]
       signs <- sign(f_f)
-      idx <- which(signs[-1] * signs[-length(signs)] < 0)
+      idx <- which(signs[-1] * signs[-length(signs)] <= 0)
       if (length(idx)) {
         i <- idx[1]
         return(list(
@@ -356,14 +334,14 @@ ph_from_achieved <- function(
       r12 <- residual_meq(12)
       message(sprintf(
         paste(
-          "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
-          "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
-          "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
+          "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
+          "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
+          "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
           sep = "\n"
         ),
-        r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, r2$ct_raw_neg, r2$CT_raw,
-        r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, r7$ct_raw_neg, r7$CT_raw,
-        r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, r12$ct_raw_neg, r12$CT_raw
+        r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, CT_mM, r2$species[["HCO3"]] * 1e3, r2$species[["CO3"]] * 1e3,
+        r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
+        r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, CT_mM, r12$species[["HCO3"]] * 1e3, r12$species[["CO3"]] * 1e3
       ))
     }
 
@@ -383,17 +361,17 @@ ph_from_achieved <- function(
     r14 <- residual_meq(14)
     message(sprintf(
       paste(
-        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
-        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
-        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
+        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
+        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
+        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
         sep = "\n"
       ),
       r0$H_mM, r0$OH_mM, r0$pos_fix_meq, r0$neg_fix_meq, r0$pos, r0$neg, r0$f,
-      Alk_mM, r0$Alk_eq, r0$CT_raw, r0$ct_raw_neg,
+      CT_mM, r0$species[["HCO3"]] * 1e3, r0$species[["CO3"]] * 1e3,
       r7$H_mM, r7$OH_mM, r7$pos_fix_meq, r7$neg_fix_meq, r7$pos, r7$neg, r7$f,
-      Alk_mM, r7$Alk_eq, r7$CT_raw, r7$ct_raw_neg,
+      CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
       r14$H_mM, r14$OH_mM, r14$pos_fix_meq, r14$neg_fix_meq, r14$pos, r14$neg, r14$f,
-      Alk_mM, r14$Alk_eq, r14$CT_raw, r14$ct_raw_neg
+      CT_mM, r14$species[["HCO3"]] * 1e3, r14$species[["CO3"]] * 1e3
     ))
   }
 
