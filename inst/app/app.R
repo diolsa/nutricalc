@@ -1344,7 +1344,7 @@ server <- function(input, output, session) {
     }
 
   final_for_ph <- water_mmol()
-  add <- res$achieved
+  add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
   for (nm in names(add)) {
     final_for_ph[[nm]] <- (final_for_ph[[nm]] %||% 0) + as.numeric(add[[nm]])
   }
