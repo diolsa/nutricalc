@@ -1433,34 +1433,46 @@ server <- function(input, output, session) {
 
     tags$div(
       tags$h5("🧪 pH & EC"),
-      tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
-      tags$p(strong("Ionic strength (mol/L):"), sprintf("%.2f", ph_res$I)),
-      tags$hr(),
-      tags$h6("Fixed cations (meq/L)"),
-      tableOutput("ph_fixed_cations"),
-      tags$h6("Fixed anions (meq/L)"),
-      tableOutput("ph_fixed_anions"),
-      tags$h6("Variable components (meq/L)"),
-      tableOutput("ph_variable"),
-      tags$h6("Charge totals (meq/L)"),
-      tableOutput("ph_totals"),
-      tags$hr(),
-      tags$h6("Estimated EC (25°C)"),
-      if (inherits(ec_res, "error")) {
-        tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
-      } else if (is.null(ec_res)) {
-        tags$p("EC calculation not available.")
-      } else {
-        tagList(
-          tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
-          tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
-          tags$h6("EC contributions"),
-          tableOutput("ec_contrib")
+      fluidRow(
+        column(
+          6,
+          tags$h6("pH"),
+          tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
+          tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
+          tags$details(
+            tags$summary("Show pH charge breakdown"),
+            tags$h6("Fixed cations (meq/L)"),
+            tableOutput("ph_fixed_cations"),
+            tags$h6("Fixed anions (meq/L)"),
+            tableOutput("ph_fixed_anions"),
+            tags$h6("Variable components (meq/L)"),
+            tableOutput("ph_variable"),
+            tags$h6("Charge totals (meq/L)"),
+            tableOutput("ph_totals")
+          )
+        ),
+        column(
+          6,
+          tags$h6("EC (25°C)"),
+          if (inherits(ec_res, "error")) {
+            tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
+          } else if (is.null(ec_res)) {
+            tags$p("EC calculation not available.")
+          } else {
+            tagList(
+              tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
+              tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
+              tags$details(
+                tags$summary("Show EC contributions"),
+                tableOutput("ec_contrib")
+              )
+            )
+          }
         )
-      },
+      ),
       tags$p(
         class = "text-muted",
-        "Estimated at 25°C with Davies activity correction; no carbonate or complexation assumed."
+        "Estimated at 25°C with Davies activity correction; no complexation assumed."
       )
     )
   })
