@@ -1343,8 +1343,8 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-  final_for_ph <- water_mmol()
   add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
+  final_for_ph <- water_mmol()
   for (nm in names(add)) {
     current <- final_for_ph[nm]
     if (is.na(current)) current <- 0
@@ -1406,11 +1406,11 @@ server <- function(input, output, session) {
 
     output$ph_species <- renderTable({
       species_vals <- ph_res$charge_breakdown$species_mM
-      if ("B" %in% names(res$achieved)) {
-        species_vals <- c(species_vals, B = as.numeric(res$achieved[["B"]]))
+      if ("B" %in% names(final_for_ph)) {
+        species_vals <- c(species_vals, B = as.numeric(final_for_ph[["B"]]))
       }
-      if ("Si" %in% names(res$achieved)) {
-        species_vals <- c(species_vals, Si = as.numeric(res$achieved[["Si"]]))
+      if ("Si" %in% names(final_for_ph)) {
+        species_vals <- c(species_vals, Si = as.numeric(final_for_ph[["Si"]]))
       }
 
       data.frame(
