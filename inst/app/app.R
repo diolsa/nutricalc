@@ -280,6 +280,18 @@ ui <- fluidPage(
   overflow-x:auto !important;
 }
 
+#result_tabs{
+  --bs-nav-link-padding-y: 10px;
+  --bs-nav-link-padding-x: 18px;
+  --bs-nav-link-font-size: 14px;
+}
+
+#result_tabs > ul.nav.nav-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+}
+
 
 
 ")),
