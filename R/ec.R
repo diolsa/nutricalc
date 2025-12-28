@@ -185,14 +185,23 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.y = FALSE
   )
   df$c_mM[!is.finite(df$c_mM)] <- 0
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
+  df$c_meq_L <- df$c_mM * abs(df$z)
+  df$kappa_mS_cm <- df$c_meq_L * df$Lambda0_eq / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
 
+  if (isTRUE(getOption("nutricalc.ec_debug", FALSE))) {
+    multivalent <- df$c_mM > 0 & abs(df$z) > 1
+    mismatch <- multivalent & (df$c_meq_L != df$c_mM * abs(df$z))
+    if (any(mismatch, na.rm = TRUE)) {
+      warning("EC debug: multivalent ions detected with unexpected meq/L conversion.", call. = FALSE)
+    }
+  }
+
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0_eq", "kappa_mS_cm")]
+    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "c_meq_L", "z", "Lambda0_eq", "kappa_mS_cm")]
   )
 }
