@@ -1454,7 +1454,7 @@ server <- function(input, output, session) {
       tags$h5("🧪 pH & EC"),
       fluidRow(
         column(
-          6,
+          5,
           tags$h6("pH"),
           tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
           tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
@@ -1471,7 +1471,7 @@ server <- function(input, output, session) {
           )
         ),
         column(
-          6,
+          7,
           tags$h6("EC (25°C)"),
           if (inherits(ec_res, "error")) {
             tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
