@@ -10,6 +10,7 @@
 #' @param tol Root tolerance in meq/L.
 #' @param max_iter Maximum iterations for the outer bisection.
 #' @param inner_max_iter Maximum iterations for the ionic strength fixed point.
+#' @param debug Logical; when TRUE prints basic bracket diagnostics.
 #'
 #' @return A list with pH, ionic strength, activity coefficients, species
 #'   distribution, and charge balance diagnostics.
@@ -20,7 +21,8 @@ ph_from_achieved <- function(
   phc_bracket = c(3, 9),
   tol = 1e-9,
   max_iter = 200,
-  inner_max_iter = 50
+  inner_max_iter = 50,
+  debug = FALSE
 ) {
   normalize_nutrient_names <- function(x) {
     x <- gsub("[–-]", "_", x)
@@ -202,7 +204,6 @@ ph_from_achieved <- function(
       Alk_eq <- Alk_mM * 1e-3
       use_alk <- is.finite(Alk_eq) && Alk_eq > 0
       denom <- a1 + 2 * a2
-      CT_infeasible <- FALSE
       if (!use_alk) {
         CT <- 0
         CO2 <- 0
@@ -210,10 +211,7 @@ ph_from_achieved <- function(
         CO3 <- 0
       } else {
         CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
-        if (!is.finite(CT) || CT < 0) {
-          CT_infeasible <- TRUE
-          CT <- 0
-        }
+        if (!is.finite(CT) || CT < 0) CT <- 0
         CO2 <- a0 * CT
         HCO3 <- a1 * CT
         CO3 <- a2 * CT
@@ -298,24 +296,52 @@ ph_from_achieved <- function(
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
       (HCO3_mM + 2 * CO3_mM)
 
-    f0 <- pos - neg
-    if (use_alk) {
-      alk_mismatch_eq <- (HCO3 + 2 * CO3 + OH - H) - Alk_eq
-      f0 <- f0 + 1e3 * alk_mismatch_eq * 1e3
-      if (CT_infeasible) {
-        f0 <- f0 + sign(f0) * 1e3
-      }
-    }
-
-    list(f = f0, I = I, gam = gam, species = species)
+    list(f = pos - neg, I = I, gam = gam, species = species)
   }
 
   # --- outer root find (bisection on pHc) ---
-  a <- phc_bracket[1]
-  b <- phc_bracket[2]
-  fa <- residual_meq(a)$f
-  fb <- residual_meq(b)$f
-  if (fa * fb > 0) stop("Root not bracketed; widen phc_bracket")
+  find_bracket <- function(a_in, b_in) {
+    fa_in <- residual_meq(a_in)$f
+    fb_in <- residual_meq(b_in)$f
+    if (fa_in * fb_in <= 0) {
+      return(list(a = a_in, b = b_in, fa = fa_in, fb = fb_in))
+    }
+
+    phc_grid <- seq(-2, 16, by = 0.5)
+    f_grid <- vapply(phc_grid, function(x) residual_meq(x)$f, numeric(1))
+    signs <- sign(f_grid)
+    idx <- which(signs[-1] * signs[-length(signs)] <= 0)
+    if (length(idx)) {
+      i <- idx[1]
+      return(list(
+        a = phc_grid[i],
+        b = phc_grid[i + 1],
+        fa = f_grid[i],
+        fb = f_grid[i + 1]
+      ))
+    }
+
+    stop(
+      sprintf(
+        "Root not bracketed; f(phc) has no sign change. f_at: %s",
+        paste(sprintf("%.2f:%.6g", phc_grid, f_grid), collapse = "; ")
+      ),
+      call. = FALSE
+    )
+  }
+
+  if (isTRUE(debug)) {
+    f0 <- residual_meq(0)$f
+    f7 <- residual_meq(7)$f
+    f14 <- residual_meq(14)$f
+    message(sprintf("pH bracket debug: f(0)=%.6g, f(7)=%.6g, f(14)=%.6g", f0, f7, f14))
+  }
+
+  bracket <- find_bracket(phc_bracket[1], phc_bracket[2])
+  a <- bracket$a
+  b <- bracket$b
+  fa <- bracket$fa
+  fb <- bracket$fb
 
   mid <- NA
   out <- NULL

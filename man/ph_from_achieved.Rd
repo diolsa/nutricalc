@@ -10,7 +10,8 @@ ph_from_achieved(
   phc_bracket = c(3, 9),
   tol = 1e-09,
   max_iter = 200,
-  inner_max_iter = 50
+  inner_max_iter = 50,
+  debug = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ ph_from_achieved(
 \item{max_iter}{Maximum iterations for the outer bisection.}
 
 \item{inner_max_iter}{Maximum iterations for the ionic strength fixed point.}
+
+\item{debug}{Logical; when TRUE prints basic bracket diagnostics.}
 }
 \value{
 A list with pH, ionic strength, activity coefficients, species
