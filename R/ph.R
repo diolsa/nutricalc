@@ -113,10 +113,10 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
-  Alk_mM <- if ("HCO3" %in% names(achieved)) {
-    achieved[["HCO3"]]
-  } else if ("Alkalinity" %in% names(achieved)) {
+  Alk_mM <- if ("Alkalinity" %in% names(achieved)) {
     achieved[["Alkalinity"]]
+  } else if ("HCO3" %in% names(achieved)) {
+    achieved[["HCO3"]]
   } else {
     0
   }
@@ -201,11 +201,17 @@ ph_from_achieved <- function(
       a2 <- (K1c_C * K2c_C) / D_c
       Alk_eq <- Alk_mM * 1e-3
       denom <- a1 + 2 * a2
-      CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else 0
-      if (!is.finite(CT) || CT < 0) CT <- 0
-      CO2 <- a0 * CT
-      HCO3 <- a1 * CT
-      CO3 <- a2 * CT
+      CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
+      if (!is.finite(CT) || CT < 0) {
+        CT <- NA_real_
+        CO2 <- 0
+        HCO3 <- 0
+        CO3 <- 0
+      } else {
+        CO2 <- a0 * CT
+        HCO3 <- a1 * CT
+        CO3 <- a2 * CT
+      }
 
       # ionic strength recompute
       I_new <- 0
@@ -286,7 +292,16 @@ ph_from_achieved <- function(
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
       (HCO3_mM + 2 * CO3_mM)
 
-    list(f = pos - neg, I = I, gam = gam, species = species)
+    alk_mismatch_eq <- if (is.finite(CT)) {
+      (HCO3 + 2 * CO3 + OH - H) - Alk_eq
+    } else {
+      0
+    }
+    penalty_w <- if (Alk_mM > 0) 1e3 else 0
+    penalty_meq <- penalty_w * alk_mismatch_eq * 1e3
+    if (!is.finite(CT) || CT < 0) penalty_meq <- penalty_meq + 1e6
+
+    list(f = pos - neg + penalty_meq, I = I, gam = gam, species = species)
   }
 
   # --- outer root find (bisection on pHc) ---
