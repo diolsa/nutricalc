@@ -31,15 +31,15 @@ ion_lambda0_25C <- function() {
     ),
     # Lambda0_eq (S*cm^2/eq). For multivalent ions we use values already per eq.
     Lambda0_eq = c(
-      349.81, 198.5,
-      73.48, 50.11, 73.5,
-      59.47, 53.06,
-      53.1, 68.0, 53.5, 52.8, 53.6,
-      76.35, 71.45,
-      44.5, 69.3,
-      50.1, 80.0,
-      36.0, 57.0, 92.8,
-      53.0
+      349.65, 198.00,
+      73.48, 50.08, 73.50,
+      59.47, 53.00,
+      53.00, 68.00, 53.50, 52.80, 53.60,
+      76.31, 71.42,
+      44.50, 69.30,
+      52.00, 80.00,
+      36.00, 57.00, 92.80,
+      74.50
     ),
     stringsAsFactors = FALSE
   )
@@ -185,7 +185,8 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.y = FALSE
   )
   df$c_mM[!is.finite(df$c_mM)] <- 0
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
+  df$Lambda0 <- df$Lambda0_eq
+  df$kappa_mS_cm <- df$c_mM * df$Lambda0 / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
@@ -193,6 +194,6 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0_eq", "kappa_mS_cm")]
+    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0", "kappa_mS_cm")]
   )
 }
