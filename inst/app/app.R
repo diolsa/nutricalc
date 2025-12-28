@@ -1343,14 +1343,19 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-  final_for_ph <- water_mmol()
-  add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
-  for (nm in names(add)) {
-    current <- final_for_ph[nm]
-    if (is.na(current)) current <- 0
-    final_for_ph[nm] <- current + as.numeric(add[[nm]])
+  raw_targets <- vapply(
+    nutrients,
+    function(nm) input[[paste0("expr_", nm)]] %||% "",
+    character(1)
+  )
+  has_targets <- any(nzchar(trimws(raw_targets))) || any(unname(targets_mmol()) != 0)
+
+  if (!has_targets) {
+    final_for_ph <- water_mmol()
+    final_for_ph <- c(final_for_ph, Alkalinity = water_hco3())
+  } else {
+    final_for_ph <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
   }
-  final_for_ph <- c(final_for_ph, Alkalinity = water_hco3())
 
   ph_res <- tryCatch(
     ph_fn(final_for_ph, phc_bracket = c(1, 13)),
