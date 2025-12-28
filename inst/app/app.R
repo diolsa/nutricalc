@@ -1354,17 +1354,29 @@ server <- function(input, output, session) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
     }
 
-    fmt_small <- function(x) {
-      ifelse(abs(x) < 0.001, format(signif(x, 6), scientific = TRUE), format(signif(x, 6), trim = TRUE))
+    fmt_sci_html <- function(x) {
+      if (!is.finite(x)) return(as.character(x))
+      formatted <- formatC(x, format = "e", digits = 2)
+      parts <- strsplit(formatted, "e", fixed = TRUE)[[1]]
+      mantissa <- parts[[1]]
+      exp_raw <- parts[[2]]
+      exp_clean <- sub("^\\+?", "", exp_raw)
+      paste0(mantissa, "×10<sup>", exp_clean, "</sup>")
     }
-    fmt_total <- function(x) {
-      format(round(x, 6), nsmall = 4, trim = TRUE)
+
+    fmt_num <- function(x, threshold = 0.01) {
+      if (!is.finite(x)) return(as.character(x))
+      if (abs(x) < threshold && x != 0) {
+        fmt_sci_html(x)
+      } else {
+        formatC(x, format = "f", digits = 2)
+      }
     }
 
     output$ph_fixed_cations <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_cations_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_cations_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1372,7 +1384,7 @@ server <- function(input, output, session) {
     output$ph_fixed_anions <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_anions_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_anions_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_anions_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1380,7 +1392,7 @@ server <- function(input, output, session) {
     output$ph_variable <- renderTable({
       data.frame(
         Component = names(ph_res$charge_breakdown$variable_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$variable_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$variable_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1396,7 +1408,7 @@ server <- function(input, output, session) {
 
       data.frame(
         Species = names(species_vals),
-        `mmol/L` = fmt_small(unname(species_vals)),
+        `mmol/L` = vapply(unname(species_vals), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1404,7 +1416,7 @@ server <- function(input, output, session) {
     output$ph_totals <- renderTable({
       data.frame(
         Total = names(ph_res$charge_breakdown$totals_meq),
-        `meq/L` = fmt_total(unname(ph_res$charge_breakdown$totals_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$totals_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1426,8 +1438,8 @@ server <- function(input, output, session) {
     output$ec_contrib <- renderTable({
       if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
       df <- ec_res$contributions
-      df$kappa_mS_cm <- fmt_small(df$kappa_mS_cm)
-      df$c_mM <- fmt_small(df$c_mM)
+      df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
+      df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
       df
     }, sanitize.text.function = function(x) x)
 
