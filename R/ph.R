@@ -143,7 +143,7 @@ ph_from_achieved <- function(
     Na = c(c = mM_to_M(Na), z = 1),
     Ca = c(c = mM_to_M(Ca), z = 2),
     Mg = c(c = mM_to_M(Mg), z = 2),
-    Fe = c(c = mM_to_M(Fe), z = 2),
+    Fe = c(c = mM_to_M(Fe), z = 3),
     Mn = c(c = mM_to_M(Mn), z = 2),
     Zn = c(c = mM_to_M(Zn), z = 2),
     Cu = c(c = mM_to_M(Cu), z = 2),
@@ -299,7 +299,7 @@ ph_from_achieved <- function(
     }
 
     # ---- charge balance in meq/L (use concentrations) ----
-    pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 2 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
+    pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 3 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
     neg_fix_meq <- NO3 + Cl + 2 * Mo
     if (length(chelate_conc)) {
       for (nm in names(chelate_conc)) {
@@ -501,7 +501,7 @@ ph_from_achieved <- function(
     Na = Na,
     `2Ca` = 2 * Ca,
     `2Mg` = 2 * Mg,
-    `2Fe` = 2 * Fe,
+    `3Fe` = 3 * Fe,
     `2Mn` = 2 * Mn,
     `2Zn` = 2 * Zn,
     `2Cu` = 2 * Cu
