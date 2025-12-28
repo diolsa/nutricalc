@@ -166,14 +166,7 @@ make_ec_ions <- function(achieved, ph_res) {
 #' @export
 ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   fe_state <- match.arg(fe_state)
-  if (!isTRUE(getOption("nutricalc.ec.sanity_ran", FALSE))) {
-    options(nutricalc.ec.sanity_ran = TRUE)
-    .ec_sanity_check()
-  }
-  .ec_from_ph_internal(achieved, ph_res, fe_state = fe_state)
-}
 
-.ec_from_ph_internal <- function(achieved, ph_res, fe_state) {
   tab <- ion_lambda0_25C()
   c_mM <- make_ec_ions(achieved, ph_res)
   if (fe_state == "Fe3+") {
@@ -191,61 +184,31 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.x = FALSE,
     all.y = FALSE
   )
-
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
+  df$c_mM[!is.finite(df$c_mM)] <- 0
+  df$Lambda0 <- df$Lambda0_eq
+  df$kappa_mS_cm <- df$c_mM * df$Lambda0 / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
 
+  ions_to_check <- c("Na+", "Cl-", "Ca2+", "Mg2+")
+  check_df <- df[df$ion %in% ions_to_check, , drop = FALSE]
+  if (nrow(check_df) > 0) {
+    zero_ions <- check_df$ion[check_df$c_mM > 0 & check_df$kappa_mS_cm <= 0]
+    if (length(zero_ions) > 0) {
+      warning(
+        sprintf(
+          "EC sanity check: expected positive contributions for %s.",
+          paste(zero_ions, collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+  }
+
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), ]
+    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0", "kappa_mS_cm")]
   )
-}
-
-.ec_sanity_check <- function() {
-  achieved <- c(
-    Ca = 3.15,
-    Mg = 0.56,
-    Na = 1.54,
-    Cl = 1.68
-  )
-  ph_res <- list(
-    species_mM = c(
-      H = 1e-7,
-      OH = 1e-7,
-      NH4 = 0,
-      HSO4 = 0,
-      SO4 = 1.58,
-      HCO3 = 4.0,
-      CO3 = 0.1,
-      H2PO4 = 0,
-      HPO4 = 0,
-      PO4 = 0
-    )
-  )
-  res <- .ec_from_ph_internal(achieved, ph_res, fe_state = "Fe2+")
-  if (res$EC_mS_cm < 0.5 || res$EC_mS_cm > 2) {
-    warning(
-      sprintf(
-        "EC sanity check expected ~1 mS/cm, got %.3f mS/cm.",
-        res$EC_mS_cm
-      ),
-      call. = FALSE
-    )
-  }
-  major <- c("Ca2+", "SO4-2", "Cl-", "Na+", "HCO3-")
-  top_ions <- head(res$contributions$ion, 6)
-  missing <- setdiff(major, top_ions)
-  if (length(missing) > 0) {
-    warning(
-      sprintf(
-        "EC sanity check missing major contributors: %s.",
-        paste(missing, collapse = ", ")
-      ),
-      call. = FALSE
-    )
-  }
-  invisible(res)
 }

@@ -1418,10 +1418,10 @@ server <- function(input, output, session) {
     }
     if (!is.null(ec_fn)) {
       ec_res <- tryCatch(
-      ec_fn(res$achieved, ph_res),
-      error = function(e) e
-    )
-  }
+        ec_fn(final_for_ph, ph_res),
+        error = function(e) e
+      )
+    }
 
     output$ec_contrib <- renderTable({
       if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
