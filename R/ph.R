@@ -11,6 +11,8 @@
 #' @param max_iter Maximum iterations for the outer bisection.
 #' @param inner_max_iter Maximum iterations for the ionic strength fixed point.
 #' @param debug Logical; when TRUE prints basic bracket diagnostics.
+#' @param chelate_z Named numeric vector of chelate charges to include as fixed
+#'   anions. Values are net charges (negative) for ligand totals in mmol/L.
 #'
 #' @return A list with pH, ionic strength, activity coefficients, species
 #'   distribution, and charge balance diagnostics.
@@ -22,7 +24,8 @@ ph_from_achieved <- function(
   tol = 1e-9,
   max_iter = 200,
   inner_max_iter = 50,
-  debug = FALSE
+  debug = FALSE,
+  chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4)
 ) {
   normalize_nutrient_names <- function(x) {
     x <- gsub("[–-]", "_", x)
@@ -119,6 +122,10 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
+  EDTA <- get0("EDTA")
+  DTPA <- get0("DTPA")
+  EDDHA <- get0("EDDHA")
+  HBED <- get0("HBED")
   CT_mM <- if ("Alkalinity" %in% names(achieved)) {
     achieved[["Alkalinity"]]
   } else if ("HCO3" %in% names(achieved)) {
@@ -145,6 +152,15 @@ ph_from_achieved <- function(
     Cl = c(c = mM_to_M(Cl), z = -1),
     MoO4 = c(c = mM_to_M(Mo), z = -2)  # Mo as molybdate
   )
+
+  chelate_conc <- c(EDTA = EDTA, DTPA = DTPA, EDDHA = EDDHA, HBED = HBED)
+  chelate_conc <- chelate_conc[intersect(names(chelate_conc), names(chelate_z))]
+  chelate_conc <- chelate_conc[!is.na(chelate_conc)]
+  if (length(chelate_conc)) {
+    for (nm in names(chelate_conc)) {
+      fixed_c[[nm]] <- c(c = mM_to_M(chelate_conc[[nm]]), z = chelate_z[[nm]])
+    }
+  }
 
   # charge balance residual f(phc): positive - negative (meq/L)
   residual_meq <- function(phc) {
@@ -285,6 +301,11 @@ ph_from_achieved <- function(
     # ---- charge balance in meq/L (use concentrations) ----
     pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 2 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
     neg_fix_meq <- NO3 + Cl + 2 * Mo
+    if (length(chelate_conc)) {
+      for (nm in names(chelate_conc)) {
+        neg_fix_meq <- neg_fix_meq + abs(chelate_z[[nm]]) * chelate_conc[[nm]]
+      }
+    }
 
     # variable parts (convert mol/L -> mmol/L)
     H_mM <- species$H * 1e3
@@ -382,23 +403,29 @@ ph_from_achieved <- function(
   }
 
   if (isTRUE(debug)) {
+    chelate_meq_total <- 0
+    if (length(chelate_conc)) {
+      for (nm in names(chelate_conc)) {
+        chelate_meq_total <- chelate_meq_total + abs(chelate_z[[nm]]) * chelate_conc[[nm]]
+      }
+    }
     r0 <- residual_meq(0)
     r7 <- residual_meq(7)
     r14 <- residual_meq(14)
     message(sprintf(
       paste(
-        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
-        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
-        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g chelate_meq=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g chelate_meq=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g chelate_meq=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
         sep = "\n"
       ),
-      r0$H_mM, r0$OH_mM, r0$pos_fix_meq, r0$neg_fix_meq, r0$pos, r0$neg, r0$f,
+      r0$H_mM, r0$OH_mM, r0$pos_fix_meq, r0$neg_fix_meq, chelate_meq_total, r0$pos, r0$neg, r0$f,
       CT_mM, r0$species[["HCO3"]] * 1e3, r0$species[["CO3"]] * 1e3,
       r0$species[["BOH4"]] * 1e3, r0$species[["H3SiO4"]] * 1e3,
-      r7$H_mM, r7$OH_mM, r7$pos_fix_meq, r7$neg_fix_meq, r7$pos, r7$neg, r7$f,
+      r7$H_mM, r7$OH_mM, r7$pos_fix_meq, r7$neg_fix_meq, chelate_meq_total, r7$pos, r7$neg, r7$f,
       CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
       r7$species[["BOH4"]] * 1e3, r7$species[["H3SiO4"]] * 1e3,
-      r14$H_mM, r14$OH_mM, r14$pos_fix_meq, r14$neg_fix_meq, r14$pos, r14$neg, r14$f,
+      r14$H_mM, r14$OH_mM, r14$pos_fix_meq, r14$neg_fix_meq, chelate_meq_total, r14$pos, r14$neg, r14$f,
       CT_mM, r14$species[["HCO3"]] * 1e3, r14$species[["CO3"]] * 1e3,
       r14$species[["BOH4"]] * 1e3, r14$species[["H3SiO4"]] * 1e3
     ))
@@ -484,6 +511,11 @@ ph_from_achieved <- function(
     Cl = Cl,
     `2Mo` = 2 * Mo
   )
+  if (length(chelate_conc)) {
+    for (nm in names(chelate_conc)) {
+      fixed_anions_meq[[nm]] <- abs(chelate_z[[nm]]) * chelate_conc[[nm]]
+    }
+  }
 
   variable_meq <- c(
     H_plus = species_mM[["H"]],
