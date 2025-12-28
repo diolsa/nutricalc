@@ -13,6 +13,7 @@ ion_lambda0_25C <- function() {
       "Ca2+", "Mg2+",
       "Fe2+", "Fe3+", "Mn2+", "Zn2+", "Cu2+",
       "Cl-", "NO3-",
+      "HCO3-", "CO3-2",
       "HSO4-", "SO4-2",
       "H2PO4-", "HPO4-2", "PO4-3",
       "MoO4-2"
@@ -24,6 +25,7 @@ ion_lambda0_25C <- function() {
       +2, +3, +2, +2, +2,
       -1, -1,
       -1, -2,
+      -1, -2,
       -1, -2, -3,
       -2
     ),
@@ -34,6 +36,7 @@ ion_lambda0_25C <- function() {
       59.47, 53.06,
       53.1, 68.0, 53.5, 52.8, 53.6,
       76.35, 71.45,
+      44.5, 69.3,
       50.1, 80.0,
       36.0, 57.0, 92.8,
       53.0
@@ -116,6 +119,9 @@ make_ec_ions <- function(achieved, ph_res) {
   HSO4 <- get0(sp, "HSO4")
   SO4 <- get0(sp, "SO4")
 
+  HCO3 <- get0(sp, "HCO3")
+  CO3 <- get0(sp, "CO3")
+
   H2PO4 <- get0(sp, "H2PO4")
   HPO4 <- get0(sp, "HPO4")
   PO4 <- get0(sp, "PO4")
@@ -135,6 +141,8 @@ make_ec_ions <- function(achieved, ph_res) {
     "Cu2+" = Cu,
     "Cl-" = Cl,
     "NO3-" = NO3,
+    "HCO3-" = HCO3,
+    "CO3-2" = CO3,
     "HSO4-" = HSO4,
     "SO4-2" = SO4,
     "H2PO4-" = H2PO4,
@@ -158,7 +166,14 @@ make_ec_ions <- function(achieved, ph_res) {
 #' @export
 ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   fe_state <- match.arg(fe_state)
+  if (!isTRUE(getOption("nutricalc.ec.sanity_ran", FALSE))) {
+    options(nutricalc.ec.sanity_ran = TRUE)
+    .ec_sanity_check()
+  }
+  .ec_from_ph_internal(achieved, ph_res, fe_state = fe_state)
+}
 
+.ec_from_ph_internal <- function(achieved, ph_res, fe_state) {
   tab <- ion_lambda0_25C()
   c_mM <- make_ec_ions(achieved, ph_res)
   if (fe_state == "Fe3+") {
@@ -187,4 +202,50 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     EC_uS_cm = EC_uS_cm,
     contributions = df[order(-df$kappa_mS_cm), ]
   )
+}
+
+.ec_sanity_check <- function() {
+  achieved <- c(
+    Ca = 3.15,
+    Mg = 0.56,
+    Na = 1.54,
+    Cl = 1.68
+  )
+  ph_res <- list(
+    species_mM = c(
+      H = 1e-7,
+      OH = 1e-7,
+      NH4 = 0,
+      HSO4 = 0,
+      SO4 = 1.58,
+      HCO3 = 4.0,
+      CO3 = 0.1,
+      H2PO4 = 0,
+      HPO4 = 0,
+      PO4 = 0
+    )
+  )
+  res <- .ec_from_ph_internal(achieved, ph_res, fe_state = "Fe2+")
+  if (res$EC_mS_cm < 0.5 || res$EC_mS_cm > 2) {
+    warning(
+      sprintf(
+        "EC sanity check expected ~1 mS/cm, got %.3f mS/cm.",
+        res$EC_mS_cm
+      ),
+      call. = FALSE
+    )
+  }
+  major <- c("Ca2+", "SO4-2", "Cl-", "Na+", "HCO3-")
+  top_ions <- head(res$contributions$ion, 6)
+  missing <- setdiff(major, top_ions)
+  if (length(missing) > 0) {
+    warning(
+      sprintf(
+        "EC sanity check missing major contributors: %s.",
+        paste(missing, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  invisible(res)
 }
