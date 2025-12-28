@@ -153,6 +153,8 @@ ph_from_achieved <- function(
     gam <- list()
     species <- list()
     ct_raw_neg <- FALSE
+    CT_raw <- NA_real_
+    Alk_eq <- Alk_mM * 1e-3
 
     for (k in seq_len(inner_max_iter)) {
       # gammas by charge state (Davies)
@@ -202,7 +204,6 @@ ph_from_achieved <- function(
       a0 <- H^2 / D_c
       a1 <- (K1c_C * H) / D_c
       a2 <- (K1c_C * K2c_C) / D_c
-      Alk_eq <- Alk_mM * 1e-3
       use_alk <- is.finite(Alk_eq) && Alk_eq > 0
       denom <- a1 + 2 * a2
       if (!use_alk) {
@@ -300,11 +301,24 @@ ph_from_achieved <- function(
 
     f0 <- pos - neg
     if (use_alk && ct_raw_neg) {
-      # steer the solver toward lower pH when alkalinity cannot be satisfied
-      f0 <- f0 + ((OH - H) - Alk_eq) * 1e3
+      f0 <- 1e6
     }
 
-    list(f = f0, I = I, gam = gam, species = species, ct_raw_neg = ct_raw_neg)
+    list(
+      f = f0,
+      I = I,
+      gam = gam,
+      species = species,
+      ct_raw_neg = ct_raw_neg,
+      CT_raw = CT_raw,
+      Alk_eq = Alk_eq,
+      H_mM = H_mM,
+      OH_mM = OH_mM,
+      pos_fix_meq = pos_fix_meq,
+      neg_fix_meq = neg_fix_meq,
+      pos = pos,
+      neg = neg
+    )
   }
 
   # --- outer root find (bisection on pHc) ---
@@ -316,9 +330,12 @@ ph_from_achieved <- function(
     }
 
     phc_grid <- seq(-2, 16, by = 0.5)
-    f_grid <- vapply(phc_grid, function(x) residual_meq(x)$f, numeric(1))
+    f_grid <- vapply(phc_grid, function(x) {
+      tryCatch(residual_meq(x)$f, error = function(e) NA_real_)
+    }, numeric(1))
     signs <- sign(f_grid)
-    idx <- which(signs[-1] * signs[-length(signs)] <= 0)
+    idx <- which(is.finite(signs[-1]) & is.finite(signs[-length(signs)]) &
+                   signs[-1] * signs[-length(signs)] < 0)
     if (length(idx)) {
       i <- idx[1]
       return(list(
@@ -329,10 +346,21 @@ ph_from_achieved <- function(
       ))
     }
 
+    if (isTRUE(debug)) {
+      r0 <- residual_meq(0)
+      r7 <- residual_meq(7)
+      r14 <- residual_meq(14)
+      message(sprintf(
+        "pH bracket debug: f(0)=%.6g f(7)=%.6g f(14)=%.6g",
+        r0$f, r7$f, r14$f
+      ))
+    }
+
     stop(
       sprintf(
-        "Root not bracketed; f(phc) has no sign change. f_at: %s",
-        paste(sprintf("%.2f:%.6g", phc_grid, f_grid), collapse = "; ")
+        "Root not bracketed; f(phc) has no sign change. min=%.6g max=%.6g",
+        min(f_grid, na.rm = TRUE),
+        max(f_grid, na.rm = TRUE)
       ),
       call. = FALSE
     )
@@ -343,8 +371,18 @@ ph_from_achieved <- function(
     r7 <- residual_meq(7)
     r14 <- residual_meq(14)
     message(sprintf(
-      "pH bracket debug: f(0)=%.6g ct_raw_neg=%s, f(7)=%.6g ct_raw_neg=%s, f(14)=%.6g ct_raw_neg=%s",
-      r0$f, r0$ct_raw_neg, r7$f, r7$ct_raw_neg, r14$f, r14$ct_raw_neg
+      paste(
+        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
+        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
+        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g Alk_mM=%.6g Alk_eq=%.6g CT_raw=%.6g ct_raw_neg=%s",
+        sep = "\n"
+      ),
+      r0$H_mM, r0$OH_mM, r0$pos_fix_meq, r0$neg_fix_meq, r0$pos, r0$neg, r0$f,
+      Alk_mM, r0$Alk_eq, r0$CT_raw, r0$ct_raw_neg,
+      r7$H_mM, r7$OH_mM, r7$pos_fix_meq, r7$neg_fix_meq, r7$pos, r7$neg, r7$f,
+      Alk_mM, r7$Alk_eq, r7$CT_raw, r7$ct_raw_neg,
+      r14$H_mM, r14$OH_mM, r14$pos_fix_meq, r14$neg_fix_meq, r14$pos, r14$neg, r14$f,
+      Alk_mM, r14$Alk_eq, r14$CT_raw, r14$ct_raw_neg
     ))
   }
 
