@@ -5,10 +5,10 @@
 \alias{nutrient_matrix}
 \title{Canonical fertilizer-to-nutrient stoichiometry matrix}
 \format{
-A numeric matrix with n rows (compounds) and 16 columns (nutrients).
+A numeric matrix with n rows (compounds) and 20 columns (nutrients).
 Row names are chemical formulas; column names are nutrient keys:
 `NO3_N`, `NH4_N`, `P`, `K`, `Ca`, `Mg`, `S`, `Na`, `Cl`, `Fe`, `Mn`, `Zn`,
-`B`, `Cu`, `Mo`, `Si`.
+`B`, `Cu`, `Mo`, `Si`, `EDTA`, `DTPA`, `EDDHA`, `HBED`.
 }
 \usage{
 data(nutrient_matrix)

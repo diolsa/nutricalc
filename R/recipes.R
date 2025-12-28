@@ -1,8 +1,5 @@
 # Canonical nutrient order (mmol/L inside file)
-nutrients <- c(
-  "NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-  "Fe","Mn","Zn","B","Cu","Mo","Si"
-)
+nutrients <- CANONICAL_NUTRIENTS
 
 # ------------------------------------------------------------------------------
 
@@ -730,4 +727,3 @@ recipes <- lapply(recipes, function(r) {
   r$targets <- normalize_targets(r, nutrients)
   r
 })
-

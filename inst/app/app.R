@@ -91,8 +91,13 @@ pretty_nutrient_label_str <- function(nm) {
   )
 }
 
-nutrients <- c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-               "Fe","Mn","Zn","B","Cu","Mo","Si")
+nutrients <- if (requireNamespace("nutricalc", quietly = TRUE) &&
+  exists("CANONICAL_NUTRIENTS", where = asNamespace("nutricalc"), inherits = FALSE)) {
+  get("CANONICAL_NUTRIENTS", envir = asNamespace("nutricalc"))
+} else {
+  c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
+    "Fe","Mn","Zn","B","Cu","Mo","Si")
+}
 
 default_expr <- c(
   "15","1.25","2.5","9","3","1.00","1.3","0","0",
@@ -1339,9 +1344,11 @@ server <- function(input, output, session) {
     }
 
   final_for_ph <- water_mmol()
-  add <- res$achieved
+  add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
   for (nm in names(add)) {
-    final_for_ph[[nm]] <- (final_for_ph[[nm]] %||% 0) + as.numeric(add[[nm]])
+    current <- final_for_ph[nm]
+    if (is.na(current)) current <- 0
+    final_for_ph[nm] <- current + as.numeric(add[[nm]])
   }
   final_for_ph <- c(final_for_ph, Alkalinity = water_hco3())
 

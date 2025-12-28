@@ -53,6 +53,12 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
   achieved <- as.vector(achieved)
   names(achieved) <- names(target)
 
+  amounts_full <- numeric(nrow(nutrient_matrix))
+  names(amounts_full) <- rownames(nutrient_matrix)
+  amounts_full[names(amounts)] <- amounts
+  achieved_full <- as.vector(t(nutrient_matrix) %*% amounts_full)
+  names(achieved_full) <- colnames(nutrient_matrix)
+
   # Errors
   abs_error <- achieved - target
   percent_error <- abs_error / target * 100
@@ -76,6 +82,7 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
     list(
       amounts = amounts,                 # mmol L^-1 per compound
       achieved = achieved,               # mmol L^-1 per nutrient
+      achieved_full = achieved_full,     # mmol L^-1 per nutrient (all columns)
       target = target,                   # mmol L^-1 per nutrient
       abs_error = abs_error,             # mmol L^-1
       percent_error = percent_error,     # %
@@ -196,10 +203,13 @@ two_stage_optimize_nutrients <- function(
     full_amounts[acid_idx] <- amounts_acid
 
     A_full <- t(nutrient_matrix[, names(target), drop = FALSE])
-    achieved_full <- as.vector(A_full %*% full_amounts)
-    names(achieved_full) <- names(target)
+    achieved <- as.vector(A_full %*% full_amounts)
+    names(achieved) <- names(target)
 
-    abs_error <- achieved_full - target
+    achieved_full <- as.vector(t(nutrient_matrix) %*% full_amounts)
+    names(achieved_full) <- colnames(nutrient_matrix)
+
+    abs_error <- achieved - target
     percent_error <- abs_error / target * 100
     percent_error[is.nan(percent_error) | !is.finite(percent_error)] <- NA
 
@@ -208,16 +218,17 @@ two_stage_optimize_nutrients <- function(
 
     tol <- 1e-9
     zero_tgt <- target == 0
-    percent_error[zero_tgt & abs(achieved_full) < tol] <- 0
+    percent_error[zero_tgt & abs(achieved) < tol] <- 0
 
     full_amounts <- drop_tiny(full_amounts)
-    achieved_full <- drop_tiny(achieved_full)
+    achieved <- drop_tiny(achieved)
     abs_error <- drop_tiny(abs_error)
     percent_error <- drop_tiny(percent_error)
 
     res <- list(
       amounts = full_amounts,
-      achieved = achieved_full,
+      achieved = achieved,
+      achieved_full = achieved_full,
       target = target,
       abs_error = abs_error,
       percent_error = percent_error,
