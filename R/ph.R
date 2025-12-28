@@ -301,7 +301,7 @@ ph_from_achieved <- function(
 
     f0 <- pos - neg
     if (use_alk && ct_raw_neg) {
-      f0 <- 1e6
+      f0 <- NA_real_
     }
 
     list(
@@ -333,26 +333,37 @@ ph_from_achieved <- function(
     f_grid <- vapply(phc_grid, function(x) {
       tryCatch(residual_meq(x)$f, error = function(e) NA_real_)
     }, numeric(1))
-    signs <- sign(f_grid)
-    idx <- which(is.finite(signs[-1]) & is.finite(signs[-length(signs)]) &
-                   signs[-1] * signs[-length(signs)] < 0)
-    if (length(idx)) {
-      i <- idx[1]
-      return(list(
-        a = phc_grid[i],
-        b = phc_grid[i + 1],
-        fa = f_grid[i],
-        fb = f_grid[i + 1]
-      ))
+    finite_idx <- which(is.finite(f_grid))
+    if (length(finite_idx) >= 2) {
+      phc_f <- phc_grid[finite_idx]
+      f_f <- f_grid[finite_idx]
+      signs <- sign(f_f)
+      idx <- which(signs[-1] * signs[-length(signs)] < 0)
+      if (length(idx)) {
+        i <- idx[1]
+        return(list(
+          a = phc_f[i],
+          b = phc_f[i + 1],
+          fa = f_f[i],
+          fb = f_f[i + 1]
+        ))
+      }
     }
 
     if (isTRUE(debug)) {
-      r0 <- residual_meq(0)
+      r2 <- residual_meq(2)
       r7 <- residual_meq(7)
-      r14 <- residual_meq(14)
+      r12 <- residual_meq(12)
       message(sprintf(
-        "pH bracket debug: f(0)=%.6g f(7)=%.6g f(14)=%.6g",
-        r0$f, r7$f, r14$f
+        paste(
+          "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
+          "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
+          "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM ct_raw_neg=%s CT_raw=%.6g",
+          sep = "\n"
+        ),
+        r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, r2$ct_raw_neg, r2$CT_raw,
+        r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, r7$ct_raw_neg, r7$CT_raw,
+        r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, r12$ct_raw_neg, r12$CT_raw
       ))
     }
 
