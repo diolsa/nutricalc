@@ -12,7 +12,7 @@ CANONICAL_NUTRIENTS
 }
 \description{
 Defines the stable nutrient order used across recipes, UI inputs, and target
-vectors. This is intentionally independent from the full \code{nutrient_matrix},
+vectors. This is intentionally independent from the full `nutrient_matrix`,
 which may include additional columns for chelate ligands or other species.
 }
 \keyword{datasets}
