@@ -200,14 +200,20 @@ ph_from_achieved <- function(
       a1 <- (K1c_C * H) / D_c
       a2 <- (K1c_C * K2c_C) / D_c
       Alk_eq <- Alk_mM * 1e-3
+      use_alk <- is.finite(Alk_eq) && Alk_eq > 0
       denom <- a1 + 2 * a2
-      CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
-      if (!is.finite(CT) || CT < 0) {
-        CT <- NA_real_
+      CT_infeasible <- FALSE
+      if (!use_alk) {
+        CT <- 0
         CO2 <- 0
         HCO3 <- 0
         CO3 <- 0
       } else {
+        CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
+        if (!is.finite(CT) || CT < 0) {
+          CT_infeasible <- TRUE
+          CT <- 0
+        }
         CO2 <- a0 * CT
         HCO3 <- a1 * CT
         CO3 <- a2 * CT
@@ -292,16 +298,16 @@ ph_from_achieved <- function(
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
       (HCO3_mM + 2 * CO3_mM)
 
-    alk_mismatch_eq <- if (is.finite(CT)) {
-      (HCO3 + 2 * CO3 + OH - H) - Alk_eq
-    } else {
-      0
+    f0 <- pos - neg
+    if (use_alk) {
+      alk_mismatch_eq <- (HCO3 + 2 * CO3 + OH - H) - Alk_eq
+      f0 <- f0 + 1e3 * alk_mismatch_eq * 1e3
+      if (CT_infeasible) {
+        f0 <- f0 + sign(f0) * 1e3
+      }
     }
-    penalty_w <- if (Alk_mM > 0) 1e3 else 0
-    penalty_meq <- penalty_w * alk_mismatch_eq * 1e3
-    if (!is.finite(CT) || CT < 0) penalty_meq <- penalty_meq + 1e6
 
-    list(f = pos - neg + penalty_meq, I = I, gam = gam, species = species)
+    list(f = f0, I = I, gam = gam, species = species)
   }
 
   # --- outer root find (bisection on pHc) ---
