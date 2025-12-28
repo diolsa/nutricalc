@@ -7,9 +7,9 @@
 #' @param plz Character or numeric vector of length one with a five digit
 #'   German postal code.
 #'
-#' @return A named numeric vector of length 16 in mmol/L with names
+#' @return A named numeric vector of length 17 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si")`, limited to the decimal precision
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity")`, limited to the decimal precision
 #'   provided by the source values.
 #' @export
 #'
@@ -44,7 +44,7 @@ fetch_bwb_mittelwert <- function(plz) {
 
   relevant <- parsed_tables[table_matches]
   target_names <- c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-                    "Fe","Mn","Zn","B","Cu","Mo","Si")
+                    "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity")
   empty_result <- stats::setNames(rep(NA_real_, length(target_names)), target_names)
 
   if (!length(relevant)) {
@@ -166,6 +166,9 @@ map_parameter_to_nutrient <- function(param) {
   if (grepl("^kupfer", clean)) return("Cu")
   if (grepl("^molybd", clean)) return("Mo")
   if (grepl("^silicium", clean)) return("Si")
+  if (grepl("saeurekapazitaet|ks\\s*4\\s*[\\.,]\\s*3|bis\\s*ph\\s*4\\s*[\\.,]\\s*3", clean)) {
+    return("Alkalinity")
+  }
   ""
 }
 
