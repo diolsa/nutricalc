@@ -185,8 +185,7 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.y = FALSE
   )
   df$c_mM[!is.finite(df$c_mM)] <- 0
-  df$Lambda0 <- df$Lambda0_eq
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0 / 1000
+  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
@@ -194,6 +193,6 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0", "kappa_mS_cm")]
+    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0_eq", "kappa_mS_cm")]
   )
 }

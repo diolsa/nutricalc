@@ -1354,17 +1354,29 @@ server <- function(input, output, session) {
       return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
     }
 
-    fmt_small <- function(x) {
-      ifelse(abs(x) < 0.001, format(signif(x, 6), scientific = TRUE), format(signif(x, 6), trim = TRUE))
+    fmt_sci_html <- function(x) {
+      if (!is.finite(x)) return(as.character(x))
+      formatted <- formatC(x, format = "e", digits = 2)
+      parts <- strsplit(formatted, "e", fixed = TRUE)[[1]]
+      mantissa <- parts[[1]]
+      exp_raw <- parts[[2]]
+      exp_clean <- sub("^\\+?", "", exp_raw)
+      paste0(mantissa, "×10<sup>", exp_clean, "</sup>")
     }
-    fmt_total <- function(x) {
-      format(round(x, 6), nsmall = 4, trim = TRUE)
+
+    fmt_num <- function(x, threshold = 0.01) {
+      if (!is.finite(x)) return(as.character(x))
+      if (abs(x) < threshold && x != 0) {
+        fmt_sci_html(x)
+      } else {
+        formatC(x, format = "f", digits = 2)
+      }
     }
 
     output$ph_fixed_cations <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_cations_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_cations_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1372,7 +1384,7 @@ server <- function(input, output, session) {
     output$ph_fixed_anions <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_anions_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$fixed_anions_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_anions_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1380,7 +1392,7 @@ server <- function(input, output, session) {
     output$ph_variable <- renderTable({
       data.frame(
         Component = names(ph_res$charge_breakdown$variable_meq),
-        `meq/L` = fmt_small(unname(ph_res$charge_breakdown$variable_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$variable_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1396,7 +1408,7 @@ server <- function(input, output, session) {
 
       data.frame(
         Species = names(species_vals),
-        `mmol/L` = fmt_small(unname(species_vals)),
+        `mmol/L` = vapply(unname(species_vals), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1404,7 +1416,7 @@ server <- function(input, output, session) {
     output$ph_totals <- renderTable({
       data.frame(
         Total = names(ph_res$charge_breakdown$totals_meq),
-        `meq/L` = fmt_total(unname(ph_res$charge_breakdown$totals_meq)),
+        `meq/L` = vapply(unname(ph_res$charge_breakdown$totals_meq), fmt_num, character(1)),
         check.names = FALSE
       )
     }, sanitize.text.function = function(x) x)
@@ -1426,41 +1438,61 @@ server <- function(input, output, session) {
     output$ec_contrib <- renderTable({
       if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
       df <- ec_res$contributions
-      df$kappa_mS_cm <- fmt_small(df$kappa_mS_cm)
-      df$c_mM <- fmt_small(df$c_mM)
+      df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
+      df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
+      df$z <- format(df$z, trim = TRUE, nsmall = 0, scientific = FALSE)
+      if ("Lambda0_eq" %in% names(df)) {
+        names(df)[names(df) == "Lambda0_eq"] <- "λ₀(eq)"
+      } else if ("Lambda0" %in% names(df)) {
+        names(df)[names(df) == "Lambda0"] <- "λ₀(eq)"
+      }
+      names(df)[names(df) == "kappa_mS_cm"] <- "κ (mS/cm)"
+      names(df)[names(df) == "c_mM"] <- "c (mM)"
       df
     }, sanitize.text.function = function(x) x)
 
     tags$div(
       tags$h5("🧪 pH & EC"),
-      tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
-      tags$p(strong("Ionic strength (mol/L):"), sprintf("%.2f", ph_res$I)),
-      tags$hr(),
-      tags$h6("Fixed cations (meq/L)"),
-      tableOutput("ph_fixed_cations"),
-      tags$h6("Fixed anions (meq/L)"),
-      tableOutput("ph_fixed_anions"),
-      tags$h6("Variable components (meq/L)"),
-      tableOutput("ph_variable"),
-      tags$h6("Charge totals (meq/L)"),
-      tableOutput("ph_totals"),
-      tags$hr(),
-      tags$h6("Estimated EC (25°C)"),
-      if (inherits(ec_res, "error")) {
-        tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
-      } else if (is.null(ec_res)) {
-        tags$p("EC calculation not available.")
-      } else {
-        tagList(
-          tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
-          tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
-          tags$h6("EC contributions"),
-          tableOutput("ec_contrib")
+      fluidRow(
+        column(
+          5,
+          tags$h6("pH"),
+          tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
+          tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
+          tags$details(
+            tags$summary("Show pH charge breakdown"),
+            tags$h6("Fixed cations (meq/L)"),
+            tableOutput("ph_fixed_cations"),
+            tags$h6("Fixed anions (meq/L)"),
+            tableOutput("ph_fixed_anions"),
+            tags$h6("Variable components (meq/L)"),
+            tableOutput("ph_variable"),
+            tags$h6("Charge totals (meq/L)"),
+            tableOutput("ph_totals")
+          )
+        ),
+        column(
+          7,
+          tags$h6("EC (25°C)"),
+          if (inherits(ec_res, "error")) {
+            tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
+          } else if (is.null(ec_res)) {
+            tags$p("EC calculation not available.")
+          } else {
+            tagList(
+              tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
+              tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
+              tags$details(
+                tags$summary("Show EC contributions"),
+                tableOutput("ec_contrib")
+              )
+            )
+          }
         )
-      },
+      ),
       tags$p(
         class = "text-muted",
-        "Estimated at 25°C with Davies activity correction; no carbonate or complexation assumed."
+        "Estimated at 25°C with Davies activity correction; no complexation assumed."
       )
     )
   })
