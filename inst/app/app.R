@@ -1338,13 +1338,15 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-  achieved_for_ph <- res$achieved
-  if (!is.null(water_hco3()) && is.finite(water_hco3())) {
-    achieved_for_ph <- c(achieved_for_ph, HCO3 = water_hco3())
+  final_for_ph <- water_mmol()
+  add <- res$achieved
+  for (nm in names(add)) {
+    final_for_ph[[nm]] <- (final_for_ph[[nm]] %||% 0) + as.numeric(add[[nm]])
   }
+  final_for_ph <- c(final_for_ph, Alkalinity = water_hco3())
 
   ph_res <- tryCatch(
-    ph_fn(achieved_for_ph, phc_bracket = c(1, 13)),
+    ph_fn(final_for_ph, phc_bracket = c(1, 13)),
     error = function(e) e
   )
 
