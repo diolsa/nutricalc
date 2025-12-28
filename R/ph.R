@@ -82,11 +82,11 @@ ph_from_achieved <- function(
 
   # acid constants (thermodynamic, for activities)
   Ka_NH4 <- 10^(-9.25)
-  Ka_HSO4 <- 10^(-1.92)
+  Ka_HSO4 <- 10^(-1.99)
 
-  Ka1_P <- 10^(-2.15)
-  Ka2_P <- 10^(-7.20)
-  Ka3_P <- 10^(-12.35)
+  Ka1_P <- 10^(-2.16)
+  Ka2_P <- 10^(-7.21)
+  Ka3_P <- 10^(-12.32)
   Ka1_C <- 10^(-6.35)
   Ka2_C <- 10^(-10.33)
   Ka_B <- 10^(-9.27)
