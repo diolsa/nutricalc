@@ -13,6 +13,7 @@ ion_lambda0_25C <- function() {
       "Ca2+", "Mg2+",
       "Fe2+", "Fe3+", "Mn2+", "Zn2+", "Cu2+",
       "Cl-", "NO3-",
+      "HCO3-", "CO3-2",
       "HSO4-", "SO4-2",
       "H2PO4-", "HPO4-2", "PO4-3",
       "MoO4-2"
@@ -24,6 +25,7 @@ ion_lambda0_25C <- function() {
       +2, +3, +2, +2, +2,
       -1, -1,
       -1, -2,
+      -1, -2,
       -1, -2, -3,
       -2
     ),
@@ -34,6 +36,7 @@ ion_lambda0_25C <- function() {
       59.47, 53.06,
       53.1, 68.0, 53.5, 52.8, 53.6,
       76.35, 71.45,
+      44.5, 69.3,
       50.1, 80.0,
       36.0, 57.0, 92.8,
       53.0
@@ -116,6 +119,9 @@ make_ec_ions <- function(achieved, ph_res) {
   HSO4 <- get0(sp, "HSO4")
   SO4 <- get0(sp, "SO4")
 
+  HCO3 <- get0(sp, "HCO3")
+  CO3 <- get0(sp, "CO3")
+
   H2PO4 <- get0(sp, "H2PO4")
   HPO4 <- get0(sp, "HPO4")
   PO4 <- get0(sp, "PO4")
@@ -135,6 +141,8 @@ make_ec_ions <- function(achieved, ph_res) {
     "Cu2+" = Cu,
     "Cl-" = Cl,
     "NO3-" = NO3,
+    "HCO3-" = HCO3,
+    "CO3-2" = CO3,
     "HSO4-" = HSO4,
     "SO4-2" = SO4,
     "H2PO4-" = H2PO4,
@@ -176,8 +184,9 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.x = FALSE,
     all.y = FALSE
   )
-
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
+  df$c_mM[!is.finite(df$c_mM)] <- 0
+  df$Lambda0 <- df$Lambda0_eq
+  df$kappa_mS_cm <- df$c_mM * df$Lambda0 / 1000
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
@@ -185,6 +194,6 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), ]
+    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0", "kappa_mS_cm")]
   )
 }
