@@ -191,21 +191,6 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
 
-  ions_to_check <- c("Na+", "Cl-", "Ca2+", "Mg2+")
-  check_df <- df[df$ion %in% ions_to_check, , drop = FALSE]
-  if (nrow(check_df) > 0) {
-    zero_ions <- check_df$ion[check_df$c_mM > 0 & check_df$kappa_mS_cm <= 0]
-    if (length(zero_ions) > 0) {
-      warning(
-        sprintf(
-          "EC sanity check: expected positive contributions for %s.",
-          paste(zero_ions, collapse = ", ")
-        ),
-        call. = FALSE
-      )
-    }
-  }
-
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
