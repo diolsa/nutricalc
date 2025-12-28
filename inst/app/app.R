@@ -1440,6 +1440,9 @@ server <- function(input, output, session) {
       df <- ec_res$contributions
       df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
       df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
+      names(df)[names(df) == "Lambda0_eq"] <- "λ₀(eq)"
+      names(df)[names(df) == "kappa_mS_cm"] <- "κ (mS/cm)"
+      names(df)[names(df) == "c_mM"] <- "c (mM)"
       df
     }, sanitize.text.function = function(x) x)
 
