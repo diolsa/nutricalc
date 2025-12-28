@@ -89,6 +89,8 @@ ph_from_achieved <- function(
   Ka3_P <- 10^(-12.35)
   Ka1_C <- 10^(-6.35)
   Ka2_C <- 10^(-10.33)
+  Ka_B <- 10^(-9.27)
+  Ka_Si1 <- 10^(-9.90)
 
   # --- helpers ---
   davies_gamma <- function(I, z) {
@@ -106,6 +108,8 @@ ph_from_achieved <- function(
   Ca <- get0("Ca")            # mmol/L Ca2+
   Mg <- get0("Mg")            # mmol/L Mg2+
   ST <- get0("S")             # mmol/L total sulfate (HSO4-/SO4^2-)
+  BT <- get0("B")             # mmol/L total boron
+  SiT <- get0("Si")           # mmol/L total silicon
 
   Na <- get0("Na")
   Cl <- get0("Cl")
@@ -122,8 +126,6 @@ ph_from_achieved <- function(
   } else {
     0
   }
-  # B is treated neutral here
-  # Si ignored
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
@@ -169,6 +171,8 @@ ph_from_achieved <- function(
       gam$PO4 <- gam$z3
       gam$HCO3 <- gam$z1
       gam$CO3 <- gam$z2
+      gam$BOH4 <- gam$z1
+      gam$H3SiO4 <- gam$z1
 
       # OH- from water autoprotolysis with activities
       OH <- Kw / (gam$H * gam$OH * H)  # mol/L
@@ -206,6 +210,17 @@ ph_from_achieved <- function(
       HCO3 <- a1 * CT
       CO3 <- a2 * CT
 
+      # borate speciation (B(OH)3 / B(OH)4-)
+      aH <- gam$H * H
+      rB <- (Ka_B / aH) * (1 / gam$BOH4)
+      BOH4 <- mM_to_M(BT) * (rB / (1 + rB))
+      BOH3 <- mM_to_M(BT) - BOH4
+
+      # silicate speciation (H4SiO4 / H3SiO4-)
+      rSi <- (Ka_Si1 / aH) * (1 / gam$H3SiO4)
+      H3SiO4 <- mM_to_M(SiT) * (rSi / (1 + rSi))
+      H4SiO4 <- mM_to_M(SiT) - H3SiO4
+
       # ionic strength recompute
       I_new <- 0
       for (nm in names(fixed_c)) {
@@ -221,7 +236,9 @@ ph_from_achieved <- function(
         HPO4 * 2^2 +
         PO4 * 3^2 +
         HCO3 * 1^2 +
-        CO3 * 2^2
+        CO3 * 2^2 +
+        BOH4 * 1^2 +
+        H3SiO4 * 1^2
       I_new <- 0.5 * I_new
 
       # converge inner loop
@@ -230,7 +247,9 @@ ph_from_achieved <- function(
         NH4 = NH4, NH3 = NH3,
         HSO4 = HSO4, SO4 = SO4,
         H3PO4 = H3PO4, H2PO4 = H2PO4, HPO4 = HPO4, PO4 = PO4,
-        CO2 = CO2, HCO3 = HCO3, CO3 = CO3
+        CO2 = CO2, HCO3 = HCO3, CO3 = CO3,
+        BOH3 = BOH3, BOH4 = BOH4,
+        H4SiO4 = H4SiO4, H3SiO4 = H3SiO4
       )
       if (abs(I_new - I) < 1e-10) {
         I <- I_new
@@ -241,7 +260,7 @@ ph_from_achieved <- function(
 
     expected_species_full <- c(
       "H", "OH", "NH4", "NH3", "HSO4", "SO4", "H3PO4", "H2PO4", "HPO4", "PO4",
-      "CO2", "HCO3", "CO3"
+      "CO2", "HCO3", "CO3", "BOH3", "BOH4", "H4SiO4", "H3SiO4"
     )
     missing_species <- setdiff(expected_species_full, names(species))
     if (length(missing_species) > 0) {
@@ -278,12 +297,16 @@ ph_from_achieved <- function(
     PO4_mM <- species$PO4 * 1e3
     HCO3_mM <- species$HCO3 * 1e3
     CO3_mM <- species$CO3 * 1e3
+    BOH4_mM <- species$BOH4 * 1e3
+    H3SiO4_mM <- species$H3SiO4 * 1e3
 
     pos <- pos_fix_meq + H_mM + NH4_mM
     neg <- neg_fix_meq + OH_mM +
       (HSO4_mM + 2 * SO4_mM) +
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
-      (HCO3_mM + 2 * CO3_mM)
+      (HCO3_mM + 2 * CO3_mM) +
+      BOH4_mM +
+      H3SiO4_mM
 
     list(
       f = pos - neg,
@@ -334,16 +357,19 @@ ph_from_achieved <- function(
       r12 <- residual_meq(12)
       message(sprintf(
         paste(
-          "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
-          "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
-          "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
-          sep = "\n"
-        ),
-        r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, CT_mM, r2$species[["HCO3"]] * 1e3, r2$species[["CO3"]] * 1e3,
-        r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
-        r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, CT_mM, r12$species[["HCO3"]] * 1e3, r12$species[["CO3"]] * 1e3
-      ))
-    }
+        "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        sep = "\n"
+      ),
+      r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, CT_mM, r2$species[["HCO3"]] * 1e3, r2$species[["CO3"]] * 1e3,
+      r2$species[["BOH4"]] * 1e3, r2$species[["H3SiO4"]] * 1e3,
+      r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
+      r7$species[["BOH4"]] * 1e3, r7$species[["H3SiO4"]] * 1e3,
+      r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, CT_mM, r12$species[["HCO3"]] * 1e3, r12$species[["CO3"]] * 1e3,
+      r12$species[["BOH4"]] * 1e3, r12$species[["H3SiO4"]] * 1e3
+    ))
+  }
 
     stop(
       sprintf(
@@ -361,17 +387,20 @@ ph_from_achieved <- function(
     r14 <- residual_meq(14)
     message(sprintf(
       paste(
-        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
-        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
-        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g",
+        "pH debug phc=0: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH debug phc=7: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+        "pH debug phc=14: H=%.6g mM OH=%.6g mM pos_fix=%.6g neg_fix=%.6g pos=%.6g neg=%.6g f=%.6g CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
         sep = "\n"
       ),
       r0$H_mM, r0$OH_mM, r0$pos_fix_meq, r0$neg_fix_meq, r0$pos, r0$neg, r0$f,
       CT_mM, r0$species[["HCO3"]] * 1e3, r0$species[["CO3"]] * 1e3,
+      r0$species[["BOH4"]] * 1e3, r0$species[["H3SiO4"]] * 1e3,
       r7$H_mM, r7$OH_mM, r7$pos_fix_meq, r7$neg_fix_meq, r7$pos, r7$neg, r7$f,
       CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
+      r7$species[["BOH4"]] * 1e3, r7$species[["H3SiO4"]] * 1e3,
       r14$H_mM, r14$OH_mM, r14$pos_fix_meq, r14$neg_fix_meq, r14$pos, r14$neg, r14$f,
-      CT_mM, r14$species[["HCO3"]] * 1e3, r14$species[["CO3"]] * 1e3
+      CT_mM, r14$species[["HCO3"]] * 1e3, r14$species[["CO3"]] * 1e3,
+      r14$species[["BOH4"]] * 1e3, r14$species[["H3SiO4"]] * 1e3
     ))
   }
 
@@ -417,12 +446,16 @@ ph_from_achieved <- function(
     PO4 = as.numeric(sp$PO4) * 1e3,
     CO2 = as.numeric(sp$CO2) * 1e3,
     HCO3 = as.numeric(sp$HCO3) * 1e3,
-    CO3 = as.numeric(sp$CO3) * 1e3
+    CO3 = as.numeric(sp$CO3) * 1e3,
+    BOH3 = as.numeric(sp$BOH3) * 1e3,
+    BOH4 = as.numeric(sp$BOH4) * 1e3,
+    H4SiO4 = as.numeric(sp$H4SiO4) * 1e3,
+    H3SiO4 = as.numeric(sp$H3SiO4) * 1e3
   )
 
   expected_species <- c(
     "H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4",
-    "CO2", "HCO3", "CO3"
+    "CO2", "HCO3", "CO3", "BOH3", "BOH4", "H4SiO4", "H3SiO4"
   )
   missing <- setdiff(expected_species, names(species_mM))
   if (length(missing) > 0) {
@@ -458,13 +491,17 @@ ph_from_achieved <- function(
     NH4_plus = species_mM[["NH4"]],
     sulfate_total_meq = species_mM[["HSO4"]] + 2 * species_mM[["SO4"]],
     phosphate_total_meq = species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]],
-    carbonate_total_meq = species_mM[["HCO3"]] + 2 * species_mM[["CO3"]]
+    carbonate_total_meq = species_mM[["HCO3"]] + 2 * species_mM[["CO3"]],
+    borate_total_meq = species_mM[["BOH4"]],
+    silicate_total_meq = species_mM[["H3SiO4"]]
   )
 
   pos_meq <- sum(fixed_cations_meq) + variable_meq[["H_plus"]] + variable_meq[["NH4_plus"]]
   neg_meq <- sum(fixed_anions_meq) + variable_meq[["OH_minus"]] +
     variable_meq[["sulfate_total_meq"]] + variable_meq[["phosphate_total_meq"]] +
-    variable_meq[["carbonate_total_meq"]]
+    variable_meq[["carbonate_total_meq"]] +
+    variable_meq[["borate_total_meq"]] +
+    variable_meq[["silicate_total_meq"]]
 
   charge_breakdown <- list(
     fixed_cations_meq = fixed_cations_meq,
