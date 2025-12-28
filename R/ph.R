@@ -85,6 +85,8 @@ ph_from_achieved <- function(
   Ka1_P <- 10^(-2.15)
   Ka2_P <- 10^(-7.20)
   Ka3_P <- 10^(-12.35)
+  Ka1_C <- 10^(-6.35)
+  Ka2_C <- 10^(-10.33)
 
   # --- helpers ---
   davies_gamma <- function(I, z) {
@@ -111,6 +113,13 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
+  Alk_mM <- if ("HCO3" %in% names(achieved)) {
+    achieved[["HCO3"]]
+  } else if ("Alkalinity" %in% names(achieved)) {
+    achieved[["Alkalinity"]]
+  } else {
+    0
+  }
   # B is treated neutral here
   # Si ignored
 
@@ -156,6 +165,8 @@ ph_from_achieved <- function(
       gam$H2PO4 <- gam$z1
       gam$HPO4 <- gam$z2
       gam$PO4 <- gam$z3
+      gam$HCO3 <- gam$z1
+      gam$CO3 <- gam$z2
 
       # OH- from water autoprotolysis with activities
       OH <- Kw / (gam$H * gam$OH * H)  # mol/L
@@ -181,6 +192,21 @@ ph_from_achieved <- function(
       HPO4 <- mM_to_M(PT) * (K1c * K2c * H / D)
       PO4 <- mM_to_M(PT) * (K1c * K2c * K3c / D)
 
+      # carbonate speciation from alkalinity
+      K1c_C <- Ka1_C / (gam$H * gam$HCO3)
+      K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
+      D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
+      a0 <- H^2 / D_c
+      a1 <- (K1c_C * H) / D_c
+      a2 <- (K1c_C * K2c_C) / D_c
+      Alk_eq <- Alk_mM * 1e-3
+      denom <- a1 + 2 * a2
+      CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else 0
+      if (!is.finite(CT) || CT < 0) CT <- 0
+      CO2 <- a0 * CT
+      HCO3 <- a1 * CT
+      CO3 <- a2 * CT
+
       # ionic strength recompute
       I_new <- 0
       for (nm in names(fixed_c)) {
@@ -194,7 +220,9 @@ ph_from_achieved <- function(
         SO4 * 2^2 +
         H2PO4 * 1^2 +
         HPO4 * 2^2 +
-        PO4 * 3^2
+        PO4 * 3^2 +
+        HCO3 * 1^2 +
+        CO3 * 2^2
       I_new <- 0.5 * I_new
 
       # converge inner loop
@@ -202,7 +230,8 @@ ph_from_achieved <- function(
         H = H, OH = OH,
         NH4 = NH4, NH3 = NH3,
         HSO4 = HSO4, SO4 = SO4,
-        H3PO4 = H3PO4, H2PO4 = H2PO4, HPO4 = HPO4, PO4 = PO4
+        H3PO4 = H3PO4, H2PO4 = H2PO4, HPO4 = HPO4, PO4 = PO4,
+        CO2 = CO2, HCO3 = HCO3, CO3 = CO3
       )
       if (abs(I_new - I) < 1e-10) {
         I <- I_new
@@ -212,7 +241,8 @@ ph_from_achieved <- function(
     }
 
     expected_species_full <- c(
-      "H", "OH", "NH4", "NH3", "HSO4", "SO4", "H3PO4", "H2PO4", "HPO4", "PO4"
+      "H", "OH", "NH4", "NH3", "HSO4", "SO4", "H3PO4", "H2PO4", "HPO4", "PO4",
+      "CO2", "HCO3", "CO3"
     )
     missing_species <- setdiff(expected_species_full, names(species))
     if (length(missing_species) > 0) {
@@ -247,11 +277,14 @@ ph_from_achieved <- function(
     H2PO4_mM <- species$H2PO4 * 1e3
     HPO4_mM <- species$HPO4 * 1e3
     PO4_mM <- species$PO4 * 1e3
+    HCO3_mM <- species$HCO3 * 1e3
+    CO3_mM <- species$CO3 * 1e3
 
     pos <- pos_fix_meq + H_mM + NH4_mM
     neg <- neg_fix_meq + OH_mM +
       (HSO4_mM + 2 * SO4_mM) +
-      (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM)
+      (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
+      (HCO3_mM + 2 * CO3_mM)
 
     list(f = pos - neg, I = I, gam = gam, species = species)
   }
@@ -296,10 +329,16 @@ ph_from_achieved <- function(
     H3PO4 = as.numeric(sp$H3PO4) * 1e3,
     H2PO4 = as.numeric(sp$H2PO4) * 1e3,
     HPO4 = as.numeric(sp$HPO4) * 1e3,
-    PO4 = as.numeric(sp$PO4) * 1e3
+    PO4 = as.numeric(sp$PO4) * 1e3,
+    CO2 = as.numeric(sp$CO2) * 1e3,
+    HCO3 = as.numeric(sp$HCO3) * 1e3,
+    CO3 = as.numeric(sp$CO3) * 1e3
   )
 
-  expected_species <- c("H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4")
+  expected_species <- c(
+    "H", "OH", "NH4", "HSO4", "SO4", "H2PO4", "HPO4", "PO4",
+    "CO2", "HCO3", "CO3"
+  )
   missing <- setdiff(expected_species, names(species_mM))
   if (length(missing) > 0) {
     stop(
@@ -333,12 +372,14 @@ ph_from_achieved <- function(
     OH_minus = species_mM[["OH"]],
     NH4_plus = species_mM[["NH4"]],
     sulfate_total_meq = species_mM[["HSO4"]] + 2 * species_mM[["SO4"]],
-    phosphate_total_meq = species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]]
+    phosphate_total_meq = species_mM[["H2PO4"]] + 2 * species_mM[["HPO4"]] + 3 * species_mM[["PO4"]],
+    carbonate_total_meq = species_mM[["HCO3"]] + 2 * species_mM[["CO3"]]
   )
 
   pos_meq <- sum(fixed_cations_meq) + variable_meq[["H_plus"]] + variable_meq[["NH4_plus"]]
   neg_meq <- sum(fixed_anions_meq) + variable_meq[["OH_minus"]] +
-    variable_meq[["sulfate_total_meq"]] + variable_meq[["phosphate_total_meq"]]
+    variable_meq[["sulfate_total_meq"]] + variable_meq[["phosphate_total_meq"]] +
+    variable_meq[["carbonate_total_meq"]]
 
   charge_breakdown <- list(
     fixed_cations_meq = fixed_cations_meq,
