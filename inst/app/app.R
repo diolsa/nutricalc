@@ -1346,7 +1346,9 @@ server <- function(input, output, session) {
   final_for_ph <- water_mmol()
   add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
   for (nm in names(add)) {
-    final_for_ph[[nm]] <- (final_for_ph[[nm]] %||% 0) + as.numeric(add[[nm]])
+    current <- final_for_ph[nm]
+    if (is.na(current)) current <- 0
+    final_for_ph[nm] <- current + as.numeric(add[[nm]])
   }
   final_for_ph <- c(final_for_ph, Alkalinity = water_hco3())
 
