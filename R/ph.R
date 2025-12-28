@@ -152,6 +152,7 @@ ph_from_achieved <- function(
     I <- 0.03 # initial guess
     gam <- list()
     species <- list()
+    ct_raw_neg <- FALSE
 
     for (k in seq_len(inner_max_iter)) {
       # gammas by charge state (Davies)
@@ -210,8 +211,9 @@ ph_from_achieved <- function(
         HCO3 <- 0
         CO3 <- 0
       } else {
-        CT <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
-        if (!is.finite(CT) || CT < 0) CT <- 0
+        CT_raw <- if (denom > 0) (Alk_eq - (OH - H)) / denom else NA_real_
+        ct_raw_neg <- !is.finite(CT_raw) || CT_raw < 0
+        CT <- if (ct_raw_neg) 0 else CT_raw
         CO2 <- a0 * CT
         HCO3 <- a1 * CT
         CO3 <- a2 * CT
@@ -296,7 +298,13 @@ ph_from_achieved <- function(
       (H2PO4_mM + 2 * HPO4_mM + 3 * PO4_mM) +
       (HCO3_mM + 2 * CO3_mM)
 
-    list(f = pos - neg, I = I, gam = gam, species = species)
+    f0 <- pos - neg
+    if (use_alk && ct_raw_neg) {
+      # steer the solver toward lower pH when alkalinity cannot be satisfied
+      f0 <- f0 + ((OH - H) - Alk_eq) * 1e3
+    }
+
+    list(f = f0, I = I, gam = gam, species = species, ct_raw_neg = ct_raw_neg)
   }
 
   # --- outer root find (bisection on pHc) ---
@@ -331,10 +339,13 @@ ph_from_achieved <- function(
   }
 
   if (isTRUE(debug)) {
-    f0 <- residual_meq(0)$f
-    f7 <- residual_meq(7)$f
-    f14 <- residual_meq(14)$f
-    message(sprintf("pH bracket debug: f(0)=%.6g, f(7)=%.6g, f(14)=%.6g", f0, f7, f14))
+    r0 <- residual_meq(0)
+    r7 <- residual_meq(7)
+    r14 <- residual_meq(14)
+    message(sprintf(
+      "pH bracket debug: f(0)=%.6g ct_raw_neg=%s, f(7)=%.6g ct_raw_neg=%s, f(14)=%.6g ct_raw_neg=%s",
+      r0$f, r0$ct_raw_neg, r7$f, r7$ct_raw_neg, r14$f, r14$ct_raw_neg
+    ))
   }
 
   bracket <- find_bracket(phc_bracket[1], phc_bracket[2])
