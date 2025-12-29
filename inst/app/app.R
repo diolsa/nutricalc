@@ -1498,6 +1498,12 @@ server <- function(input, output, session) {
       if ("Si" %in% names(res$achieved)) {
         species_vals <- c(species_vals, Si = as.numeric(res$achieved[["Si"]]))
       }
+      chelate_keys <- c("EDTA", "DTPA", "EDDHA", "HBED")
+      for (key in chelate_keys) {
+        if (key %in% names(final_for_ph)) {
+          species_vals <- c(species_vals, stats::setNames(as.numeric(final_for_ph[[key]]), key))
+        }
+      }
 
       data.frame(
         Species = names(species_vals),
