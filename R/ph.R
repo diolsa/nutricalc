@@ -101,7 +101,9 @@ ph_from_achieved <- function(
   davies_gamma <- function(I, z) {
     if (!is.finite(I) || I <= 0) return(1.0)
     term <- (sqrt(I) / (1 + sqrt(I)) - 0.3 * I)
-    10^(-A_davies * z^2 * term)
+    val <- 10^(-A_davies * z^2 * term)
+    if (!is.finite(val) || val <= 0) return(.Machine$double.xmin)
+    val
   }
 
   # pull inputs (mmol/L)
@@ -327,11 +329,18 @@ ph_from_achieved <- function(
     }
     non_finite <- vapply(species, function(x) !is.finite(x), logical(1))
     if (any(non_finite)) {
-      bad <- names(species)[non_finite]
-      stop(
-        sprintf("Speciation failed: non-finite values for [%s].", paste(bad, collapse = ", ")),
-        call. = FALSE
-      )
+      return(list(
+        f = NA_real_,
+        I = I,
+        gam = gam,
+        species = species,
+        H_mM = NA_real_,
+        OH_mM = NA_real_,
+        pos_fix_meq = NA_real_,
+        neg_fix_meq = NA_real_,
+        pos = NA_real_,
+        neg = NA_real_
+      ))
     }
 
     # ---- charge balance in meq/L (use concentrations) ----
@@ -479,6 +488,11 @@ ph_from_achieved <- function(
     mid <- 0.5 * (a + b)
     out <- residual_meq(mid)
     fm <- out$f
+    if (!is.finite(fm)) {
+      b <- mid
+      fb <- fm
+      next
+    }
     if (abs(fm) < tol) break
     if (fa * fm <= 0) {
       b <- mid
