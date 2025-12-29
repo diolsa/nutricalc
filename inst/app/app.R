@@ -624,9 +624,9 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-  run_trigger <- reactiveVal(0)
-
   targets_mmol <- reactiveVal(default_targets_mmol)
+  base_targets_mmol <- reactiveVal(default_targets_mmol)
+  display_lock <- reactiveVal(FALSE)
   water_mmol <- reactiveVal(default_water_mmol)
   water_hco3 <- reactiveVal(hco3_to_mmol(as.numeric(default_water_hco3_expr), canonical_unit))
   water_co2_aq <- reactiveVal(co2_to_mmol(as.numeric(default_water_ks82_expr), canonical_unit))
@@ -690,6 +690,7 @@ server <- function(input, output, session) {
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
     targets_mmol(vals_mmol)
+    base_targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, unit_in))
@@ -697,20 +698,35 @@ server <- function(input, output, session) {
     water_co2_aq(co2_to_mmol(co2_val, unit_in))
   }
 
+  observeEvent(lapply(nutrients, function(nm) input[[paste0("expr_", nm)]]), {
+    req(inputs_ready())
+    if (isTRUE(display_lock())) return()
+    unit_in <- input$input_unit %||% canonical_unit
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
+    base_targets_mmol(vals_mmol)
+    targets_mmol(vals_mmol)
+  }, ignoreInit = TRUE)
+
   observeEvent(input$reset, {
+    display_lock(TRUE)
+    on.exit(display_lock(FALSE), add = TRUE)
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
       updateSliderInput(session, paste0("imp_", nm), value = default_importance[[nm]])
     }
     targets_mmol(default_targets_mmol)
+    base_targets_mmol(default_targets_mmol)
     current_input_unit(input$input_unit %||% canonical_unit)
   })
 
   observeEvent(input$set_all_zero, {
+    display_lock(TRUE)
+    on.exit(display_lock(FALSE), add = TRUE)
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = "0")
     }
     targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
+    base_targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
   })
 
   observeEvent(input$apply_bwb, {
@@ -773,12 +789,22 @@ server <- function(input, output, session) {
     req(inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
     update_targets_from_inputs(unit_in)
-    run_trigger(isolate(run_trigger()) + 1L)
   })
 
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
-    run_trigger(isolate(run_trigger()) + 1L)
+    display_lock(TRUE)
+    on.exit(display_lock(FALSE), add = TRUE)
+
+    unit_out <- input$input_unit %||% canonical_unit
+    scaled_display <- from_canonical_to_unit(scaled_targets_mmol(), unit_out)
+
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("expr_", nm),
+        value = format(scaled_display[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
   }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
@@ -790,6 +816,7 @@ server <- function(input, output, session) {
     vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water_expr_")
     targets_mmol(vals_mmol)
+    base_targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, old_unit))
@@ -799,6 +826,8 @@ server <- function(input, output, session) {
     display_vals <- targets_for_display(vals_mmol, new_unit)
     display_water <- targets_for_display(vals_water_mmol, new_unit)
 
+    display_lock(TRUE)
+    on.exit(display_lock(FALSE), add = TRUE)
     for (nm in nutrients) {
       updateTextInput(
         session, paste0("expr_", nm),
@@ -824,18 +853,25 @@ server <- function(input, output, session) {
     current_input_unit(new_unit)
   }, ignoreInit = TRUE)
 
+  multiplier <- reactive({
+    m <- input$ph_ec_multiplier %||% 1
+    if (!is.numeric(m) || is.na(m)) m <- 1
+    min(max(m, 0), 2)
+  })
+
+  scaled_targets_mmol <- reactive({
+    base_targets_mmol() * multiplier()
+  })
+
   eval_targets <- reactive({
-    vals <- targets_mmol()
+    vals <- scaled_targets_mmol()
     water_vals <- water_mmol()
-    multiplier <- input$ph_ec_multiplier %||% 1
-    if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 1
-    multiplier <- min(max(multiplier, 0), 2)
     validate(
       need(!is.null(vals), "Targets not initialized yet."),
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    pmax((vals * multiplier) - water_vals, 0)
+    pmax(vals - water_vals, 0)
   })
 
   importance_vec <- reactive({
@@ -1202,6 +1238,8 @@ server <- function(input, output, session) {
       updateRadioButtons(session, "input_unit", selected = normalize_unit(rec$unit))
       session$onFlushed(function() {
         if (!is.null(rec$targets)) {
+          display_lock(TRUE)
+          on.exit(display_lock(FALSE), add = TRUE)
           for (nm in nutrients) {
             val <- rec$targets[[nm]]
             if (!is.null(val)) {
@@ -1218,6 +1256,7 @@ server <- function(input, output, session) {
           }
           vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
           targets_mmol(vals_mmol)
+          base_targets_mmol(vals_mmol)
         }
 
         apply_salts(rec)
@@ -1227,6 +1266,8 @@ server <- function(input, output, session) {
 
     } else {
       if (!is.null(rec$targets)) {
+        display_lock(TRUE)
+        on.exit(display_lock(FALSE), add = TRUE)
         for (nm in nutrients) {
           val <- rec$targets[[nm]]
           if (!is.null(val)) {
@@ -1243,6 +1284,7 @@ server <- function(input, output, session) {
         }
         vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
         targets_mmol(vals_mmol)
+        base_targets_mmol(vals_mmol)
       }
 
       apply_salts(rec)
@@ -1276,6 +1318,8 @@ server <- function(input, output, session) {
 
     # helper to actually write values + update internal targets
     apply_mgL <- function() {
+      display_lock(TRUE)
+      on.exit(display_lock(FALSE), add = TRUE)
       # 1) first set all target inputs to 0 (in mg/L)
       for (nm in nutrients) {
         updateTextInput(
@@ -1297,6 +1341,7 @@ server <- function(input, output, session) {
       # 3) update internal canonical targets (mmol/L) from mg/L
       vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
       targets_mmol(vals_mmol)
+      base_targets_mmol(vals_mmol)
 
       # 4) jump back to the Targets tab
       updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
@@ -1319,7 +1364,7 @@ server <- function(input, output, session) {
 
 
   # -------- OPTIMIZATION RESULT --------
-  result <- eventReactive(run_trigger(), {
+  result <- reactive({
     sel <- selected_salts(); req(length(sel) > 0)
 
     # Determine whether acids/bases are allowed
@@ -1386,7 +1431,7 @@ server <- function(input, output, session) {
 
     out$salt_names <- rownames(nm_sub)
     out
-  }, ignoreInit = TRUE)
+  })
 
   # -------- DELIVERY TAB UI --------
   output$delivery_ui <- renderUI({
