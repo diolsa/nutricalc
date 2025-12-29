@@ -5,6 +5,8 @@
 #' no precipitation.
 #'
 #' @param achieved Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
+#'   If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
+#'   from BWB "Basenkapazität KB 8,2" / KS 8.2 and used to fix carbonate speciation.
 #' @param temp_C Temperature in Celsius (only 25 C supported in this version).
 #' @param phc_bracket Numeric length-2 bracket for pHc = -log10([H+]) search.
 #' @param tol Root tolerance in meq/L.
@@ -97,13 +99,21 @@ ph_from_achieved <- function(
 
   # --- helpers ---
   davies_gamma <- function(I, z) {
-    if (I <= 0) return(1.0)
+    if (!is.finite(I) || I <= 0) return(1.0)
     term <- (sqrt(I) / (1 + sqrt(I)) - 0.3 * I)
-    10^(-A_davies * z^2 * term)
+    val <- 10^(-A_davies * z^2 * term)
+    if (!is.finite(val) || val <= 0) return(.Machine$double.xmin)
+    val
   }
 
   # pull inputs (mmol/L)
   get0 <- function(nm) if (nm %in% names(achieved)) achieved[[nm]] else 0
+  get_any0 <- function(keys) {
+    for (key in keys) {
+      if (key %in% names(achieved)) return(achieved[[key]])
+    }
+    0
+  }
   NO3 <- get0("NO3_N")        # mmol/L NO3- (NO3-N is 1:1)
   NT <- get0("NH4_N")         # mmol/L total ammonia (NH4+/NH3)
   PT <- get0("P")             # mmol/L total phosphate
@@ -122,17 +132,39 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
-  EDTA <- get0("EDTA")
-  DTPA <- get0("DTPA")
-  EDDHA <- get0("EDDHA")
-  HBED <- get0("HBED")
-  CT_mM <- if ("Alkalinity" %in% names(achieved)) {
+  EDTA <- get_any0(c("EDTA"))
+  DTPA <- get_any0(c("DTPA"))
+  EDDHA <- get_any0(c("EDDHA"))
+  HBED <- get_any0(c("HBED"))
+  as_scalar_finite0 <- function(x) {
+    if (is.null(x) || !length(x)) return(0)
+    x <- suppressWarnings(as.numeric(x[1]))
+    if (!is.finite(x)) return(0)
+    x
+  }
+
+  CT_mM <- if ("KS4_3" %in% names(achieved)) {
+    achieved[["KS4_3"]]
+  } else if ("Alkalinity" %in% names(achieved)) {
     achieved[["Alkalinity"]]
   } else if ("HCO3" %in% names(achieved)) {
     achieved[["HCO3"]]
   } else {
     0
   }
+  CT_mM <- max(0, as_scalar_finite0(CT_mM))
+
+  # BWB "Basenkapazität KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
+  CO2_aq_mM <- if ("CO2_aq" %in% names(achieved)) {
+    achieved[["CO2_aq"]]
+  } else if ("KB8_2" %in% names(achieved)) {
+    achieved[["KB8_2"]]
+  } else if ("KS8_2" %in% names(achieved)) {
+    achieved[["KS8_2"]]
+  } else {
+    0
+  }
+  CO2_aq_mM <- max(0, as_scalar_finite0(CO2_aq_mM))
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
@@ -154,8 +186,8 @@ ph_from_achieved <- function(
   )
 
   chelate_conc <- c(EDTA = EDTA, DTPA = DTPA, EDDHA = EDDHA, HBED = HBED)
-  chelate_conc <- chelate_conc[intersect(names(chelate_conc), names(chelate_z))]
-  chelate_conc <- chelate_conc[!is.na(chelate_conc)]
+  chelate_conc <- chelate_conc[names(chelate_conc) %in% names(chelate_z)]
+  chelate_conc <- chelate_conc[is.finite(chelate_conc) & chelate_conc > 0]
   if (length(chelate_conc)) {
     for (nm in names(chelate_conc)) {
       fixed_c[[nm]] <- c(c = mM_to_M(chelate_conc[[nm]]), z = chelate_z[[nm]])
@@ -214,19 +246,29 @@ ph_from_achieved <- function(
       HPO4 <- mM_to_M(PT) * (K1c * K2c * H / D)
       PO4 <- mM_to_M(PT) * (K1c * K2c * K3c / D)
 
-      # carbonate speciation from CT (total inorganic carbon)
+      # carbonate speciation from CT (total inorganic carbon) or fixed CO2(aq)
       K1c_C <- Ka1_C / (gam$H * gam$HCO3)
       K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
-      D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
-      a0 <- H^2 / D_c
-      a1 <- (K1c_C * H) / D_c
-      a2 <- (K1c_C * K2c_C) / D_c
+      if (isTRUE(CO2_aq_mM > 0)) {
+        CO2 <- mM_to_M(CO2_aq_mM)
+        HCO3 <- (K1c_C * CO2) / H
+        CO3 <- (K2c_C * HCO3) / H
+      } else if (isTRUE(CT_mM > 0)) {
+        D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
+        a0 <- H^2 / D_c
+        a1 <- (K1c_C * H) / D_c
+        a2 <- (K1c_C * K2c_C) / D_c
 
-      CT <- mM_to_M(CT_mM)
+        CT <- mM_to_M(CT_mM)
 
-      CO2 <- a0 * CT
-      HCO3 <- a1 * CT
-      CO3 <- a2 * CT
+        CO2 <- a0 * CT
+        HCO3 <- a1 * CT
+        CO3 <- a2 * CT
+      } else {
+        CO2 <- 0
+        HCO3 <- 0
+        CO3 <- 0
+      }
 
       # borate speciation (B(OH)3 / B(OH)4-)
       aH <- gam$H * H
@@ -269,7 +311,7 @@ ph_from_achieved <- function(
         BOH3 = BOH3, BOH4 = BOH4,
         H4SiO4 = H4SiO4, H3SiO4 = H3SiO4
       )
-      if (abs(I_new - I) < 1e-10) {
+      if (isTRUE(abs(I_new - I) < 1e-10)) {
         I <- I_new
         break
       }
@@ -293,11 +335,18 @@ ph_from_achieved <- function(
     }
     non_finite <- vapply(species, function(x) !is.finite(x), logical(1))
     if (any(non_finite)) {
-      bad <- names(species)[non_finite]
-      stop(
-        sprintf("Speciation failed: non-finite values for [%s].", paste(bad, collapse = ", ")),
-        call. = FALSE
-      )
+      return(list(
+        f = NA_real_,
+        I = I,
+        gam = gam,
+        species = species,
+        H_mM = NA_real_,
+        OH_mM = NA_real_,
+        pos_fix_meq = NA_real_,
+        neg_fix_meq = NA_real_,
+        pos = NA_real_,
+        neg = NA_real_
+      ))
     }
 
     # ---- charge balance in meq/L (use concentrations) ----
@@ -445,6 +494,11 @@ ph_from_achieved <- function(
     mid <- 0.5 * (a + b)
     out <- residual_meq(mid)
     fm <- out$f
+    if (!is.finite(fm)) {
+      b <- mid
+      fb <- fm
+      next
+    }
     if (abs(fm) < tol) break
     if (fa * fm <= 0) {
       b <- mid
@@ -564,3 +618,10 @@ ph_from_achieved <- function(
     charge_breakdown = charge_breakdown
   )
 }
+
+# Example sanity check (CO2_aq lowers pH; CO2 is neutral):
+# achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, KS4_3 = 4.1)
+# ph_no_co2 <- ph_from_achieved(achieved)$pH
+# achieved[["CO2_aq"]] <- 0.44
+# ph_with_co2 <- ph_from_achieved(achieved)$pH
+# stopifnot(ph_with_co2 < ph_no_co2)
