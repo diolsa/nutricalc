@@ -669,6 +669,17 @@ server <- function(input, output, session) {
     }, logical(1))) && !is.null(input$water_expr_HCO3) && !is.null(input$water_ks82)
   })
 
+  update_targets_from_inputs <- function(unit_in) {
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
+    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
+    targets_mmol(vals_mmol)
+    water_mmol(vals_water_mmol)
+    hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
+    water_hco3(hco3_to_mmol(hco3_val, unit_in))
+    co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
+    water_co2_aq(co2_to_mmol(co2_val, unit_in))
+  }
+
   observeEvent(input$reset, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
@@ -744,19 +755,14 @@ server <- function(input, output, session) {
   observeEvent(input$run, {
     req(inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
-    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
-    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
-    targets_mmol(vals_mmol)
-    water_mmol(vals_water_mmol)
-    hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
-    water_hco3(hco3_to_mmol(hco3_val, unit_in))
-    co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
-    water_co2_aq(co2_to_mmol(co2_val, unit_in))
+    update_targets_from_inputs(unit_in)
     run_trigger(isolate(run_trigger()) + 1L)
   })
 
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
+    unit_in <- input$input_unit %||% canonical_unit
+    update_targets_from_inputs(unit_in)
     run_trigger(isolate(run_trigger()) + 1L)
   }, ignoreInit = TRUE)
 
