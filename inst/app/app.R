@@ -686,11 +686,16 @@ server <- function(input, output, session) {
     }, logical(1))) && !is.null(input$water_expr_HCO3) && !is.null(input$water_ks82)
   })
 
+  set_base_targets <- function(vals_mmol) {
+    base_targets_mmol(vals_mmol)
+    targets_mmol(vals_mmol * multiplier())
+  }
+
   update_targets_from_inputs <- function(unit_in) {
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
-    targets_mmol(vals_mmol)
-    base_targets_mmol(vals_mmol)
+    base_vals <- if (multiplier() == 0) vals_mmol else vals_mmol / multiplier()
+    set_base_targets(base_vals)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, unit_in))
@@ -703,9 +708,21 @@ server <- function(input, output, session) {
     if (isTRUE(display_lock())) return()
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
-    base_targets_mmol(vals_mmol)
-    targets_mmol(vals_mmol)
+    base_vals <- if (multiplier() == 0) vals_mmol else vals_mmol / multiplier()
+    set_base_targets(base_vals)
   }, ignoreInit = TRUE)
+
+  update_display_from_base <- function(unit_out) {
+    display_lock(TRUE)
+    on.exit(display_lock(FALSE), add = TRUE)
+    scaled_display <- from_canonical_to_unit(base_targets_mmol() * multiplier(), unit_out)
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("expr_", nm),
+        value = format(scaled_display[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+  }
 
   observeEvent(input$reset, {
     display_lock(TRUE)
@@ -714,8 +731,8 @@ server <- function(input, output, session) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
       updateSliderInput(session, paste0("imp_", nm), value = default_importance[[nm]])
     }
-    targets_mmol(default_targets_mmol)
-    base_targets_mmol(default_targets_mmol)
+    set_base_targets(default_targets_mmol)
+    update_display_from_base(input$input_unit %||% canonical_unit)
     current_input_unit(input$input_unit %||% canonical_unit)
   })
 
@@ -725,8 +742,9 @@ server <- function(input, output, session) {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = "0")
     }
-    targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
-    base_targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
+    zero_targets <- setNames(rep(0, length(nutrients)), nutrients)
+    set_base_targets(zero_targets)
+    update_display_from_base(input$input_unit %||% canonical_unit)
   })
 
   observeEvent(input$apply_bwb, {
@@ -793,18 +811,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
-    display_lock(TRUE)
-    on.exit(display_lock(FALSE), add = TRUE)
-
-    unit_out <- input$input_unit %||% canonical_unit
-    scaled_display <- from_canonical_to_unit(scaled_targets_mmol(), unit_out)
-
-    for (nm in nutrients) {
-      updateTextInput(
-        session, paste0("expr_", nm),
-        value = format(scaled_display[[nm]], trim = TRUE, scientific = FALSE)
-      )
-    }
+    update_display_from_base(input$input_unit %||% canonical_unit)
   }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
@@ -815,15 +822,15 @@ server <- function(input, output, session) {
 
     vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water_expr_")
-    targets_mmol(vals_mmol)
-    base_targets_mmol(vals_mmol)
+    base_vals <- if (multiplier() == 0) vals_mmol else vals_mmol / multiplier()
+    set_base_targets(base_vals)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, old_unit))
     co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
     water_co2_aq(co2_to_mmol(co2_val, old_unit))
 
-    display_vals <- targets_for_display(vals_mmol, new_unit)
+    display_vals <- targets_for_display(base_targets_mmol() * multiplier(), new_unit)
     display_water <- targets_for_display(vals_water_mmol, new_unit)
 
     display_lock(TRUE)
@@ -1255,8 +1262,8 @@ server <- function(input, output, session) {
             }
           }
           vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
-          targets_mmol(vals_mmol)
-          base_targets_mmol(vals_mmol)
+          set_base_targets(vals_mmol)
+          update_display_from_base(input$input_unit %||% canonical_unit)
         }
 
         apply_salts(rec)
@@ -1283,8 +1290,8 @@ server <- function(input, output, session) {
           }
         }
         vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
-        targets_mmol(vals_mmol)
-        base_targets_mmol(vals_mmol)
+        set_base_targets(vals_mmol)
+        update_display_from_base(input$input_unit %||% canonical_unit)
       }
 
       apply_salts(rec)
@@ -1340,8 +1347,8 @@ server <- function(input, output, session) {
 
       # 3) update internal canonical targets (mmol/L) from mg/L
       vals_mmol <- to_canonical_from_unit(mgL, "mg/L")
-      targets_mmol(vals_mmol)
-      base_targets_mmol(vals_mmol)
+      set_base_targets(vals_mmol)
+      update_display_from_base("mg/L")
 
       # 4) jump back to the Targets tab
       updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
