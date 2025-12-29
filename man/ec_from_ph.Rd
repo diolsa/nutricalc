@@ -2,7 +2,7 @@
 % Please edit documentation in R/ec.R
 \name{ec_from_ph}
 \alias{ec_from_ph}
-\title{Compute electrical conductivity (EC) from achieved composition and pH speciation}
+\title{Compute EC from achieved composition and pH speciation}
 \usage{
 ec_from_ph(
   achieved,
@@ -10,7 +10,7 @@ ec_from_ph(
   fe_state = c("Fe2+", "Fe3+"),
   t_C = 25,
   gamma = NULL,
-  gamma_model = c("auto", "debye_huckel_25C", "unity", "provided"),
+  gamma_model = "debye_huckel_25C",
   A_DH_25 = 0.5085
 )
 }
@@ -18,61 +18,30 @@ ec_from_ph(
 \item{achieved}{Named numeric vector (mmol/L) or data.frame with columns
 Nutrient and Achieved.}
 
-\item{ph_res}{Result list from your pH/speciation routine; must contain `species_mM`
-(named numeric, mmol/L). Optionally may contain `gamma_ions` (named numeric).}
+\item{ph_res}{Result list from `ph_from_achieved()` containing `species_mM`.}
 
-<<<<<<< HEAD
-\item{fe_state}{Either "Fe2+" or "Fe3+". If "Fe3+", all Fe is assigned to Fe3+.}
-
-\item{t_C}{Temperature in °C used in the prefactor (default 25).}
-
-\item{gamma}{Optional named numeric vector of per-ion activity coefficients.}
-
-\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", "provided".
-- "auto": use `gamma` if provided, else `ph_res$gamma_ions` if present, else Debye–Hückel.
-- "debye_huckel_25C": always use Debye–Hückel at 25 °C (A = A_DH_25).
-- "unity": gamma_i = 1 for all ions.
-- "provided": require `gamma` and use it.}
-
-\item{A_DH_25}{Debye–Hückel A parameter at 25 °C (default 0.5085).}
-=======
 \item{fe_state}{One of "Fe2+" or "Fe3+". When "Fe3+", all Fe2+ is treated
 as Fe3+ for EC purposes.}
 
 \item{t_C}{Temperature in degrees C.}
 
-\item{gamma}{Optional named numeric vector of activity coefficients.}
+\item{gamma}{Optional named numeric vector of activity coefficients (per ion).}
 
-\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", or "provided".}
+\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", or "provided".
+Default is "debye_huckel_25C".}
 
 \item{A_DH_25}{Debye-Huckel A constant at 25 C.}
->>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
 }
 \value{
-A list with:
-  - EC_mS_cm: conductivity in mS/cm
-  - EC_uS_cm: conductivity in µS/cm
-  - inputs: list of diagnostics (T, ionic strength, gamma model)
-  - contributions: per-ion contributions (mS/cm), sorted descending
+A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
 }
 \description{
-<<<<<<< HEAD
-Estimates solution electrical conductivity from an ion mixture using:
-  EC = (F^2 / (R*T)) * sum_i( D_i * z_i^2 * (gamma_i^alpha_i) * c_i )
-}
-\details{
-Inputs are expected in mmol/L (mM). Numerically, mmol/L equals mol/m^3,
-which is consistent with SI when D is in m^2/s.
-
-Activity coefficients can be supplied (gamma), taken from `ph_res$gamma_ions`,
-or approximated via the simple Debye–Hückel expression at 25 °C:
-  log10(gamma_i) = -A * z_i^2 * sqrt(I), with A = 0.5085 (25 °C, water)
-
-The exponent alpha_i is computed from ionic strength I (mol/L):
-  alpha_i = 0.6/sqrt(|z_i|)           if I <= 0.36*|z_i|
-           = sqrt(I)/|z_i|            otherwise
-=======
 Estimates conductivity using an ion-transport summation based on diffusion
 coefficients and activity coefficients.
->>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
+}
+\details{
+Units:
+- c is in mmol/L (mM); numerically identical to mol/m^3, used directly as such.
+- D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
+- Output: EC in mS/cm and µS/cm.
 }
