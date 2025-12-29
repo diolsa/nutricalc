@@ -680,6 +680,11 @@ server <- function(input, output, session) {
     water_co2_aq(co2_to_mmol(co2_val, unit_in))
   }
 
+  update_targets_only <- function(unit_in) {
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
+    targets_mmol(vals_mmol)
+  }
+
   observeEvent(input$reset, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
@@ -762,7 +767,7 @@ server <- function(input, output, session) {
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
-    update_targets_from_inputs(unit_in)
+    update_targets_only(unit_in)
     run_trigger(isolate(run_trigger()) + 1L)
   }, ignoreInit = TRUE)
 
