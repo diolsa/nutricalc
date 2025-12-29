@@ -221,7 +221,9 @@ ph_from_achieved <- function(
       a0 <- H^2 / D_c
       a1 <- (K1c_C * H) / D_c
       a2 <- (K1c_C * K2c_C) / D_c
+
       CT <- mM_to_M(CT_mM)
+
       CO2 <- a0 * CT
       HCO3 <- a1 * CT
       CO3 <- a2 * CT
