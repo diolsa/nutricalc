@@ -167,10 +167,10 @@ map_parameter_to_nutrient <- function(param) {
   if (grepl("^kupfer", clean)) return("Cu")
   if (grepl("^molybd", clean)) return("Mo")
   if (grepl("^silicium", clean)) return("Si")
-  if (grepl("saeurekapazitaet|ks\\s*4\\s*[\\.,]\\s*3|bis\\s*ph\\s*4\\s*[\\.,]\\s*3", clean)) {
+  if (grepl("saeurekapazitae?t|saurekapazitae?t|ks\\s*4\\s*[\\.,]\\s*3|bis\\s*ph\\s*4\\s*[\\.,]\\s*3", clean)) {
     return("KS4_3")
   }
-  if (grepl("basen?kapazitaet|basekapazitaet", clean) &&
+  if (grepl("basen?kapazitae?t|basekapazitae?t", clean) &&
       grepl("kb\\s*8\\s*[\\.,]\\s*2", clean)) {
     return("KS8_2")
   }
