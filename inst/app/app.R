@@ -329,7 +329,7 @@ ui <- fluidPage(
 
   ),
 
-  titlePanel("NutriCalc 🌿 Nutrient Optimization"),
+  titlePanel("NutriCalc 🌿 Nutrient Solution Formulation in Horticultural Sciences"),
 
   fluidRow(
     # LEFT: inputs
