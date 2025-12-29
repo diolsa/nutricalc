@@ -11,10 +11,11 @@ fetch_bwb_mittelwert(plz)
 German postal code.}
 }
 \value{
-A named numeric vector of length 17 in mmol/L with names
+A named numeric vector of length 18 in mmol/L with names
   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-  "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity")`, limited to the decimal precision
-  provided by the source values.
+  "Fe","Mn","Zn","B","Cu","Mo","Si","KS4_3","KB8_2")`, limited to the decimal precision
+  provided by the source values. `KS4_3` is the acid capacity (alkalinity, KS 4.3);
+  `KB8_2` is the base capacity (acidity, KS 8.2) and is treated as dissolved CO2(aq).
 }
 \description{
 Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given Berlin
