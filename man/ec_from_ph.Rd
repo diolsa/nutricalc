@@ -4,7 +4,15 @@
 \alias{ec_from_ph}
 \title{Compute EC from achieved composition and pH speciation}
 \usage{
-ec_from_ph(achieved, ph_res, fe_state = c("Fe2+", "Fe3+"))
+ec_from_ph(
+  achieved,
+  ph_res,
+  fe_state = c("Fe2+", "Fe3+"),
+  t_C = 25,
+  gamma = NULL,
+  gamma_model = c("auto", "debye_huckel_25C", "unity", "provided"),
+  A_DH_25 = 0.5085
+)
 }
 \arguments{
 \item{achieved}{Named numeric vector (mmol/L) or data.frame with columns
@@ -12,12 +20,21 @@ Nutrient and Achieved.}
 
 \item{ph_res}{Result list from `ph_from_achieved()` containing `species_mM`.}
 
-\item{method}{One of "standard" or "divide_z".}
+\item{fe_state}{One of "Fe2+" or "Fe3+". When "Fe3+", all Fe2+ is treated
+as Fe3+ for EC purposes.}
+
+\item{t_C}{Temperature in degrees C.}
+
+\item{gamma}{Optional named numeric vector of activity coefficients.}
+
+\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", or "provided".}
+
+\item{A_DH_25}{Debye-Huckel A constant at 25 C.}
 }
 \value{
 A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
 }
 \description{
-Uses limiting equivalent conductances (Lambda0_eq) at 25 C to estimate
-conductivity from species concentrations.
+Estimates conductivity using an ion-transport summation based on diffusion
+coefficients and activity coefficients.
 }
