@@ -147,6 +147,9 @@ ph_from_achieved <- function(
   } else {
     0
   }
+  if (!is.finite(CO2_aq_mM)) {
+    CO2_aq_mM <- 0
+  }
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
