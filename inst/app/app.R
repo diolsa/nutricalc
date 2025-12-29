@@ -285,6 +285,10 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
+ .adjust-concentration-slider .irs-single,
+ .adjust-concentration-slider .irs-min,
+ .adjust-concentration-slider .irs-max { display: none !important; }
+
 
 
   #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
@@ -751,6 +755,11 @@ server <- function(input, output, session) {
     run_trigger(isolate(run_trigger()) + 1L)
   })
 
+  observeEvent(input$ph_ec_multiplier, {
+    req(inputs_ready())
+    run_trigger(isolate(run_trigger()) + 1L)
+  }, ignoreInit = TRUE)
+
   observeEvent(input$input_unit, {
     req(inputs_ready())
 
@@ -797,12 +806,15 @@ server <- function(input, output, session) {
   eval_targets <- reactive({
     vals <- targets_mmol()
     water_vals <- water_mmol()
+    multiplier <- input$ph_ec_multiplier %||% 1
+    if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 1
+    multiplier <- min(max(multiplier, 0), 2)
     validate(
       need(!is.null(vals), "Targets not initialized yet."),
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    pmax(vals - water_vals, 0)
+    pmax((vals * multiplier) - water_vals, 0)
   })
 
   importance_vec <- reactive({
@@ -1553,6 +1565,23 @@ server <- function(input, output, session) {
     }, sanitize.text.function = function(x) x)
 
     tags$div(
+      tags$div(
+        class = "text-center mb-2",
+        tags$strong("Adjust Concentration"),
+        div(
+          class = "adjust-concentration-slider",
+          sliderInput(
+            "ph_ec_multiplier",
+            label = NULL,
+            min = 0,
+            max = 2,
+            value = 1,
+            step = 0.01,
+            ticks = FALSE,
+            width = "100%"
+          )
+        )
+      ),
       tags$h5("🧪 pH & EC"),
       fluidRow(
         column(
