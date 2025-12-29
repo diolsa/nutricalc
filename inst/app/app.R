@@ -767,8 +767,21 @@ server <- function(input, output, session) {
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
-    update_targets_only(unit_in)
-    run_trigger(isolate(run_trigger()) + 1L)
+    multiplier <- input$ph_ec_multiplier %||% 1
+    if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 1
+    multiplier <- min(max(multiplier, 0), 2)
+
+    base_targets_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
+    scaled_targets_mmol <- base_targets_mmol * multiplier
+    targets_mmol(scaled_targets_mmol)
+
+    display_vals <- targets_for_display(scaled_targets_mmol, unit_in)
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("expr_", nm),
+        value = format(display_vals[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
   }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
