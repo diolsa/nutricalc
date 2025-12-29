@@ -797,12 +797,17 @@ server <- function(input, output, session) {
   eval_targets <- reactive({
     vals <- targets_mmol()
     water_vals <- water_mmol()
+    multiplier <- input$adjust_concentration %||% 1
+    if (!is.numeric(multiplier) || is.na(multiplier)) {
+      multiplier <- 1
+    }
+    multiplier <- min(max(multiplier, 0), 2)
     validate(
       need(!is.null(vals), "Targets not initialized yet."),
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    pmax(vals - water_vals, 0)
+    pmax((vals * multiplier) - water_vals, 0)
   })
 
   importance_vec <- reactive({
@@ -1286,7 +1291,7 @@ server <- function(input, output, session) {
 
 
   # -------- OPTIMIZATION RESULT --------
-  result <- eventReactive(run_trigger(), {
+  result <- eventReactive(list(run_trigger(), input$adjust_concentration), {
     sel <- selected_salts(); req(length(sel) > 0)
 
     # Determine whether acids/bases are allowed
@@ -1554,6 +1559,16 @@ server <- function(input, output, session) {
 
     tags$div(
       tags$h5("🧪 pH & EC"),
+      sliderInput(
+        "adjust_concentration",
+        "Adjust Concentration",
+        min = 0,
+        max = 2,
+        value = 1,
+        step = 0.01,
+        ticks = FALSE,
+        width = "100%"
+      ),
       fluidRow(
         column(
           5,
