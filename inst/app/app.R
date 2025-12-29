@@ -707,9 +707,9 @@ server <- function(input, output, session) {
     }
     if (is.na(water_hco3_mmol)) water_hco3_mmol <- 0
     water_hco3(water_hco3_mmol)
-    water_co2_aq_mmol <- vals_mmol[["KS8_2"]]
+    water_co2_aq_mmol <- vals_mmol[["KB8_2"]]
     if (is.na(water_co2_aq_mmol)) {
-      water_co2_aq_mmol <- vals_mmol[["KB8_2"]]
+      water_co2_aq_mmol <- vals_mmol[["KS8_2"]]
     }
     if (is.na(water_co2_aq_mmol)) water_co2_aq_mmol <- 0
     water_co2_aq(water_co2_aq_mmol)
@@ -746,7 +746,7 @@ server <- function(input, output, session) {
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, unit_in))
-    co2_val <- safe_numeric_expr(input$water_ks82, default = 0)
+    co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
     water_co2_aq(co2_to_mmol(co2_val, unit_in))
     run_trigger(isolate(run_trigger()) + 1L)
   })
@@ -763,7 +763,7 @@ server <- function(input, output, session) {
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
     water_hco3(hco3_to_mmol(hco3_val, old_unit))
-    co2_val <- safe_numeric_expr(input$water_ks82, default = 0)
+    co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
     water_co2_aq(co2_to_mmol(co2_val, old_unit))
 
     display_vals <- targets_for_display(vals_mmol, new_unit)

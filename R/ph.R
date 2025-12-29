@@ -128,6 +128,13 @@ ph_from_achieved <- function(
   DTPA <- get0("DTPA")
   EDDHA <- get0("EDDHA")
   HBED <- get0("HBED")
+  as_scalar_finite0 <- function(x) {
+    if (is.null(x) || !length(x)) return(0)
+    x <- suppressWarnings(as.numeric(x[1]))
+    if (!is.finite(x)) return(0)
+    x
+  }
+
   CT_mM <- if ("KS4_3" %in% names(achieved)) {
     achieved[["KS4_3"]]
   } else if ("Alkalinity" %in% names(achieved)) {
@@ -137,19 +144,19 @@ ph_from_achieved <- function(
   } else {
     0
   }
+  CT_mM <- max(0, as_scalar_finite0(CT_mM))
+
   # BWB "Basenkapazität KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
   CO2_aq_mM <- if ("CO2_aq" %in% names(achieved)) {
     achieved[["CO2_aq"]]
-  } else if ("KS8_2" %in% names(achieved)) {
-    achieved[["KS8_2"]]
   } else if ("KB8_2" %in% names(achieved)) {
     achieved[["KB8_2"]]
+  } else if ("KS8_2" %in% names(achieved)) {
+    achieved[["KS8_2"]]
   } else {
     0
   }
-  if (!is.finite(CO2_aq_mM)) {
-    CO2_aq_mM <- 0
-  }
+  CO2_aq_mM <- max(0, as_scalar_finite0(CO2_aq_mM))
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
@@ -234,11 +241,11 @@ ph_from_achieved <- function(
       # carbonate speciation from CT (total inorganic carbon) or fixed CO2(aq)
       K1c_C <- Ka1_C / (gam$H * gam$HCO3)
       K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
-      if (CO2_aq_mM > 0) {
+      if (isTRUE(CO2_aq_mM > 0)) {
         CO2 <- mM_to_M(CO2_aq_mM)
         HCO3 <- (K1c_C * CO2) / H
         CO3 <- (K2c_C * HCO3) / H
-      } else if (CT_mM > 0) {
+      } else if (isTRUE(CT_mM > 0)) {
         D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
         a0 <- H^2 / D_c
         a1 <- (K1c_C * H) / D_c

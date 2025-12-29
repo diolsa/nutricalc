@@ -9,9 +9,9 @@
 #'
 #' @return A named numeric vector of length 18 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si","KS4_3","KS8_2")`, limited to the decimal precision
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si","KS4_3","KB8_2")`, limited to the decimal precision
 #'   provided by the source values. `KS4_3` is the acid capacity (alkalinity, KS 4.3);
-#'   `KS8_2` is the base capacity (acidity, KS 8.2) and is treated as dissolved CO2(aq).
+#'   `KB8_2` is the base capacity (acidity, KS 8.2) and is treated as dissolved CO2(aq).
 #' @export
 #'
 
@@ -45,7 +45,7 @@ fetch_bwb_mittelwert <- function(plz) {
 
   relevant <- parsed_tables[table_matches]
   target_names <- c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-                    "Fe","Mn","Zn","B","Cu","Mo","Si","KS4_3","KS8_2")
+                    "Fe","Mn","Zn","B","Cu","Mo","Si","KS4_3","KB8_2")
   empty_result <- stats::setNames(rep(NA_real_, length(target_names)), target_names)
 
   if (!length(relevant)) {
@@ -172,7 +172,7 @@ map_parameter_to_nutrient <- function(param) {
   }
   if (grepl("basen?kapazitae?t|basekapazitae?t", clean) &&
       grepl("kb\\s*8\\s*[\\.,]\\s*2", clean)) {
-    return("KS8_2")
+    return("KB8_2")
   }
   ""
 }
@@ -195,7 +195,7 @@ convert_mittelwert <- function(value, unit, nutrient) {
 
   if (identical(unit, "mmol/L")) return(value)
 
-  if (identical(nutrient, "KS8_2")) {
+  if (identical(nutrient, "KB8_2")) {
     molar_mass_co2 <- 44.01
     if (identical(unit, "mg/L")) {
       return(value / molar_mass_co2)
