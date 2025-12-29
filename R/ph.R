@@ -6,7 +6,7 @@
 #'
 #' @param achieved Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
 #'   If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
-#'   from BWB "Basenkapazität KB 8,2" and used to fix carbonate speciation.
+#'   from BWB "Basenkapazität KB 8,2" / KS 8.2 and used to fix carbonate speciation.
 #' @param temp_C Temperature in Celsius (only 25 C supported in this version).
 #' @param phc_bracket Numeric length-2 bracket for pHc = -log10([H+]) search.
 #' @param tol Root tolerance in meq/L.
@@ -128,15 +128,25 @@ ph_from_achieved <- function(
   DTPA <- get0("DTPA")
   EDDHA <- get0("EDDHA")
   HBED <- get0("HBED")
-  CT_mM <- if ("Alkalinity" %in% names(achieved)) {
+  CT_mM <- if ("KS4_3" %in% names(achieved)) {
+    achieved[["KS4_3"]]
+  } else if ("Alkalinity" %in% names(achieved)) {
     achieved[["Alkalinity"]]
   } else if ("HCO3" %in% names(achieved)) {
     achieved[["HCO3"]]
   } else {
     0
   }
-  # BWB "Basenkapazität KB 8,2" is treated as free dissolved CO2(aq) in mmol/L.
-  CO2_aq_mM <- get0("CO2_aq")
+  # BWB "Basenkapazität KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
+  CO2_aq_mM <- if ("CO2_aq" %in% names(achieved)) {
+    achieved[["CO2_aq"]]
+  } else if ("KS8_2" %in% names(achieved)) {
+    achieved[["KS8_2"]]
+  } else if ("KB8_2" %in% names(achieved)) {
+    achieved[["KB8_2"]]
+  } else {
+    0
+  }
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
@@ -580,7 +590,7 @@ ph_from_achieved <- function(
 }
 
 # Example sanity check (CO2_aq lowers pH; CO2 is neutral):
-# achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, Alkalinity = 4.1)
+# achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, KS4_3 = 4.1)
 # ph_no_co2 <- ph_from_achieved(achieved)$pH
 # achieved[["CO2_aq"]] <- 0.44
 # ph_with_co2 <- ph_from_achieved(achieved)$pH
