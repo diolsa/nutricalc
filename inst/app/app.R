@@ -543,6 +543,23 @@ ui <- fluidPage(
                                uiOutput("delivery_ui")
                       ),
                       tabPanel("🧪 pH & EC",
+                               tags$div(
+                                 class = "text-center mb-2",
+                                 tags$strong("Adjust Concentration"),
+                                 tags$div(
+                                   class = "adjust-concentration-slider",
+                                   sliderInput(
+                                     "ph_ec_multiplier",
+                                     label = NULL,
+                                     min = 0,
+                                     max = 2,
+                                     value = 1,
+                                     step = 0.01,
+                                     ticks = FALSE,
+                                     width = "100%"
+                                   )
+                                 )
+                               ),
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -680,11 +697,6 @@ server <- function(input, output, session) {
     water_co2_aq(co2_to_mmol(co2_val, unit_in))
   }
 
-  update_targets_only <- function(unit_in) {
-    vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
-    targets_mmol(vals_mmol)
-  }
-
   observeEvent(input$reset, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
@@ -766,22 +778,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$ph_ec_multiplier, {
     req(inputs_ready())
-    unit_in <- input$input_unit %||% canonical_unit
-    multiplier <- input$ph_ec_multiplier %||% 1
-    if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 1
-    multiplier <- min(max(multiplier, 0), 2)
-
-    base_targets_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
-    scaled_targets_mmol <- base_targets_mmol * multiplier
-    targets_mmol(scaled_targets_mmol)
-
-    display_vals <- targets_for_display(scaled_targets_mmol, unit_in)
-    for (nm in nutrients) {
-      updateTextInput(
-        session, paste0("expr_", nm),
-        value = format(display_vals[[nm]], trim = TRUE, scientific = FALSE)
-      )
-    }
+    run_trigger(isolate(run_trigger()) + 1L)
   }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
@@ -1589,23 +1586,6 @@ server <- function(input, output, session) {
     }, sanitize.text.function = function(x) x)
 
     tags$div(
-      tags$div(
-        class = "text-center mb-2",
-        tags$strong("Adjust Concentration"),
-        div(
-          class = "adjust-concentration-slider",
-          sliderInput(
-            "ph_ec_multiplier",
-            label = NULL,
-            min = 0,
-            max = 2,
-            value = 1,
-            step = 0.01,
-            ticks = FALSE,
-            width = "100%"
-          )
-        )
-      ),
       tags$h5("🧪 pH & EC"),
       fluidRow(
         column(
