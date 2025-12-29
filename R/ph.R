@@ -108,6 +108,12 @@ ph_from_achieved <- function(
 
   # pull inputs (mmol/L)
   get0 <- function(nm) if (nm %in% names(achieved)) achieved[[nm]] else 0
+  get_any0 <- function(keys) {
+    for (key in keys) {
+      if (key %in% names(achieved)) return(achieved[[key]])
+    }
+    0
+  }
   NO3 <- get0("NO3_N")        # mmol/L NO3- (NO3-N is 1:1)
   NT <- get0("NH4_N")         # mmol/L total ammonia (NH4+/NH3)
   PT <- get0("P")             # mmol/L total phosphate
@@ -126,10 +132,10 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
-  EDTA <- get0("EDTA")
-  DTPA <- get0("DTPA")
-  EDDHA <- get0("EDDHA")
-  HBED <- get0("HBED")
+  EDTA <- get_any0(c("EDTA"))
+  DTPA <- get_any0(c("DTPA"))
+  EDDHA <- get_any0(c("EDDHA"))
+  HBED <- get_any0(c("HBED"))
   as_scalar_finite0 <- function(x) {
     if (is.null(x) || !length(x)) return(0)
     x <- suppressWarnings(as.numeric(x[1]))
@@ -180,8 +186,8 @@ ph_from_achieved <- function(
   )
 
   chelate_conc <- c(EDTA = EDTA, DTPA = DTPA, EDDHA = EDDHA, HBED = HBED)
-  chelate_conc <- chelate_conc[intersect(names(chelate_conc), names(chelate_z))]
-  chelate_conc <- chelate_conc[!is.na(chelate_conc)]
+  chelate_conc <- chelate_conc[names(chelate_conc) %in% names(chelate_z)]
+  chelate_conc <- chelate_conc[is.finite(chelate_conc) & chelate_conc > 0]
   if (length(chelate_conc)) {
     for (nm in names(chelate_conc)) {
       fixed_c[[nm]] <- c(c = mM_to_M(chelate_conc[[nm]]), z = chelate_z[[nm]])
