@@ -638,7 +638,7 @@ server <- function(input, output, session) {
     hco3_row <- div(
       class = "nutrient-row",
       fluidRow(
-        column(2, tags$label("Acid Capacity KS 4.3")),
+        column(2, tags$label("KS 4.3")),
         column(2, tags$div()),
         column(2, textInput(inputId = "water_expr_HCO3", label = NULL, value = default_water_hco3_expr)),
         column(6, tags$div())
@@ -648,7 +648,7 @@ server <- function(input, output, session) {
     co2_row <- div(
       class = "nutrient-row",
       fluidRow(
-        column(2, tags$label("Base Capacity KB 8.2")),
+        column(2, tags$label("KB 8.2")),
         column(2, tags$div()),
         column(2, textInput(inputId = "water_ks82", label = NULL, value = default_water_ks82_expr)),
         column(6, tags$div())
