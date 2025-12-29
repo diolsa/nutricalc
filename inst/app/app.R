@@ -1357,6 +1357,17 @@ server <- function(input, output, session) {
 
   final_for_ph <- water_mmol()
   add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
+  chelate_cols <- intersect(c("EDTA", "DTPA", "EDDHA", "HBED"), colnames(nutrient_matrix))
+  needs_full_achieved <- is.null(add) || is.null(names(add)) ||
+    (length(chelate_cols) > 0 && !all(chelate_cols %in% names(add)))
+  if (needs_full_achieved && !is.null(res$amounts) && !is.null(names(res$amounts))) {
+    salt_names <- intersect(names(res$amounts), rownames(nutrient_matrix))
+    if (length(salt_names)) {
+      nm_sub <- nutrient_matrix[salt_names, , drop = FALSE]
+      add <- as.vector(t(nm_sub) %*% res$amounts[salt_names])
+      names(add) <- colnames(nm_sub)
+    }
+  }
   for (nm in names(add)) {
     current <- final_for_ph[nm]
     if (is.na(current)) current <- 0
