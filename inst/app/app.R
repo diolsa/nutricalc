@@ -1419,11 +1419,8 @@ server <- function(input, output, session) {
     }
 
   final_for_ph <- water_mmol()
-  add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
-  chelate_cols <- intersect(c("EDTA", "DTPA", "EDDHA", "HBED"), colnames(nutrient_matrix))
-  needs_full_achieved <- is.null(add) || is.null(names(add)) ||
-    (length(chelate_cols) > 0 && !all(chelate_cols %in% names(add)))
-  if (needs_full_achieved && !is.null(res$amounts) && !is.null(names(res$amounts))) {
+  add <- NULL
+  if (!is.null(res$amounts) && !is.null(names(res$amounts))) {
     salt_names <- intersect(names(res$amounts), rownames(nutrient_matrix))
     if (length(salt_names)) {
       nm_sub <- nutrient_matrix[salt_names, , drop = FALSE]
@@ -1431,12 +1428,16 @@ server <- function(input, output, session) {
       names(add) <- colnames(nm_sub)
     }
   }
+  if (is.null(add)) {
+    add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
+  }
   for (nm in names(add)) {
     current <- final_for_ph[nm]
     if (is.na(current)) current <- 0
     final_for_ph[nm] <- current + as.numeric(add[[nm]])
   }
   final_for_ph <- c(final_for_ph, KS4_3 = water_hco3(), CO2_aq = water_co2_aq())
+  # Debug: grep("EDTA", names(final_for_ph)); final_for_ph[["EDTA"]]
 
   ph_res <- tryCatch(
     ph_fn(final_for_ph, phc_bracket = c(1, 13)),
