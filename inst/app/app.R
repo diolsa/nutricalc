@@ -254,6 +254,12 @@ targets_for_display <- function(targets_mmol, unit_out) {
   from_canonical_to_unit(targets_mmol, unit_out)
 }
 
+multiplier_from_slider <- function(s, eps = 1e-4, k = 4) {
+  s <- max(min(s, 1), -1)
+  if (s >= 0) return(1 + s)
+  eps + (1 - eps) * (1 + s)^k
+}
+
 # =========================================================
 # 2) UI
 # =========================================================
@@ -329,6 +335,18 @@ ui <- fluidPage(
 
 ")),
 
+
+    tags$script(HTML("
+      $(document).on('input change', 'input#ph_ec_log', function(e){
+        var v = parseFloat($(this).val());
+        if (isNaN(v)) return;
+        var snap = 0.03;
+        if (Math.abs(v) < snap) {
+          $(this).val(0);
+          Shiny.setInputValue('ph_ec_log', 0, {priority: 'event'});
+        }
+      });
+    ")),
 
 
   ),
@@ -549,11 +567,11 @@ ui <- fluidPage(
                                  tags$div(
                                    class = "adjust-concentration-slider",
                                    sliderInput(
-                                     "ph_ec_multiplier",
+                                     "ph_ec_log",
                                      label = NULL,
-                                     min = 0,
-                                     max = 2,
-                                     value = 1,
+                                     min = -1,
+                                     max = 1,
+                                     value = 0,
                                      step = 0.01,
                                      ticks = FALSE,
                                      width = "100%"
@@ -809,7 +827,7 @@ server <- function(input, output, session) {
     update_targets_from_inputs(unit_in)
   })
 
-  observeEvent(input$ph_ec_multiplier, {
+  observeEvent(input$ph_ec_log, {
     req(inputs_ready())
     update_display_from_base(input$input_unit %||% canonical_unit)
   }, ignoreInit = TRUE)
@@ -861,9 +879,9 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   multiplier <- reactive({
-    m <- input$ph_ec_multiplier %||% 1
-    if (!is.numeric(m) || is.na(m)) m <- 1
-    min(max(m, 0), 2)
+    s <- input$ph_ec_log %||% 0
+    if (!is.numeric(s) || is.na(s)) s <- 0
+    multiplier_from_slider(s)
   })
 
   scaled_targets_mmol <- reactive({
