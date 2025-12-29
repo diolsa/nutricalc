@@ -1,11 +1,11 @@
-#' Lookup table of limiting equivalent conductances at 25 C
+#' Lookup table of ion diffusion coefficients at 25 C
 #'
-#' Returns a data frame with ions, charge, and limiting equivalent conductances
-#' (Lambda0_eq) at 25 C. Values are expressed as S*cm^2/eq.
+#' Returns a data frame with ions, charge, and diffusion coefficients (D) at 25 C.
+#' Values are expressed as 10^-5 cm^2/s.
 #'
-#' @return A data.frame with columns: ion, z, Lambda0_eq.
+#' @return A data.frame with columns: ion, z, D_1e5_cm2_s.
 #' @export
-ion_lambda0_25C <- function() {
+ion_diffusion_25C <- function() {
   data.frame(
     ion = c(
       "H+", "OH-",
@@ -29,17 +29,16 @@ ion_lambda0_25C <- function() {
       -1, -2, -3,
       -2
     ),
-    # Lambda0_eq (S*cm^2/eq). For multivalent ions we use values already per eq.
-    Lambda0_eq = c(
-      349.81, 198.5,
-      73.48, 50.11, 73.5,
-      59.47, 53.06,
-      53.1, 68.0, 53.5, 52.8, 53.6,
-      76.35, 71.45,
-      44.5, 69.3,
-      50.1, 80.0,
-      36.0, 57.0, 92.8,
-      53.0
+    D_1e5_cm2_s = c(
+      9.310, 5.270,
+      1.960, 1.330, 1.980,
+      0.793, 0.705,
+      0.719, 0.604, 0.688, 0.715, 0.733,
+      2.030, 1.900,
+      1.180, 0.955,
+      1.330, 1.070,
+      0.846, 0.690, 0.612,
+      1.984
     ),
     stringsAsFactors = FALSE
   )
@@ -154,28 +153,42 @@ make_ec_ions <- function(achieved, ph_res) {
 
 #' Compute EC from achieved composition and pH speciation
 #'
-#' Uses limiting equivalent conductances (Lambda0_eq) at 25 C to estimate
-#' conductivity from species concentrations.
+#' Estimates conductivity using an ion-transport summation based on diffusion
+#' coefficients and activity coefficients.
 #'
 #' @param achieved Named numeric vector (mmol/L) or data.frame with columns
 #'   Nutrient and Achieved.
 #' @param ph_res Result list from `ph_from_achieved()` containing `species_mM`.
-#' @param method One of "standard" or "divide_z".
+#' @param fe_state One of "Fe2+" or "Fe3+". When "Fe3+", all Fe2+ is treated
+#'   as Fe3+ for EC purposes.
+#' @param t_C Temperature in degrees C.
+#' @param gamma Optional named numeric vector of activity coefficients.
+#' @param gamma_model One of "auto", "debye_huckel_25C", "unity", or "provided".
+#' @param A_DH_25 Debye-Huckel A constant at 25 C.
 #'
 #' @return A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
 #' @export
-ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
+ec_from_ph <- function(
+  achieved,
+  ph_res,
+  fe_state = c("Fe2+", "Fe3+"),
+  t_C = 25,
+  gamma = NULL,
+  gamma_model = c("auto", "debye_huckel_25C", "unity", "provided"),
+  A_DH_25 = 0.5085
+) {
   fe_state <- match.arg(fe_state)
+  gamma_model <- match.arg(gamma_model)
 
-  tab <- ion_lambda0_25C()
+  tab <- ion_diffusion_25C()
   c_mM <- make_ec_ions(achieved, ph_res)
+  if (!"Fe3+" %in% names(c_mM)) {
+    c_mM[["Fe3+"]] <- 0
+  }
   if (fe_state == "Fe3+") {
     c_mM[["Fe3+"]] <- c_mM[["Fe2+"]]
     c_mM[["Fe2+"]] <- 0
   }
-
-  ions <- intersect(names(c_mM), tab$ion)
-  if (length(ions) == 0) stop("No overlapping ions between concentrations and lookup table.", call. = FALSE)
 
   df <- merge(
     data.frame(ion = names(c_mM), c_mM = as.numeric(c_mM), stringsAsFactors = FALSE),
@@ -184,8 +197,70 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
     all.x = FALSE,
     all.y = FALSE
   )
+  if (nrow(df) == 0) {
+    stop("No overlapping ions between concentrations and diffusion lookup table.", call. = FALSE)
+  }
   df$c_mM[!is.finite(df$c_mM)] <- 0
-  df$kappa_mS_cm <- df$c_mM * df$Lambda0_eq / 1000
+
+  I_mol_L <- 0.5 * sum((df$z^2) * (df$c_mM / 1000), na.rm = TRUE)
+  abs_z <- abs(df$z)
+  df$alpha <- ifelse(
+    I_mol_L <= 0.36 * abs_z,
+    0.6 / sqrt(abs_z),
+    sqrt(I_mol_L) / abs_z
+  )
+
+  gamma_dh <- function(z, I_mol_L, A) {
+    10^(-A * z^2 * sqrt(I_mol_L))
+  }
+
+  if (gamma_model == "auto") {
+    if (!is.null(gamma)) {
+      gamma_src <- gamma
+      gamma_vals <- gamma_src[df$ion]
+      gamma_vals[is.na(gamma_vals)] <- 1
+    } else if (!is.null(ph_res$gamma_ions)) {
+      gamma_src <- ph_res$gamma_ions
+      gamma_vals <- gamma_src[df$ion]
+      gamma_vals[is.na(gamma_vals)] <- 1
+    } else {
+      gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
+    }
+  } else if (gamma_model == "provided") {
+    if (is.null(gamma) || is.null(names(gamma))) {
+      stop("gamma_model = \"provided\" requires a named numeric gamma vector.", call. = FALSE)
+    }
+    gamma_vals <- gamma[df$ion]
+    missing_gamma <- df$ion[is.na(gamma_vals)]
+    if (length(missing_gamma) > 0) {
+      stop(
+        sprintf(
+          "gamma is missing values for ions: %s",
+          paste(unique(missing_gamma), collapse = ", ")
+        ),
+        call. = FALSE
+      )
+    }
+  } else if (gamma_model == "unity") {
+    gamma_vals <- rep(1, nrow(df))
+  } else {
+    gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
+  }
+
+  if (any(!is.finite(gamma_vals) | gamma_vals <= 0)) {
+    stop("gamma must be finite and > 0 for all ions used in EC.", call. = FALSE)
+  }
+
+  df$gamma <- as.numeric(gamma_vals)
+
+  F_const <- 9.6485e4
+  R_const <- 8.31446
+  T_K <- t_C + 273.15
+  pref <- F_const^2 / (R_const * T_K)
+  D_m2_s <- df$D_1e5_cm2_s * 1e-9
+  c_mol_m3 <- df$c_mM
+  kappa_S_m <- pref * D_m2_s * (df$z^2) * (df$gamma^df$alpha) * c_mol_m3
+  df$kappa_mS_cm <- kappa_S_m * 10
 
   EC_mS_cm <- sum(df$kappa_mS_cm, na.rm = TRUE)
   EC_uS_cm <- EC_mS_cm * 1000
@@ -193,6 +268,15 @@ ec_from_ph <- function(achieved, ph_res, fe_state = c("Fe2+", "Fe3+")) {
   list(
     EC_mS_cm = EC_mS_cm,
     EC_uS_cm = EC_uS_cm,
-    contributions = df[order(-df$kappa_mS_cm), c("ion", "c_mM", "z", "Lambda0_eq", "kappa_mS_cm")]
+    contributions = df[order(-df$kappa_mS_cm), c(
+      "ion", "c_mM", "z", "D_1e5_cm2_s", "gamma", "alpha", "kappa_mS_cm"
+    )],
+    inputs = list(
+      t_C = t_C,
+      T_K = T_K,
+      I_mol_L = I_mol_L,
+      gamma_model = gamma_model,
+      A_DH_25 = A_DH_25
+    )
   )
 }
