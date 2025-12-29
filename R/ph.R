@@ -99,7 +99,7 @@ ph_from_achieved <- function(
 
   # --- helpers ---
   davies_gamma <- function(I, z) {
-    if (I <= 0) return(1.0)
+    if (!is.finite(I) || I <= 0) return(1.0)
     term <- (sqrt(I) / (1 + sqrt(I)) - 0.3 * I)
     10^(-A_davies * z^2 * term)
   }
@@ -303,7 +303,7 @@ ph_from_achieved <- function(
         BOH3 = BOH3, BOH4 = BOH4,
         H4SiO4 = H4SiO4, H3SiO4 = H3SiO4
       )
-      if (abs(I_new - I) < 1e-10) {
+      if (isTRUE(abs(I_new - I) < 1e-10)) {
         I <- I_new
         break
       }
