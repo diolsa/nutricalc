@@ -1468,6 +1468,7 @@ server <- function(input, output, session) {
     output$ec_contrib <- renderTable({
       if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
       df <- ec_res$contributions
+      df <- df[, setdiff(names(df), c("D_1e5_cm2_s", "gamma", "alpha")), drop = FALSE]
       df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
       df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
       df$z <- format(df$z, trim = TRUE, nsmall = 0, scientific = FALSE)
