@@ -2,7 +2,11 @@
 % Please edit documentation in R/ec.R
 \name{ion_diffusion_25C}
 \alias{ion_diffusion_25C}
+<<<<<<< HEAD
 \title{Lookup table of diffusion coefficients at 25 °C for EC calculation}
+=======
+\title{Lookup table of ion diffusion coefficients at 25 C}
+>>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
 \usage{
 ion_diffusion_25C()
 }
@@ -10,7 +14,12 @@ ion_diffusion_25C()
 A data.frame with columns: ion, z, D_1e5_cm2_s.
 }
 \description{
+<<<<<<< HEAD
 Returns a data frame with ions, charge, and diffusion coefficients at 25 °C.
 Diffusion values are stored as numbers in 10^-5 cm^2/s (which is numerically
 equal to 10^-9 m^2/s).
+=======
+Returns a data frame with ions, charge, and diffusion coefficients (D) at 25 C.
+Values are expressed as 10^-5 cm^2/s.
+>>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
 }

@@ -21,6 +21,7 @@ Nutrient and Achieved.}
 \item{ph_res}{Result list from your pH/speciation routine; must contain `species_mM`
 (named numeric, mmol/L). Optionally may contain `gamma_ions` (named numeric).}
 
+<<<<<<< HEAD
 \item{fe_state}{Either "Fe2+" or "Fe3+". If "Fe3+", all Fe is assigned to Fe3+.}
 
 \item{t_C}{Temperature in °C used in the prefactor (default 25).}
@@ -34,6 +35,18 @@ Nutrient and Achieved.}
 - "provided": require `gamma` and use it.}
 
 \item{A_DH_25}{Debye–Hückel A parameter at 25 °C (default 0.5085).}
+=======
+\item{fe_state}{One of "Fe2+" or "Fe3+". When "Fe3+", all Fe2+ is treated
+as Fe3+ for EC purposes.}
+
+\item{t_C}{Temperature in degrees C.}
+
+\item{gamma}{Optional named numeric vector of activity coefficients.}
+
+\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", or "provided".}
+
+\item{A_DH_25}{Debye-Huckel A constant at 25 C.}
+>>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
 }
 \value{
 A list with:
@@ -43,6 +56,7 @@ A list with:
   - contributions: per-ion contributions (mS/cm), sorted descending
 }
 \description{
+<<<<<<< HEAD
 Estimates solution electrical conductivity from an ion mixture using:
   EC = (F^2 / (R*T)) * sum_i( D_i * z_i^2 * (gamma_i^alpha_i) * c_i )
 }
@@ -57,4 +71,8 @@ or approximated via the simple Debye–Hückel expression at 25 °C:
 The exponent alpha_i is computed from ionic strength I (mol/L):
   alpha_i = 0.6/sqrt(|z_i|)           if I <= 0.36*|z_i|
            = sqrt(I)/|z_i|            otherwise
+=======
+Estimates conductivity using an ion-transport summation based on diffusion
+coefficients and activity coefficients.
+>>>>>>> 3c18957ec15e594e4615c877b4277bd2f688970a
 }
