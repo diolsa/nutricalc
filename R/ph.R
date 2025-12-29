@@ -5,6 +5,8 @@
 #' no precipitation.
 #'
 #' @param achieved Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
+#'   If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
+#'   from BWB "Basenkapazität KB 8,2" and used to fix carbonate speciation.
 #' @param temp_C Temperature in Celsius (only 25 C supported in this version).
 #' @param phc_bracket Numeric length-2 bracket for pHc = -log10([H+]) search.
 #' @param tol Root tolerance in meq/L.
@@ -133,6 +135,8 @@ ph_from_achieved <- function(
   } else {
     0
   }
+  # BWB "Basenkapazität KB 8,2" is treated as free dissolved CO2(aq) in mmol/L.
+  CO2_aq_mM <- get0("CO2_aq")
 
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
@@ -214,19 +218,29 @@ ph_from_achieved <- function(
       HPO4 <- mM_to_M(PT) * (K1c * K2c * H / D)
       PO4 <- mM_to_M(PT) * (K1c * K2c * K3c / D)
 
-      # carbonate speciation from CT (total inorganic carbon)
+      # carbonate speciation from CT (total inorganic carbon) or fixed CO2(aq)
       K1c_C <- Ka1_C / (gam$H * gam$HCO3)
       K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
-      D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
-      a0 <- H^2 / D_c
-      a1 <- (K1c_C * H) / D_c
-      a2 <- (K1c_C * K2c_C) / D_c
+      if (CO2_aq_mM > 0) {
+        CO2 <- mM_to_M(CO2_aq_mM)
+        HCO3 <- (K1c_C * CO2) / H
+        CO3 <- (K2c_C * HCO3) / H
+      } else if (CT_mM > 0) {
+        D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
+        a0 <- H^2 / D_c
+        a1 <- (K1c_C * H) / D_c
+        a2 <- (K1c_C * K2c_C) / D_c
 
-      CT <- mM_to_M(CT_mM)
+        CT <- mM_to_M(CT_mM)
 
-      CO2 <- a0 * CT
-      HCO3 <- a1 * CT
-      CO3 <- a2 * CT
+        CO2 <- a0 * CT
+        HCO3 <- a1 * CT
+        CO3 <- a2 * CT
+      } else {
+        CO2 <- 0
+        HCO3 <- 0
+        CO3 <- 0
+      }
 
       # borate speciation (B(OH)3 / B(OH)4-)
       aH <- gam$H * H
@@ -564,3 +578,10 @@ ph_from_achieved <- function(
     charge_breakdown = charge_breakdown
   )
 }
+
+# Example sanity check (CO2_aq lowers pH; CO2 is neutral):
+# achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, Alkalinity = 4.1)
+# ph_no_co2 <- ph_from_achieved(achieved)$pH
+# achieved[["CO2_aq"]] <- 0.44
+# ph_with_co2 <- ph_from_achieved(achieved)$pH
+# stopifnot(ph_with_co2 < ph_no_co2)

@@ -7,10 +7,11 @@
 #' @param plz Character or numeric vector of length one with a five digit
 #'   German postal code.
 #'
-#' @return A named numeric vector of length 17 in mmol/L with names
+#' @return A named numeric vector of length 18 in mmol/L with names
 #'   `c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-#'   "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity")`, limited to the decimal precision
-#'   provided by the source values.
+#'   "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity","KB8_2")`, limited to the decimal precision
+#'   provided by the source values. `KB8_2` corresponds to the BWB-reported
+#'   "Basenkapazität KB 8,2" (mmol/L), treated as dissolved CO2(aq).
 #' @export
 #'
 
@@ -44,7 +45,7 @@ fetch_bwb_mittelwert <- function(plz) {
 
   relevant <- parsed_tables[table_matches]
   target_names <- c("NO3_N","NH4_N","P","K","Ca","Mg","S","Na","Cl",
-                    "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity")
+                    "Fe","Mn","Zn","B","Cu","Mo","Si","Alkalinity","KB8_2")
   empty_result <- stats::setNames(rep(NA_real_, length(target_names)), target_names)
 
   if (!length(relevant)) {
@@ -169,6 +170,10 @@ map_parameter_to_nutrient <- function(param) {
   if (grepl("saeurekapazitaet|ks\\s*4\\s*[\\.,]\\s*3|bis\\s*ph\\s*4\\s*[\\.,]\\s*3", clean)) {
     return("Alkalinity")
   }
+  if (grepl("basen?kapazitaet|basekapazitaet", clean) &&
+      grepl("kb\\s*8\\s*[\\.,]\\s*2", clean)) {
+    return("KB8_2")
+  }
   ""
 }
 
@@ -189,6 +194,16 @@ convert_mittelwert <- function(value, unit, nutrient) {
   if (is.na(value) || is.na(unit)) return(NA_real_)
 
   if (identical(unit, "mmol/L")) return(value)
+
+  if (identical(nutrient, "KB8_2")) {
+    molar_mass_co2 <- 44.01
+    if (identical(unit, "mg/L")) {
+      return(value / molar_mass_co2)
+    }
+    if (identical(unit, "µg/L")) {
+      return(value / 1000 / molar_mass_co2)
+    }
+  }
 
   if (identical(unit, "mg/L")) {
     return(convert_units(stats::setNames(value, nutrient), to = "mmol/L")[[1]])
