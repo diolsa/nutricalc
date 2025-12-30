@@ -197,6 +197,11 @@ targets_for_display <- function(targets_mmol, unit_out) {
   from_canonical_to_unit(targets_mmol, unit_out)
 }
 
+convert_water_value <- function(value, unit_in, unit_out, formula) { unit_in <- normalize_unit(unit_in); unit_out <- normalize_unit(unit_out)
+  if (unit_in == unit_out) return(value); molar_mass <- compute_molar_mass(formula)
+  if (unit_in == "mg/L") value <- value / molar_mass else if (unit_in == "µmol/L") value <- value / 1000
+  if (unit_out == "mg/L") value <- value * molar_mass else if (unit_out == "µmol/L") value <- value * 1000; value }
+
 # =========================================================
 # 2) UI
 # =========================================================
@@ -673,12 +678,12 @@ server <- function(input, output, session) {
     updateTextInput(
       session,
       "water_expr_HCO3",
-      value = format(water_hco3_mmol, trim = TRUE, scientific = FALSE)
+      value = format(convert_water_value(water_hco3_mmol, canonical_unit, unit_out, "HCO3"), trim = TRUE, scientific = FALSE)
     )
     updateTextInput(
       session,
       "water_ks82",
-      value = format(water_co2_aq_mmol, trim = TRUE, scientific = FALSE)
+      value = format(convert_water_value(water_co2_aq_mmol, canonical_unit, unit_out, "CO2"), trim = TRUE, scientific = FALSE)
     )
 
     showNotification("BWB water values applied.", type = "message")
@@ -694,9 +699,9 @@ server <- function(input, output, session) {
     targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
-    water_hco3(hco3_val)
+    water_hco3(convert_water_value(hco3_val, unit_in, canonical_unit, "HCO3"))
     co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
-    water_co2_aq(co2_val)
+    water_co2_aq(convert_water_value(co2_val, unit_in, canonical_unit, "CO2"))
     run_trigger(isolate(run_trigger()) + 1L)
   })
 
@@ -716,9 +721,9 @@ server <- function(input, output, session) {
     targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
-    water_hco3(hco3_val)
+    water_hco3(convert_water_value(hco3_val, old_unit, canonical_unit, "HCO3"))
     co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
-    water_co2_aq(co2_val)
+    water_co2_aq(convert_water_value(co2_val, old_unit, canonical_unit, "CO2"))
     display_vals <- targets_for_display(vals_mmol, new_unit)
     display_water <- targets_for_display(vals_water_mmol, new_unit)
 
@@ -736,12 +741,12 @@ server <- function(input, output, session) {
     updateTextInput(
       session,
       "water_expr_HCO3",
-      value = format(water_hco3(), trim = TRUE, scientific = FALSE)
+      value = format(convert_water_value(water_hco3(), canonical_unit, new_unit, "HCO3"), trim = TRUE, scientific = FALSE)
     )
     updateTextInput(
       session,
       "water_ks82",
-      value = format(water_co2_aq(), trim = TRUE, scientific = FALSE)
+      value = format(convert_water_value(water_co2_aq(), canonical_unit, new_unit, "CO2"), trim = TRUE, scientific = FALSE)
     )
 
     current_input_unit(new_unit)
