@@ -542,8 +542,8 @@ ui <- fluidPage(
                                tags$div(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
-                                 sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
-                                             step = 0.01, ticks = FALSE, width = "100%")
+                                 sliderInput("ph_ec_multiplier", label = NULL, min = -100, max = 100, value = 0,
+                                             step = 1, ticks = FALSE, width = "100%", sep= "", post = " %")
                                ),
                                uiOutput("ph_ui")
                       ),
@@ -809,7 +809,8 @@ server <- function(input, output, session) {
   eval_targets <- reactive({
     vals <- targets_mmol()
     water_vals <- water_mmol()
-    multiplier <- input$ph_ec_multiplier %||% 0
+    multiplier_pct <- input$ph_ec_multiplier %||% 0
+    multiplier <- suppressWarnings(as.numeric(multiplier_pct)) / 100
     if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 0
     multiplier <- min(max(multiplier, -1), 1)
     validate(
