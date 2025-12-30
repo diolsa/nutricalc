@@ -1545,6 +1545,10 @@ server <- function(input, output, session) {
             tagList(
               tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
               tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
+              tags$p(
+                strong("Osmotic Potential (kPa):"),
+                sprintf("%.2f", -0.036 * ec_res$EC_uS_cm)
+              ),
               tags$details(
                 tags$summary("Show EC contributions"),
                 tableOutput("ec_contrib")
