@@ -745,6 +745,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     req(inputs_ready())
+    updateSliderInput(session, "ph_ec_multiplier", value = 0)
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
