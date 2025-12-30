@@ -1516,7 +1516,7 @@ server <- function(input, output, session) {
           numeric_value <- suppressWarnings(as.numeric(value))
           formatted <- format(value, trim = TRUE, nsmall = 0, scientific = FALSE)
           if (is.finite(numeric_value) && numeric_value > 0) {
-            paste0("+", formatted)
+            paste0(" ", formatted)
           } else {
             formatted
           }
