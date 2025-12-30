@@ -539,6 +539,12 @@ ui <- fluidPage(
                                uiOutput("delivery_ui")
                       ),
                       tabPanel("🧪 pH & EC",
+                               tags$div(
+                                 class = "text-center mb-2",
+                                 tags$strong("Adjust Concentration"),
+                                 sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
+                                             step = 0.01, ticks = FALSE, width = "100%")
+                               ),
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -739,6 +745,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     req(inputs_ready())
+    updateSliderInput(session, "ph_ec_multiplier", value = 0)
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
@@ -750,6 +757,11 @@ server <- function(input, output, session) {
     water_co2_aq(co2_to_mmol(co2_val, unit_in))
     run_trigger(isolate(run_trigger()) + 1L)
   })
+
+  observeEvent(input$ph_ec_multiplier, {
+    req(inputs_ready())
+    run_trigger(isolate(run_trigger()) + 1L)
+  }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
     req(inputs_ready())
@@ -797,12 +809,15 @@ server <- function(input, output, session) {
   eval_targets <- reactive({
     vals <- targets_mmol()
     water_vals <- water_mmol()
+    multiplier <- input$ph_ec_multiplier %||% 0
+    if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 0
+    multiplier <- min(max(multiplier, -1), 1)
     validate(
       need(!is.null(vals), "Targets not initialized yet."),
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    pmax(vals - water_vals, 0)
+    pmax((vals * (1 + multiplier)) - water_vals, 0)
   })
 
   importance_vec <- reactive({
