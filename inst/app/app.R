@@ -543,7 +543,8 @@ ui <- fluidPage(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
                                  sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
-                                             step = 0.01, ticks = FALSE, width = "100%")
+                                             step = 0.01, ticks = FALSE, width = "100%"),
+                                 tags$small(class = "text-muted", textOutput("ph_ec_multiplier_label", inline = TRUE))
                                ),
                                uiOutput("ph_ui")
                       ),
@@ -805,6 +806,12 @@ server <- function(input, output, session) {
 
     current_input_unit(new_unit)
   }, ignoreInit = TRUE)
+
+  output$ph_ec_multiplier_label <- renderText({
+    val <- input$ph_ec_multiplier %||% 0
+    if (!is.numeric(val) || is.na(val)) val <- 0
+    sprintf("%d%%", round(val * 100))
+  })
 
   eval_targets <- reactive({
     vals <- targets_mmol()
