@@ -285,6 +285,9 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
+ .adjust-concentration-slider .irs-min,
+ .adjust-concentration-slider .irs-max { display: none !important; }
+
 
 
   #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
@@ -325,6 +328,21 @@ ui <- fluidPage(
 
 ")),
 
+
+    tags$script(HTML("
+      (function() {
+        function updatePhEcLabel() {
+          var el = $('input#ph_ec_multiplier');
+          if (!el.length) return;
+          var v = parseFloat(el.val());
+          if (isNaN(v)) v = 0;
+          var pct = Math.round(v * 100);
+          el.closest('.adjust-concentration-slider').find('.irs-single').text(pct + ' %');
+        }
+        $(document).on('input change', 'input#ph_ec_multiplier', updatePhEcLabel);
+        $(document).on('shiny:connected', updatePhEcLabel);
+      })();
+    ")),
 
 
   ),
@@ -543,8 +561,7 @@ ui <- fluidPage(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
                                  sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
-                                             step = 0.01, ticks = FALSE, width = "100%"),
-                                 tags$small(class = "text-muted", textOutput("ph_ec_multiplier_label", inline = TRUE))
+                                             step = 0.01, ticks = FALSE, width = "100%")
                                ),
                                uiOutput("ph_ui")
                       ),
@@ -806,12 +823,6 @@ server <- function(input, output, session) {
 
     current_input_unit(new_unit)
   }, ignoreInit = TRUE)
-
-  output$ph_ec_multiplier_label <- renderText({
-    val <- input$ph_ec_multiplier %||% 0
-    if (!is.numeric(val) || is.na(val)) val <- 0
-    sprintf("%d%%", round(val * 100))
-  })
 
   eval_targets <- reactive({
     vals <- targets_mmol()
