@@ -1429,6 +1429,13 @@ server <- function(input, output, session) {
       }
     }
 
+    totals_meq <- ph_res$charge_breakdown$totals_meq
+    charge_equiv <- NA_real_
+    if (!is.null(totals_meq) &&
+        all(c("pos_total_meq", "neg_total_meq") %in% names(totals_meq))) {
+      charge_equiv <- (totals_meq[["pos_total_meq"]] + totals_meq[["neg_total_meq"]]) / 2
+    }
+
     output$ph_fixed_cations <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
@@ -1522,6 +1529,10 @@ server <- function(input, output, session) {
           tags$h6("pH"),
           tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
           tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
+          tags$p(
+            strong("Total charge equivalents (meq/L):"),
+            fmt_num(charge_equiv)
+          ),
           tags$details(
             tags$summary("Show pH charge breakdown"),
             tags$h6("Fixed cations (meq/L)"),
@@ -1529,9 +1540,7 @@ server <- function(input, output, session) {
             tags$h6("Fixed anions (meq/L)"),
             tableOutput("ph_fixed_anions"),
             tags$h6("Variable components (meq/L)"),
-            tableOutput("ph_variable"),
-            tags$h6("Charge totals (meq/L)"),
-            tableOutput("ph_totals")
+            tableOutput("ph_variable")
           )
         ),
         column(
