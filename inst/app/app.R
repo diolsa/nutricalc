@@ -1510,7 +1510,19 @@ server <- function(input, output, session) {
       df <- df[, setdiff(names(df), c("D_1e5_cm2_s", "gamma", "alpha")), drop = FALSE]
       df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
       df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
-      df$z <- format(df$z, trim = TRUE, nsmall = 0, scientific = FALSE)
+      df$z <- vapply(
+        df$z,
+        function(value) {
+          numeric_value <- suppressWarnings(as.numeric(value))
+          formatted <- format(value, trim = TRUE, nsmall = 0, scientific = FALSE)
+          if (is.finite(numeric_value) && numeric_value > 0) {
+            paste0("+", formatted)
+          } else {
+            formatted
+          }
+        },
+        character(1)
+      )
       if ("Lambda0_eq" %in% names(df)) {
         names(df)[names(df) == "Lambda0_eq"] <- "λ₀(eq)"
       } else if ("Lambda0" %in% names(df)) {
