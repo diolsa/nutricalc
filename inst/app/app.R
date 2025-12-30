@@ -285,9 +285,6 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
- .adjust-concentration-slider .irs-min,
- .adjust-concentration-slider .irs-max { display: none !important; }
-
 
 
   #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
@@ -328,21 +325,6 @@ ui <- fluidPage(
 
 ")),
 
-
-    tags$script(HTML("
-      (function() {
-        function updatePhEcLabel() {
-          var el = $('input#ph_ec_multiplier');
-          if (!el.length) return;
-          var v = parseFloat(el.val());
-          if (isNaN(v)) v = 0;
-          var pct = Math.round(v * 100);
-          el.closest('.adjust-concentration-slider').find('.irs-single').text(pct + ' %');
-        }
-        $(document).on('input change', 'input#ph_ec_multiplier', updatePhEcLabel);
-        $(document).on('shiny:connected', updatePhEcLabel);
-      })();
-    ")),
 
 
   ),
@@ -763,7 +745,6 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     req(inputs_ready())
-    updateSliderInput(session, "ph_ec_multiplier", value = 0)
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
