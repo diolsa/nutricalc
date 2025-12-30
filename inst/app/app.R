@@ -545,7 +545,6 @@ ui <- fluidPage(
                                  sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
                                              step = 0.01, ticks = FALSE, width = "100%")
                                ),
-                               textOutput("ph_ec_multiplier_pct")
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -746,7 +745,6 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     req(inputs_ready())
-    updateSliderInput(session, "ph_ec_multiplier", value = 0)
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
@@ -819,12 +817,6 @@ server <- function(input, output, session) {
     )
 
     pmax((vals * (1 + multiplier)) - water_vals, 0)
-  })
-
-  output$ph_ec_multiplier_pct <- renderText({
-    val <- input$ph_ec_multiplier %||% 0
-    if (!is.numeric(val) || is.na(val)) val <- 0
-    paste0(round(val * 100), "%")
   })
 
   importance_vec <- reactive({
