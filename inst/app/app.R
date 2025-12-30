@@ -566,16 +566,8 @@ ui <- fluidPage(
                                  tags$strong("Adjust Concentration"),
                                  tags$div(
                                    class = "adjust-concentration-slider",
-                                   sliderInput(
-                                     "ph_ec_log",
-                                     label = NULL,
-                                     min = -1,
-                                     max = 1,
-                                     value = 0,
-                                     step = 0.01,
-                                     ticks = FALSE,
-                                     width = "100%"
-                                   )
+                                   sliderInput("ph_ec_log", label = NULL, min = -1, max = 1,
+                                               value = 0, step = 0.01, ticks = FALSE, width = "100%")
                                  )
                                ),
                                uiOutput("ph_ui")
