@@ -1513,13 +1513,8 @@ server <- function(input, output, session) {
       df$z <- vapply(
         df$z,
         function(value) {
-          numeric_value <- suppressWarnings(as.numeric(value))
           formatted <- format(value, trim = TRUE, nsmall = 0, scientific = FALSE)
-          if (is.finite(numeric_value) && numeric_value > 0) {
-            paste0(" ", formatted)
-          } else {
-            formatted
-          }
+          sprintf("<div style='text-align:right'>%s</div>", formatted)
         },
         character(1)
       )
