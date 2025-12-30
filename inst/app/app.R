@@ -545,6 +545,7 @@ ui <- fluidPage(
                                  sliderInput("ph_ec_multiplier", label = NULL, min = -1, max = 1, value = 0,
                                              step = 0.01, ticks = FALSE, width = "100%")
                                ),
+                               textOutput("ph_ec_multiplier_pct")
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -818,6 +819,12 @@ server <- function(input, output, session) {
     )
 
     pmax((vals * (1 + multiplier)) - water_vals, 0)
+  })
+
+  output$ph_ec_multiplier_pct <- renderText({
+    val <- input$ph_ec_multiplier %||% 0
+    if (!is.numeric(val) || is.na(val)) val <- 0
+    paste0(round(val * 100), "%")
   })
 
   importance_vec <- reactive({
