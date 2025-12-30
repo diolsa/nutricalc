@@ -121,7 +121,6 @@ default_targets_mmol <- {
 default_water_expr <- setNames(rep("0", length(nutrients)), nutrients)
 default_water_hco3_expr <- "0"
 default_water_ks82_expr <- "0"
-
 default_water_mmol <- {
   v <- as.numeric(default_water_expr)
   names(v) <- nutrients
@@ -166,62 +165,6 @@ from_canonical_to_unit <- function(vals, unit_out) {
     return(convert_units(vals, to = "mg/L"))
   } else if (unit_out == "µmol/L") {
     return(vals * 1000)
-  } else {
-    stop("Unsupported output unit: ", unit_out, call. = FALSE)
-  }
-}
-
-hco3_to_mmol <- function(val, unit_in) {
-  unit_in <- normalize_unit(unit_in)
-  molar_mass_hco3 <- 61.016
-  if (unit_in == "mmol/L") {
-    val
-  } else if (unit_in == "µmol/L") {
-    val / 1000
-  } else if (unit_in == "mg/L") {
-    val / molar_mass_hco3
-  } else {
-    stop("Unsupported input unit: ", unit_in, call. = FALSE)
-  }
-}
-
-hco3_from_mmol <- function(val, unit_out) {
-  unit_out <- normalize_unit(unit_out)
-  molar_mass_hco3 <- 61.016
-  if (unit_out == "mmol/L") {
-    val
-  } else if (unit_out == "µmol/L") {
-    val * 1000
-  } else if (unit_out == "mg/L") {
-    val * molar_mass_hco3
-  } else {
-    stop("Unsupported output unit: ", unit_out, call. = FALSE)
-  }
-}
-
-co2_to_mmol <- function(val, unit_in) {
-  unit_in <- normalize_unit(unit_in)
-  molar_mass_co2 <- 44.01
-  if (unit_in == "mmol/L") {
-    val
-  } else if (unit_in == "µmol/L") {
-    val / 1000
-  } else if (unit_in == "mg/L") {
-    val / molar_mass_co2
-  } else {
-    stop("Unsupported input unit: ", unit_in, call. = FALSE)
-  }
-}
-
-co2_from_mmol <- function(val, unit_out) {
-  unit_out <- normalize_unit(unit_out)
-  molar_mass_co2 <- 44.01
-  if (unit_out == "mmol/L") {
-    val
-  } else if (unit_out == "µmol/L") {
-    val * 1000
-  } else if (unit_out == "mg/L") {
-    val * molar_mass_co2
   } else {
     stop("Unsupported output unit: ", unit_out, call. = FALSE)
   }
@@ -613,8 +556,8 @@ server <- function(input, output, session) {
 
   targets_mmol <- reactiveVal(default_targets_mmol)
   water_mmol <- reactiveVal(default_water_mmol)
-  water_hco3 <- reactiveVal(hco3_to_mmol(as.numeric(default_water_hco3_expr), canonical_unit))
-  water_co2_aq <- reactiveVal(co2_to_mmol(as.numeric(default_water_ks82_expr), canonical_unit))
+  water_hco3 <- reactiveVal(as.numeric(default_water_hco3_expr))
+  water_co2_aq <- reactiveVal(as.numeric(default_water_ks82_expr))
   current_input_unit <- reactiveVal(canonical_unit)
   selected_salts <- reactiveVal(rownames(nutrient_matrix))
 
@@ -719,7 +662,6 @@ server <- function(input, output, session) {
     }
     if (is.na(water_co2_aq_mmol)) water_co2_aq_mmol <- 0
     water_co2_aq(water_co2_aq_mmol)
-
     unit_out <- current_input_unit() %||% canonical_unit
     display_water <- targets_for_display(vals_mmol[nutrients], unit_out)
     for (nm in nutrients) {
@@ -731,12 +673,12 @@ server <- function(input, output, session) {
     updateTextInput(
       session,
       "water_expr_HCO3",
-      value = format(hco3_from_mmol(water_hco3_mmol, unit_out), trim = TRUE, scientific = FALSE)
+      value = format(water_hco3_mmol, trim = TRUE, scientific = FALSE)
     )
     updateTextInput(
       session,
       "water_ks82",
-      value = format(co2_from_mmol(water_co2_aq_mmol, unit_out), trim = TRUE, scientific = FALSE)
+      value = format(water_co2_aq_mmol, trim = TRUE, scientific = FALSE)
     )
 
     showNotification("BWB water values applied.", type = "message")
@@ -752,9 +694,9 @@ server <- function(input, output, session) {
     targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
-    water_hco3(hco3_to_mmol(hco3_val, unit_in))
+    water_hco3(hco3_val)
     co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
-    water_co2_aq(co2_to_mmol(co2_val, unit_in))
+    water_co2_aq(co2_val)
     run_trigger(isolate(run_trigger()) + 1L)
   })
 
@@ -774,10 +716,9 @@ server <- function(input, output, session) {
     targets_mmol(vals_mmol)
     water_mmol(vals_water_mmol)
     hco3_val <- safe_numeric_expr(input$water_expr_HCO3, default = 0)
-    water_hco3(hco3_to_mmol(hco3_val, old_unit))
+    water_hco3(hco3_val)
     co2_val <- safe_numeric_expr(gsub(",", ".", input$water_ks82 %||% "", fixed = TRUE), default = 0)
-    water_co2_aq(co2_to_mmol(co2_val, old_unit))
-
+    water_co2_aq(co2_val)
     display_vals <- targets_for_display(vals_mmol, new_unit)
     display_water <- targets_for_display(vals_water_mmol, new_unit)
 
@@ -795,12 +736,12 @@ server <- function(input, output, session) {
     updateTextInput(
       session,
       "water_expr_HCO3",
-      value = format(hco3_from_mmol(water_hco3(), new_unit), trim = TRUE, scientific = FALSE)
+      value = format(water_hco3(), trim = TRUE, scientific = FALSE)
     )
     updateTextInput(
       session,
       "water_ks82",
-      value = format(co2_from_mmol(water_co2_aq(), new_unit), trim = TRUE, scientific = FALSE)
+      value = format(water_co2_aq(), trim = TRUE, scientific = FALSE)
     )
 
     current_input_unit(new_unit)
