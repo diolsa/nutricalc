@@ -543,7 +543,8 @@ ui <- fluidPage(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
                                  sliderInput("ph_ec_multiplier", label = NULL, min = 0, max = 2, value = 1,
-                                             step = 0.01, ticks = FALSE, width = "100%")
+                                             step = 0.01, ticks = FALSE, width = "100%"),
+                                 tags$small(class = "text-muted", "0 = -100%, 1 = 0%, 2 = 100%")
                                ),
                                uiOutput("ph_ui")
                       ),
@@ -745,6 +746,7 @@ server <- function(input, output, session) {
 
   observeEvent(input$run, {
     req(inputs_ready())
+    updateSliderInput(session, "ph_ec_multiplier", value = 1)
     unit_in <- input$input_unit %||% canonical_unit
     vals_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "expr_")
     vals_water_mmol <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = "water_expr_")
