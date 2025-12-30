@@ -487,12 +487,6 @@ ui <- fluidPage(
                                uiOutput("delivery_ui")
                       ),
                       tabPanel("🧪 pH & EC",
-                               tags$div(
-                                 class = "text-center mb-2",
-                                 tags$strong("Adjust Concentration"),
-                                 sliderInput("ph_ec_multiplier", label = NULL, min = -100, max = 100, value = 0,
-                                             step = 1, ticks = FALSE, width = "100%", sep= "", post = " %")
-                               ),
                                uiOutput("ph_ui")
                       ),
                       tabPanel("🛢️ Solution",
@@ -1523,10 +1517,15 @@ server <- function(input, output, session) {
 
     tags$div(
       tags$h5("🧪 pH & EC"),
+      tags$div(
+        class = "text-center mb-2",
+        tags$strong("Adjust Concentration"),
+        sliderInput("ph_ec_multiplier", label = NULL, min = -100, max = 100, value = 0,
+                    step = 1, ticks = FALSE, width = "100%", sep = "", post = " %")
+      ),
       fluidRow(
         column(
           5,
-          tags$h6("pH"),
           tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
           tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
           tags$p(
@@ -1545,7 +1544,6 @@ server <- function(input, output, session) {
         ),
         column(
           7,
-          tags$h6("EC (25°C)"),
           if (inherits(ec_res, "error")) {
             tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
           } else if (is.null(ec_res)) {
