@@ -629,21 +629,13 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$set_all_zero, {
-    set_zero_inputs <- function() {
-      for (nm in nutrients) {
-        updateTextInput(session, paste0("expr_", nm), value = "0")
-        updateTextInput(session, paste0("water_expr_", nm), value = "0")
-      }
-      updateTextInput(session, "water_expr_HCO3", value = "0")
-      updateTextInput(session, "water_ks82", value = "0")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+    for (nm in nutrients) {
+      updateTextInput(session, paste0("expr_", nm), value = "0")
+      updateTextInput(session, paste0("water_expr_", nm), value = "0")
     }
-
-    if (inputs_ready()) {
-      set_zero_inputs()
-    } else {
-      session$onFlushed(set_zero_inputs, once = TRUE)
-    }
-
+    updateTextInput(session, "water_expr_HCO3", value = "0")
+    updateTextInput(session, "water_ks82", value = "0")
     targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
     water_mmol(setNames(rep(0, length(nutrients)), nutrients))
     water_hco3(0)
