@@ -1373,7 +1373,7 @@ server <- function(input, output, session) {
     })
 
     tagList(
-      tags$h5("🎯 Delivery vs target (mM; ≤0.1 shown as µM)"),
+      tags$h5("🎯 Delivery vs target"),
       tableOutput("tbl_n"),
       tags$p(strong("🧮 Total squared absolute error: "), round(res$squared_error, 6)),
       tags$p(strong("📊 Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
