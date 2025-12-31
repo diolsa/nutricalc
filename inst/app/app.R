@@ -208,7 +208,8 @@ convert_water_value <- function(value, unit_in, unit_out, formula) { unit_in <- 
 
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
-  tags$head(tags$style(HTML("
+  tags$head(
+    tags$style(HTML("
   body { font-size: 13px; }
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
@@ -272,6 +273,33 @@ ui <- fluidPage(
 
 
 ")),
+    tags$script(HTML("
+      Shiny.addCustomMessageHandler('setInputsValue', function(msg) {
+        var ids = msg.ids || [];
+        var value = msg.value;
+        var remaining = 20;
+        var applyValues = function() {
+          var pending = [];
+          ids.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) {
+              pending.push(id);
+              return;
+            }
+            el.value = value;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+          ids = pending;
+          remaining -= 1;
+          if (ids.length > 0 && remaining > 0) {
+            setTimeout(applyValues, 50);
+          }
+        };
+        applyValues();
+      });
+    "))
+  ),
 
 
 
@@ -637,16 +665,13 @@ server <- function(input, output, session) {
     water_hco3(0)
     water_co2_aq(0)
 
-    set_zero_inputs <- function() {
-      for (nm in nutrients) {
-        updateTextInput(session, paste0("expr_", nm), value = "0")
-        updateTextInput(session, paste0("water_expr_", nm), value = "0")
-      }
-      updateTextInput(session, "water_expr_HCO3", value = "0")
-      updateTextInput(session, "water_ks82", value = "0")
-    }
-
-    if (inputs_ready()) set_zero_inputs() else session$onFlushed(set_zero_inputs, once = TRUE)
+    ids <- c(
+      paste0("expr_", nutrients),
+      paste0("water_expr_", nutrients),
+      "water_expr_HCO3",
+      "water_ks82"
+    )
+    session$sendCustomMessage("setInputsValue", list(ids = ids, value = "0"))
   })
 
   observeEvent(input$apply_bwb, {
