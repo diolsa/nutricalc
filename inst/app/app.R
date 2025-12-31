@@ -491,7 +491,7 @@ ui <- fluidPage(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
                                  sliderInput("ph_ec_multiplier", label = NULL, min = -100, max = 100, value = 0,
-                                             step = 1, ticks = FALSE, width = "100%", sep= "", post = " %")
+                                             step = 1, ticks = FALSE, width = "100%", sep = "", post = " %")
                                ),
                                uiOutput("ph_ui")
                       ),
@@ -1429,6 +1429,13 @@ server <- function(input, output, session) {
       }
     }
 
+    totals_meq <- ph_res$charge_breakdown$totals_meq
+    charge_equiv <- NA_real_
+    if (!is.null(totals_meq) &&
+        all(c("pos_total_meq", "neg_total_meq") %in% names(totals_meq))) {
+      charge_equiv <- (totals_meq[["pos_total_meq"]] + totals_meq[["neg_total_meq"]]) / 2
+    }
+
     output$ph_fixed_cations <- renderTable({
       data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
@@ -1503,7 +1510,14 @@ server <- function(input, output, session) {
       df <- df[, setdiff(names(df), c("D_1e5_cm2_s", "gamma", "alpha")), drop = FALSE]
       df$kappa_mS_cm <- vapply(df$kappa_mS_cm, fmt_num, character(1))
       df$c_mM <- vapply(df$c_mM, fmt_num, character(1))
-      df$z <- format(df$z, trim = TRUE, nsmall = 0, scientific = FALSE)
+      df$z <- vapply(
+        df$z,
+        function(value) {
+          formatted <- format(value, trim = TRUE, nsmall = 0, scientific = FALSE)
+          sprintf("<div style='text-align:right'>%s</div>", formatted)
+        },
+        character(1)
+      )
       if ("Lambda0_eq" %in% names(df)) {
         names(df)[names(df) == "Lambda0_eq"] <- "λ₀(eq)"
       } else if ("Lambda0" %in% names(df)) {
@@ -1519,9 +1533,12 @@ server <- function(input, output, session) {
       fluidRow(
         column(
           5,
-          tags$h6("pH"),
           tags$p(strong("pH:"), sprintf("%.2f", ph_res$pH)),
           tags$p(strong("Ionic strength (mmol/L):"), sprintf("%.2f", ph_res$I * 1000)),
+          tags$p(
+            strong("Total charge equivalents (meq/L):"),
+            fmt_num(charge_equiv)
+          ),
           tags$details(
             tags$summary("Show pH charge breakdown"),
             tags$h6("Fixed cations (meq/L)"),
@@ -1529,14 +1546,11 @@ server <- function(input, output, session) {
             tags$h6("Fixed anions (meq/L)"),
             tableOutput("ph_fixed_anions"),
             tags$h6("Variable components (meq/L)"),
-            tableOutput("ph_variable"),
-            tags$h6("Charge totals (meq/L)"),
-            tableOutput("ph_totals")
+            tableOutput("ph_variable")
           )
         ),
         column(
           7,
-          tags$h6("EC (25°C)"),
           if (inherits(ec_res, "error")) {
             tags$p(class = "text-warning", paste("EC calculation failed:", ec_res$message))
           } else if (is.null(ec_res)) {
