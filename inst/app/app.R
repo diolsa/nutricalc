@@ -1338,7 +1338,7 @@ server <- function(input, output, session) {
       if (abs(x) <= 0.1) {
         paste0(formatC(x * 1000, format = "f", digits = 2), " \u00b5M")
       } else {
-        paste0(formatC(x, format = "f", digits = 3), " mM")
+        paste0(formatC(x, format = "f", digits = 2), " mM")
       }
     }
 
