@@ -1338,7 +1338,7 @@ server <- function(input, output, session) {
       if (abs(x) <= 0.1) {
         paste0(formatC(x * 1000, format = "f", digits = 2), " \u00b5M")
       } else {
-        paste0(formatC(x, format = "f", digits = 3), " mmol/L")
+        paste0(formatC(x, format = "f", digits = 3), " mM")
       }
     }
 
@@ -1357,7 +1357,11 @@ server <- function(input, output, session) {
       character(1)
     )
 
-    output$tbl_n <- renderTable(nd, sanitize.text.function = function(x) x)
+    output$tbl_n <- renderTable(
+      nd,
+      sanitize.text.function = function(x) x,
+      align = c("l", "r", "r", "r", "r")
+    )
 
     output$raw_print <- renderPrint({
       res0 <- result()
@@ -1369,7 +1373,7 @@ server <- function(input, output, session) {
     })
 
     tagList(
-      tags$h5("🎯 Delivery vs target (mmol l⁻¹; ≤0.1 shown as µM)"),
+      tags$h5("🎯 Delivery vs target (mM; ≤0.1 shown as µM)"),
       tableOutput("tbl_n"),
       tags$p(strong("🧮 Total squared absolute error: "), round(res$squared_error, 6)),
       tags$p(strong("📊 Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
