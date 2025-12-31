@@ -1333,10 +1333,19 @@ server <- function(input, output, session) {
     abs_err  <- strip_negative_zero(round(drop_tiny(as.numeric(res$abs_error)), 6))
     pct_err  <- strip_negative_zero(round(as.numeric(res$percent_error), 2))
 
+    format_delivery_value <- function(x) {
+      if (is.na(x) || !is.finite(x)) return("")
+      if (abs(x) <= 0.1) {
+        paste0(formatC(x * 1000, format = "f", digits = 2), " \u00b5M")
+      } else {
+        paste0(formatC(x, format = "f", digits = 2), " mM")
+      }
+    }
+
     nd <- data.frame(
       Nutrient          = names(res$target),
-      Target            = target,
-      Achieved          = achieved,
+      Target            = vapply(target, format_delivery_value, character(1)),
+      Achieved          = vapply(achieved, format_delivery_value, character(1)),
       "Absolute Error"  = abs_err,
       "Percent Error"   = pct_err,
       stringsAsFactors  = FALSE,
@@ -1348,7 +1357,11 @@ server <- function(input, output, session) {
       character(1)
     )
 
-    output$tbl_n <- renderTable(nd, sanitize.text.function = function(x) x)
+    output$tbl_n <- renderTable(
+      nd,
+      sanitize.text.function = function(x) x,
+      align = "lrrrr"
+    )
 
     output$raw_print <- renderPrint({
       res0 <- result()
@@ -1360,7 +1373,7 @@ server <- function(input, output, session) {
     })
 
     tagList(
-      tags$h5("🎯 Delivery vs target (mmol l⁻¹)"),
+      tags$h5("🎯 Delivery vs target (mM; ≤0.1 shown as µM)"),
       tableOutput("tbl_n"),
       tags$p(strong("🧮 Total squared absolute error: "), round(res$squared_error, 6)),
       tags$p(strong("📊 Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
