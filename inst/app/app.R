@@ -1360,7 +1360,7 @@ server <- function(input, output, session) {
     output$tbl_n <- renderTable(
       nd,
       sanitize.text.function = function(x) x,
-      align = c("l", "r", "r", "r", "r")
+      align = "lrrrr"
     )
 
     output$raw_print <- renderPrint({
