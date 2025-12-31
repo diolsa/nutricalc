@@ -629,10 +629,16 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$set_all_zero, {
-    for (nm in nutrients) {
-      updateTextInput(session, paste0("expr_", nm), value = "0")
-    }
-    targets_mmol(setNames(rep(0, length(nutrients)), nutrients))
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+
+    session$onFlushed(function() {
+      for (nm in nutrients) {
+        updateTextInput(session, paste0("expr_", nm), value = "0")
+        updateTextInput(session, paste0("water_expr_", nm), value = "0")
+      }
+      updateTextInput(session, "water_expr_HCO3", value = "0")
+      updateTextInput(session, "water_ks82", value = "0")
+    }, once = TRUE)
   })
 
   observeEvent(input$apply_bwb, {
@@ -687,7 +693,7 @@ server <- function(input, output, session) {
     )
 
     showNotification("BWB water values applied.", type = "message")
-    updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
   })
 
   observeEvent(input$run, {
@@ -1150,7 +1156,7 @@ server <- function(input, output, session) {
         }
 
         apply_salts(rec)
-        updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+        updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
         showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
       }, once = TRUE)
 
@@ -1175,7 +1181,7 @@ server <- function(input, output, session) {
       }
 
       apply_salts(rec)
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
       showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
     }
 
@@ -1228,7 +1234,7 @@ server <- function(input, output, session) {
       targets_mmol(vals_mmol)
 
       # 4) jump back to the Targets tab
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
     }
 
     # If unit is not mg/L, first switch unit,
