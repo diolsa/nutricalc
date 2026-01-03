@@ -382,12 +382,12 @@ ui <- fluidPage(
                                fluidRow(
                                  column(
                                    4,
-                                   h6("Water 1"),
+                                   h6(textOutput("water1_mix_label")),
                                    div(class = "water-input-grid", uiOutput("water1_inputs"))
                                  ),
                                  column(
                                    4,
-                                   h6("Water 2"),
+                                   h6(textOutput("water2_mix_label")),
                                    div(class = "water-input-grid", uiOutput("water2_inputs"))
                                  ),
                                  column(
@@ -768,7 +768,7 @@ server <- function(input, output, session) {
     w1 <- parse_water_set("water1_expr_", unit_in)
     w2 <- parse_water_set("water2_expr_", unit_in)
 
-    ratio <- suppressWarnings(as.numeric(input$water_mix_pct %||% 50)) / 100
+    ratio <- 1 - (suppressWarnings(as.numeric(input$water_mix_pct %||% 50)) / 100)
     if (!is.numeric(ratio) || is.na(ratio)) ratio <- 0.5
     ratio <- min(max(ratio, 0), 1)
 
@@ -794,6 +794,20 @@ server <- function(input, output, session) {
       check.names = FALSE
     )
   }, sanitize.text.function = function(x) x, colnames = FALSE)
+
+  output$water1_mix_label <- renderText({
+    pct <- 100 - (suppressWarnings(as.numeric(input$water_mix_pct %||% 50)))
+    if (!is.numeric(pct) || is.na(pct)) pct <- 50
+    pct <- round(min(max(pct, 0), 100))
+    sprintf("Water 1 [%d%%]", pct)
+  })
+
+  output$water2_mix_label <- renderText({
+    pct <- suppressWarnings(as.numeric(input$water_mix_pct %||% 50))
+    if (!is.numeric(pct) || is.na(pct)) pct <- 50
+    pct <- round(min(max(pct, 0), 100))
+    sprintf("Water 2 [%d%%]", pct)
+  })
 
   observeEvent(input$reset, {
     for (nm in nutrients) {
