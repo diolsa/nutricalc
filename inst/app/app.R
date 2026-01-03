@@ -260,10 +260,8 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
- .water-mix-table table { width: 100%; margin-bottom: 0; }
- .water-mix-table td { padding: 4px 6px; height: 26px; vertical-align: middle; }
- .water-mix-table tr { border-bottom: 1px solid #dee2e6; }
- .water-mix-table tr:last-child { border-bottom: none; }
+ .water-mix-table { margin-top: -0.1px; }
+ .water-mix-table td { padding: 4px 6px; height: 37.8px; vertical-align: middle; }
 
 
 
