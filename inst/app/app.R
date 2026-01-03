@@ -361,7 +361,7 @@ ui <- fluidPage(
                                tags$hr(style = "margin:6px 0;"),
                                fluidRow(
                                  column(
-                                   12,
+                                   8,
                                    sliderInput(
                                      "water_mix_pct",
                                      label = "Mix (Water 1 %)",
@@ -372,6 +372,11 @@ ui <- fluidPage(
                                      width = "100%",
                                      sep = ""
                                    )
+                                 ),
+                                 column(
+                                   4,
+                                   div(style = "margin-top: 24px;",
+                                       actionButton("apply_mix_to_water", "Load Mixed Water", class = "btn btn-primary btn-sm"))
                                  )
                                ),
                                fluidRow(
@@ -922,11 +927,11 @@ server <- function(input, output, session) {
     current_input_unit(new_unit)
   }, ignoreInit = TRUE)
 
-  observeEvent(mixed_water(), {
+  observeEvent(input$apply_mix_to_water, {
     mix <- mixed_water()
     unit_out <- input$input_unit %||% canonical_unit
     update_water_inputs("water_expr_", mix$mixed, unit_out)
-  }, ignoreInit = TRUE)
+  })
 
   eval_targets <- reactive({
     vals <- targets_mmol()
