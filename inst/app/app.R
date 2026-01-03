@@ -356,8 +356,7 @@ ui <- fluidPage(
                                           actionButton("apply_bwb_water1", "Mix Water", class = "btn btn-outline-primary btn-sm"),
                                           actionButton("apply_bwb", "Load Water", class = "btn btn-primary btn-sm")
                                         ),
-                                        tags$br(), tags$br(),
-                                        tags$small(class = "text-muted", "Values respect the current unit selection above."))
+                                        tags$br(), tags$br())
                                ),
                                tags$hr(style = "margin:6px 0;"),
                                fluidRow(
