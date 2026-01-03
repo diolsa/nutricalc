@@ -931,6 +931,8 @@ server <- function(input, output, session) {
     mix <- mixed_water()
     unit_out <- input$input_unit %||% canonical_unit
     update_water_inputs("water_expr_", mix$mixed, unit_out)
+    showNotification("Mixed water values applied.", type = "message")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
   })
 
   eval_targets <- reactive({
