@@ -869,7 +869,6 @@ server <- function(input, output, session) {
     update_water_inputs("water1_expr_", bwb$values, unit_out)
 
     showNotification("BWB water values applied to Water 1.", type = "message")
-    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
   })
 
   observeEvent(input$run, {
