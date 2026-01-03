@@ -354,6 +354,21 @@ ui <- fluidPage(
                                tags$hr(style = "margin:6px 0;"),
                                fluidRow(
                                  column(
+                                   12,
+                                   sliderInput(
+                                     "water_mix_pct",
+                                     label = "Mix (Water 1 %)",
+                                     min = 0,
+                                     max = 100,
+                                     value = 50,
+                                     step = 1,
+                                     width = "100%",
+                                     sep = ""
+                                   )
+                                 )
+                               ),
+                               fluidRow(
+                                 column(
                                    4,
                                    h6("Water 1"),
                                    uiOutput("water1_inputs")
@@ -366,16 +381,6 @@ ui <- fluidPage(
                                  column(
                                    4,
                                    h6("Mixed water"),
-                                   sliderInput(
-                                     "water_mix_pct",
-                                     label = "Mix (Water 1 %)",
-                                     min = 0,
-                                     max = 100,
-                                     value = 50,
-                                     step = 1,
-                                     width = "100%",
-                                     sep = ""
-                                   ),
                                    tableOutput("water_mix_table")
                                  )
                                )
@@ -773,8 +778,6 @@ server <- function(input, output, session) {
 
     data.frame(
       Nutrient = vapply(water_keys, water_key_label, character(1)),
-      `Water 1` = round(w1_display, 4),
-      `Water 2` = round(w2_display, 4),
       Mix = round(mix_display, 4),
       check.names = FALSE
     )
