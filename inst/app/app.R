@@ -353,8 +353,8 @@ ui <- fluidPage(
                                         br(),
                                         div(
                                           style = "display:flex; gap:6px; align-items:center;",
-                                          actionButton("apply_bwb_water1", "Load into Water 1", class = "btn btn-outline-primary btn-sm"),
-                                          actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm")
+                                          actionButton("apply_bwb_water1", "Mix Water", class = "btn btn-outline-primary btn-sm"),
+                                          actionButton("apply_bwb", "Load Water", class = "btn btn-primary btn-sm")
                                         ),
                                         tags$br(), tags$br(),
                                         tags$small(class = "text-muted", "Values respect the current unit selection above."))
