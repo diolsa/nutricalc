@@ -385,7 +385,7 @@ ui <- fluidPage(
                                  ),
                                  column(
                                    4,
-                                   div(style = "margin-top: 16px;",
+                                   div(style = "margin-top: 14px; margin-bottom: 14px;",
                                        actionButton("apply_mix_to_water", "Load Mixed Water", class = "btn btn-primary btn-sm"))
                                  )
                                ),
