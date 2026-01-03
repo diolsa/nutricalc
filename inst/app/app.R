@@ -351,7 +351,11 @@ ui <- fluidPage(
                                         tags$small(class = "text-muted", "Fetch Berliner Wasserbetriebe Mittelwert data and fill water inputs under Targets.")),
                                  column(6,
                                         br(),
-                                        actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm"),
+                                        div(
+                                          style = "display:flex; gap:6px; align-items:center;",
+                                          actionButton("apply_bwb_water1", "Load into Water 1", class = "btn btn-outline-primary btn-sm"),
+                                          actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm")
+                                        ),
                                         tags$br(), tags$br(),
                                         tags$small(class = "text-muted", "Values respect the current unit selection above."))
                                ),
@@ -809,12 +813,12 @@ server <- function(input, output, session) {
     }, once = TRUE)
   })
 
-  observeEvent(input$apply_bwb, {
+  apply_bwb_values <- function() {
     plz <- input$bwb_plz %||% ""
     plz <- trimws(plz)
     if (!nzchar(plz)) {
       showNotification("Please enter a postal code.", type = "error")
-      return()
+      return(NULL)
     }
 
     vals_mmol <- tryCatch(
@@ -825,28 +829,46 @@ server <- function(input, output, session) {
       }
     )
 
-    if (is.null(vals_mmol)) return()
+    if (is.null(vals_mmol)) return(NULL)
 
     vals_mmol[is.na(vals_mmol)] <- 0
-    water_mmol(vals_mmol[nutrients])
     water_hco3_mmol <- vals_mmol[["KS4_3"]]
     if (is.na(water_hco3_mmol)) {
       water_hco3_mmol <- vals_mmol[["Alkalinity"]]
     }
     if (is.na(water_hco3_mmol)) water_hco3_mmol <- 0
-    water_hco3(water_hco3_mmol)
     water_co2_aq_mmol <- vals_mmol[["KB8_2"]]
     if (is.na(water_co2_aq_mmol)) {
       water_co2_aq_mmol <- vals_mmol[["KS8_2"]]
     }
     if (is.na(water_co2_aq_mmol)) water_co2_aq_mmol <- 0
-    water_co2_aq(water_co2_aq_mmol)
+    list(
+      values = c(vals_mmol[nutrients], HCO3 = water_hco3_mmol, KS82 = water_co2_aq_mmol)
+    )
+  }
+
+  observeEvent(input$apply_bwb, {
+    bwb <- apply_bwb_values()
+    if (is.null(bwb)) return()
+
     unit_out <- current_input_unit() %||% canonical_unit
-    water_vals <- c(vals_mmol[nutrients], HCO3 = water_hco3_mmol, KS82 = water_co2_aq_mmol)
-    update_water_inputs("water_expr_", water_vals, unit_out)
-    update_water_inputs("water1_expr_", water_vals, unit_out)
+    water_mmol(bwb$values[nutrients])
+    water_hco3(bwb$values[["HCO3"]])
+    water_co2_aq(bwb$values[["KS82"]])
+    update_water_inputs("water_expr_", bwb$values, unit_out)
 
     showNotification("BWB water values applied.", type = "message")
+    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+  })
+
+  observeEvent(input$apply_bwb_water1, {
+    bwb <- apply_bwb_values()
+    if (is.null(bwb)) return()
+
+    unit_out <- current_input_unit() %||% canonical_unit
+    update_water_inputs("water1_expr_", bwb$values, unit_out)
+
+    showNotification("BWB water values applied to Water 1.", type = "message")
     updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
   })
 
