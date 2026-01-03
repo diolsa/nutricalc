@@ -262,7 +262,9 @@ ui <- fluidPage(
 
  #water_mix_pct .irs-min,
  #water_mix_pct .irs-max,
- #water_mix_pct .irs-single { display: none !important; }
+ #water_mix_pct .irs-single,
+ #water_mix_pct .irs-grid-text,
+ #water_mix_pct .irs-grid { display: none !important; }
 
  .water-mix-table td { padding: 4px 6px; height: 37.8px; vertical-align: top; }
  .water-mix-table tr:last-child td { border-bottom: none !important; }
