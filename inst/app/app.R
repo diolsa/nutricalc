@@ -260,7 +260,11 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
- .water_mix_pct .irs-min,.water_mix_pct .irs-max {display: none !important;}
+ .water-mix-slider .irs-min,
+ .water-mix-slider .irs-max,
+ .water-mix-slider .irs-single,
+ .water-mix-slider .irs-grid-text,
+ .water-mix-slider .irs-grid { display: none !important; }
 
  .water-mix-table td { padding: 4px 6px; height: 37.8px; vertical-align: top; }
  .water-mix-table tr:last-child td { border-bottom: none !important; }
@@ -364,21 +368,24 @@ ui <- fluidPage(
                                fluidRow(
                                  column(
                                    8,
-                                   sliderInput(
-                                     "water_mix_pct",
-                                     label = NULL,
-                                     min = 0,
-                                     max = 100,
-                                     value = 50,
-                                     step = 1,
-                                     width = "100%",
-                                     ticks = FALSE,
-                                     sep = ""
+                                   div(
+                                     class = "water-mix-slider",
+                                     sliderInput(
+                                       "water_mix_pct",
+                                       label = NULL,
+                                       min = 0,
+                                       max = 100,
+                                       value = 50,
+                                       step = 1,
+                                       width = "100%",
+                                       ticks = FALSE,
+                                       sep = ""
+                                     )
                                    )
                                  ),
                                  column(
                                    4,
-                                   div(style = "margin-top: 24px;",
+                                   div(style = "margin-top: 14px; margin-bottom: 14px;",
                                        actionButton("apply_mix_to_water", "Load Mixed Water", class = "btn btn-primary btn-sm"))
                                  )
                                ),
@@ -395,7 +402,7 @@ ui <- fluidPage(
                                  ),
                                  column(
                                    4,
-                                   h6("Mixed water"),
+                                   h6(textOutput("mixed_water_label")),
                                    div(class = "water-mix-table", tableOutput("water_mix_table"))
                                  )
                                )
@@ -812,6 +819,11 @@ server <- function(input, output, session) {
     sprintf("Water 2 [%d%%]", pct)
   })
 
+  output$mixed_water_label <- renderText({
+    unit_out <- input$input_unit %||% canonical_unit
+    sprintf("Mixed water [%s]", unit_out)
+  })
+
   observeEvent(input$reset, {
     for (nm in nutrients) {
       updateTextInput(session, paste0("expr_", nm), value = default_expr[[nm]])
@@ -828,9 +840,15 @@ server <- function(input, output, session) {
       for (nm in nutrients) {
         updateTextInput(session, paste0("expr_", nm), value = "0")
         updateTextInput(session, paste0("water_expr_", nm), value = "0")
+        updateTextInput(session, paste0("water1_expr_", nm), value = "0")
+        updateTextInput(session, paste0("water2_expr_", nm), value = "0")
       }
       updateTextInput(session, "water_expr_HCO3", value = "0")
       updateTextInput(session, "water_ks82", value = "0")
+      updateTextInput(session, "water1_expr_HCO3", value = "0")
+      updateTextInput(session, "water1_expr_ks82", value = "0")
+      updateTextInput(session, "water2_expr_HCO3", value = "0")
+      updateTextInput(session, "water2_expr_ks82", value = "0")
     }, once = TRUE)
   })
 
