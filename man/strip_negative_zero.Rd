@@ -12,4 +12,3 @@ strip_negative_zero(x)
 \description{
 Ensures rounded values like -0.00 are displayed as 0.
 }
-\keyword{internal}

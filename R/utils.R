@@ -22,7 +22,7 @@ drop_tiny <- function(x, tol = 1e-9) {
 #'
 #' @param x Numeric vector or matrix.
 #'
-#' @keywords internal
+#' @export
 strip_negative_zero <- function(x) {
   x[x == 0] <- 0
   x
