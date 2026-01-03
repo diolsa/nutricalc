@@ -260,11 +260,11 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
- #water_mix_pct .irs-min,
- #water_mix_pct .irs-max,
- #water_mix_pct .irs-single,
- #water_mix_pct .irs-grid-text,
- #water_mix_pct .irs-grid { display: none !important; }
+ .water-mix-slider .irs-min,
+ .water-mix-slider .irs-max,
+ .water-mix-slider .irs-single,
+ .water-mix-slider .irs-grid-text,
+ .water-mix-slider .irs-grid { display: none !important; }
 
  .water-mix-table td { padding: 4px 6px; height: 37.8px; vertical-align: top; }
  .water-mix-table tr:last-child td { border-bottom: none !important; }
@@ -368,16 +368,19 @@ ui <- fluidPage(
                                fluidRow(
                                  column(
                                    8,
-                                   sliderInput(
-                                     "water_mix_pct",
-                                     label = NULL,
-                                     min = 0,
-                                     max = 100,
-                                     value = 50,
-                                     step = 1,
-                                     width = "100%",
-                                     ticks = FALSE,
-                                     sep = ""
+                                   div(
+                                     class = "water-mix-slider",
+                                     sliderInput(
+                                       "water_mix_pct",
+                                       label = NULL,
+                                       min = 0,
+                                       max = 100,
+                                       value = 50,
+                                       step = 1,
+                                       width = "100%",
+                                       ticks = FALSE,
+                                       sep = ""
+                                     )
                                    )
                                  ),
                                  column(
