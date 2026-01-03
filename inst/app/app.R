@@ -126,6 +126,8 @@ default_water_mmol <- {
   names(v) <- nutrients
   v
 }
+default_water1_expr <- default_water_expr
+default_water2_expr <- default_water_expr
 
 normalize_unit <- function(u) {
   if (is.null(u) || is.na(u) || !nzchar(u)) return(canonical_unit)
@@ -323,6 +325,34 @@ ui <- fluidPage(
                                         actionButton("apply_bwb", "Load into water inputs", class = "btn btn-primary btn-sm"),
                                         tags$br(), tags$br(),
                                         tags$small(class = "text-muted", "Values respect the current unit selection above."))
+                               ),
+                               tags$hr(style = "margin:6px 0;"),
+                               fluidRow(
+                                 column(
+                                   4,
+                                   h6("Water 1"),
+                                   uiOutput("water1_inputs")
+                                 ),
+                                 column(
+                                   4,
+                                   h6("Water 2"),
+                                   uiOutput("water2_inputs")
+                                 ),
+                                 column(
+                                   4,
+                                   h6("Mixed water"),
+                                   sliderInput(
+                                     "water_mix_pct",
+                                     label = "Mix (Water 1 %)",
+                                     min = 0,
+                                     max = 100,
+                                     value = 50,
+                                     step = 1,
+                                     width = "100%",
+                                     sep = ""
+                                   ),
+                                   tableOutput("water_mix_table")
+                                 )
                                )
                       ),
                       tabPanel("🧂 Fertilizers",
@@ -612,12 +642,156 @@ server <- function(input, output, session) {
     tagList(c(rows, list(hco3_row, co2_row)))
   })
 
+  output$water1_inputs <- renderUI({
+    rows <- lapply(nutrients, function(nm) {
+      div(
+        class = "nutrient-row",
+        fluidRow(
+          column(6, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+          column(6, textInput(inputId = paste0("water1_expr_", nm), label = NULL, value = default_water1_expr[[nm]], width = "100%"))
+        )
+      )
+    })
+
+    hco3_row <- div(
+      class = "nutrient-row",
+      fluidRow(
+        column(6, tags$label("KS 4.3")),
+        column(6, textInput(inputId = "water1_expr_HCO3", label = NULL, value = default_water_hco3_expr, width = "100%"))
+      )
+    )
+
+    co2_row <- div(
+      class = "nutrient-row",
+      fluidRow(
+        column(6, tags$label("KB 8.2")),
+        column(6, textInput(inputId = "water1_ks82", label = NULL, value = default_water_ks82_expr, width = "100%"))
+      )
+    )
+
+    tagList(c(rows, list(hco3_row, co2_row)))
+  })
+
+  output$water2_inputs <- renderUI({
+    rows <- lapply(nutrients, function(nm) {
+      div(
+        class = "nutrient-row",
+        fluidRow(
+          column(6, tags$label(HTML(pretty_nutrient_label_str(nm)))),
+          column(6, textInput(inputId = paste0("water2_expr_", nm), label = NULL, value = default_water2_expr[[nm]], width = "100%"))
+        )
+      )
+    })
+
+    hco3_row <- div(
+      class = "nutrient-row",
+      fluidRow(
+        column(6, tags$label("KS 4.3")),
+        column(6, textInput(inputId = "water2_expr_HCO3", label = NULL, value = default_water_hco3_expr, width = "100%"))
+      )
+    )
+
+    co2_row <- div(
+      class = "nutrient-row",
+      fluidRow(
+        column(6, tags$label("KB 8.2")),
+        column(6, textInput(inputId = "water2_ks82", label = NULL, value = default_water_ks82_expr, width = "100%"))
+      )
+    )
+
+    tagList(c(rows, list(hco3_row, co2_row)))
+  })
+
   inputs_ready <- reactive({
     all(vapply(nutrients, function(nm) {
       !is.null(input[[paste0("expr_", nm)]]) &&
         !is.null(input[[paste0("water_expr_", nm)]])
     }, logical(1))) && !is.null(input$water_expr_HCO3) && !is.null(input$water_ks82)
   })
+
+  water_mix_inputs_ready <- reactive({
+    all(vapply(nutrients, function(nm) {
+      !is.null(input[[paste0("water1_expr_", nm)]]) &&
+        !is.null(input[[paste0("water2_expr_", nm)]])
+    }, logical(1))) &&
+      !is.null(input$water1_expr_HCO3) &&
+      !is.null(input$water2_expr_HCO3) &&
+      !is.null(input$water1_ks82) &&
+      !is.null(input$water2_ks82)
+  })
+
+  parse_water_set <- function(prefix, hco3_id, ks82_id, unit_in) {
+    vals <- parse_targets_from_inputs(input, nutrients, unit_in, prefix = prefix)
+    hco3_val <- safe_numeric_expr(input[[hco3_id]], default = 0)
+    co2_val <- safe_numeric_expr(gsub(",", ".", input[[ks82_id]] %||% "", fixed = TRUE), default = 0)
+
+    list(
+      nutrients = vals,
+      hco3 = convert_water_value(hco3_val, unit_in, canonical_unit, "HCO3"),
+      co2 = convert_water_value(co2_val, unit_in, canonical_unit, "CO2")
+    )
+  }
+
+  mixed_water <- reactive({
+    req(water_mix_inputs_ready())
+    unit_in <- input$input_unit %||% canonical_unit
+    w1 <- parse_water_set("water1_expr_", "water1_expr_HCO3", "water1_ks82", unit_in)
+    w2 <- parse_water_set("water2_expr_", "water2_expr_HCO3", "water2_ks82", unit_in)
+
+    ratio <- suppressWarnings(as.numeric(input$water_mix_pct %||% 50)) / 100
+    if (!is.numeric(ratio) || is.na(ratio)) ratio <- 0.5
+    ratio <- min(max(ratio, 0), 1)
+
+    list(
+      nutrients = (w1$nutrients * ratio) + (w2$nutrients * (1 - ratio)),
+      hco3 = (w1$hco3 * ratio) + (w2$hco3 * (1 - ratio)),
+      co2 = (w1$co2 * ratio) + (w2$co2 * (1 - ratio)),
+      ratio = ratio,
+      unit = unit_in,
+      w1 = w1,
+      w2 = w2
+    )
+  })
+
+  output$water_mix_table <- renderTable({
+    mix <- mixed_water()
+    unit_out <- input$input_unit %||% canonical_unit
+    w1_display <- targets_for_display(mix$w1$nutrients, unit_out)
+    w2_display <- targets_for_display(mix$w2$nutrients, unit_out)
+    mix_display <- targets_for_display(mix$nutrients, unit_out)
+
+    hco3_1 <- convert_water_value(mix$w1$hco3, canonical_unit, unit_out, "HCO3")
+    hco3_2 <- convert_water_value(mix$w2$hco3, canonical_unit, unit_out, "HCO3")
+    hco3_mix <- convert_water_value(mix$hco3, canonical_unit, unit_out, "HCO3")
+
+    co2_1 <- convert_water_value(mix$w1$co2, canonical_unit, unit_out, "CO2")
+    co2_2 <- convert_water_value(mix$w2$co2, canonical_unit, unit_out, "CO2")
+    co2_mix <- convert_water_value(mix$co2, canonical_unit, unit_out, "CO2")
+
+    data.frame(
+      Nutrient = c(
+        vapply(nutrients, pretty_nutrient_label_str, character(1)),
+        "KS 4.3",
+        "KB 8.2"
+      ),
+      `Water 1` = c(
+        round(w1_display, 4),
+        round(hco3_1, 4),
+        round(co2_1, 4)
+      ),
+      `Water 2` = c(
+        round(w2_display, 4),
+        round(hco3_2, 4),
+        round(co2_2, 4)
+      ),
+      Mix = c(
+        round(mix_display, 4),
+        round(hco3_mix, 4),
+        round(co2_mix, 4)
+      ),
+      check.names = FALSE
+    )
+  }, sanitize.text.function = function(x) x)
 
   observeEvent(input$reset, {
     for (nm in nutrients) {
@@ -692,6 +866,23 @@ server <- function(input, output, session) {
       value = format(convert_water_value(water_co2_aq_mmol, canonical_unit, unit_out, "CO2"), trim = TRUE, scientific = FALSE)
     )
 
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("water1_expr_", nm),
+        value = format(display_water[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+    updateTextInput(
+      session,
+      "water1_expr_HCO3",
+      value = format(convert_water_value(water_hco3_mmol, canonical_unit, unit_out, "HCO3"), trim = TRUE, scientific = FALSE)
+    )
+    updateTextInput(
+      session,
+      "water1_ks82",
+      value = format(convert_water_value(water_co2_aq_mmol, canonical_unit, unit_out, "CO2"), trim = TRUE, scientific = FALSE)
+    )
+
     showNotification("BWB water values applied.", type = "message")
     updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
   })
@@ -755,7 +946,74 @@ server <- function(input, output, session) {
       value = format(convert_water_value(water_co2_aq(), canonical_unit, new_unit, "CO2"), trim = TRUE, scientific = FALSE)
     )
 
+    if (water_mix_inputs_ready()) {
+      water1_vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water1_expr_")
+      water2_vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water2_expr_")
+      water1_hco3_val <- safe_numeric_expr(input$water1_expr_HCO3, default = 0)
+      water2_hco3_val <- safe_numeric_expr(input$water2_expr_HCO3, default = 0)
+      water1_co2_val <- safe_numeric_expr(gsub(",", ".", input$water1_ks82 %||% "", fixed = TRUE), default = 0)
+      water2_co2_val <- safe_numeric_expr(gsub(",", ".", input$water2_ks82 %||% "", fixed = TRUE), default = 0)
+
+      water1_display <- targets_for_display(water1_vals_mmol, new_unit)
+      water2_display <- targets_for_display(water2_vals_mmol, new_unit)
+
+      for (nm in nutrients) {
+        updateTextInput(
+          session, paste0("water1_expr_", nm),
+          value = format(water1_display[[nm]], trim = TRUE, scientific = FALSE)
+        )
+        updateTextInput(
+          session, paste0("water2_expr_", nm),
+          value = format(water2_display[[nm]], trim = TRUE, scientific = FALSE)
+        )
+      }
+
+      updateTextInput(
+        session,
+        "water1_expr_HCO3",
+        value = format(convert_water_value(water1_hco3_val, old_unit, new_unit, "HCO3"), trim = TRUE, scientific = FALSE)
+      )
+      updateTextInput(
+        session,
+        "water2_expr_HCO3",
+        value = format(convert_water_value(water2_hco3_val, old_unit, new_unit, "HCO3"), trim = TRUE, scientific = FALSE)
+      )
+      updateTextInput(
+        session,
+        "water1_ks82",
+        value = format(convert_water_value(water1_co2_val, old_unit, new_unit, "CO2"), trim = TRUE, scientific = FALSE)
+      )
+      updateTextInput(
+        session,
+        "water2_ks82",
+        value = format(convert_water_value(water2_co2_val, old_unit, new_unit, "CO2"), trim = TRUE, scientific = FALSE)
+      )
+    }
+
     current_input_unit(new_unit)
+  }, ignoreInit = TRUE)
+
+  observeEvent(mixed_water(), {
+    mix <- mixed_water()
+    unit_out <- input$input_unit %||% canonical_unit
+    display_mix <- targets_for_display(mix$nutrients, unit_out)
+
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("water_expr_", nm),
+        value = format(display_mix[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+    updateTextInput(
+      session,
+      "water_expr_HCO3",
+      value = format(convert_water_value(mix$hco3, canonical_unit, unit_out, "HCO3"), trim = TRUE, scientific = FALSE)
+    )
+    updateTextInput(
+      session,
+      "water_ks82",
+      value = format(convert_water_value(mix$co2, canonical_unit, unit_out, "CO2"), trim = TRUE, scientific = FALSE)
+    )
   }, ignoreInit = TRUE)
 
   eval_targets <- reactive({
