@@ -402,7 +402,7 @@ ui <- fluidPage(
                                  ),
                                  column(
                                    4,
-                                   h6("Mixed water"),
+                                   h6(textOutput("mixed_water_label")),
                                    div(class = "water-mix-table", tableOutput("water_mix_table"))
                                  )
                                )
@@ -817,6 +817,11 @@ server <- function(input, output, session) {
     if (!is.numeric(pct) || is.na(pct)) pct <- 50
     pct <- round(min(max(pct, 0), 100))
     sprintf("Water 2 [%d%%]", pct)
+  })
+
+  output$mixed_water_label <- renderText({
+    unit_out <- input$input_unit %||% canonical_unit
+    sprintf("Mixed water [%s]", unit_out)
   })
 
   observeEvent(input$reset, {
