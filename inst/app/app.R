@@ -260,6 +260,11 @@ ui <- fluidPage(
  .nutrient-row {border-bottom: 1px solid #dee2e6;padding: 2px 0 4px 0;margin-bottom: 2px; }
  .nutrient-row:last-child {border-bottom: none;}
 
+ .water-mix-table table { width: 100%; margin-bottom: 0; }
+ .water-mix-table td { padding: 4px 6px; height: 26px; vertical-align: middle; }
+ .water-mix-table tr { border-bottom: 1px solid #dee2e6; }
+ .water-mix-table tr:last-child { border-bottom: none; }
+
 
 
   #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
@@ -381,7 +386,7 @@ ui <- fluidPage(
                                  column(
                                    4,
                                    h6("Mixed water"),
-                                   tableOutput("water_mix_table")
+                                   div(class = "water-mix-table", tableOutput("water_mix_table"))
                                  )
                                )
                       ),
@@ -781,7 +786,7 @@ server <- function(input, output, session) {
       Mix = round(mix_display, 4),
       check.names = FALSE
     )
-  }, sanitize.text.function = function(x) x)
+  }, sanitize.text.function = function(x) x, colnames = FALSE)
 
   observeEvent(input$reset, {
     for (nm in nutrients) {
