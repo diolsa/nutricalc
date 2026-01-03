@@ -353,8 +353,8 @@ ui <- fluidPage(
                       tabPanel("💦 Water",
                                fluidRow(
                                  column(6,
-                                        textInput("bwb_plz", "BWB postal code", placeholder = "e.g. 10115", width = "100%"),
-                                        tags$small(class = "text-muted", "Fetch Berliner Wasserbetriebe Mittelwert data and fill water inputs under Targets.")),
+                                        textInput("bwb_plz", "Berlin postal code:", placeholder = "e.g. 14195", width = "100%"),
+                                        tags$small(class = "text-muted", "Fetch average values from Berliner Wasserbetriebe")),
                                  column(6,
                                         br(),
                                         div(
@@ -375,7 +375,7 @@ ui <- fluidPage(
                                        label = NULL,
                                        min = 0,
                                        max = 100,
-                                       value = 50,
+                                       value = 0,
                                        step = 1,
                                        width = "100%",
                                        ticks = FALSE,
