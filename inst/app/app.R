@@ -261,6 +261,7 @@ ui <- fluidPage(
  .nutrient-row:last-child {border-bottom: none;}
 
  .water-mix-table td { padding: 4px 6px; height: 37.8px; vertical-align: top; }
+ .water-mix-table tr:last-child td { border-bottom: none !important; }
  .water-input-grid { margin-top: 10px; }
 
 
