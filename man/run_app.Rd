@@ -4,7 +4,7 @@
 \alias{run_app}
 \title{Launch the NutriCalc Shiny App}
 \usage{
-run_app()
+run_app(...)
 }
 \description{
 Launch the NutriCalc Shiny App
