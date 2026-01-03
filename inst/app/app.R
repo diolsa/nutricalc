@@ -840,9 +840,15 @@ server <- function(input, output, session) {
       for (nm in nutrients) {
         updateTextInput(session, paste0("expr_", nm), value = "0")
         updateTextInput(session, paste0("water_expr_", nm), value = "0")
+        updateTextInput(session, paste0("water1_expr_", nm), value = "0")
+        updateTextInput(session, paste0("water2_expr_", nm), value = "0")
       }
       updateTextInput(session, "water_expr_HCO3", value = "0")
       updateTextInput(session, "water_ks82", value = "0")
+      updateTextInput(session, "water1_expr_HCO3", value = "0")
+      updateTextInput(session, "water1_expr_ks82", value = "0")
+      updateTextInput(session, "water2_expr_HCO3", value = "0")
+      updateTextInput(session, "water2_expr_ks82", value = "0")
     }, once = TRUE)
   })
 
