@@ -1,4 +1,5 @@
 #' Launch the NutriCalc Shiny App
+#' @param ... Arguments passed to [shiny::runApp()].
 #' @export
 run_app <- function(...) {
   if (!requireNamespace("shiny", quietly = TRUE)) {

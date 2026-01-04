@@ -50,6 +50,8 @@ plot_ternary(
 
 \item{cex_points}{Point size.}
 
+\item{show_link}{Logical, draw connector between Target and Achieved.}
+
 \item{lty_link, lwd_link}{Style for connector if shown.}
 
 \item{legend_pos}{Legend position.}
