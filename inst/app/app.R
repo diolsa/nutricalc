@@ -110,14 +110,6 @@ default_importance <- c(
 
 canonical_unit <- "mmol/L"
 
-`%||%` <- nutricalc:::`%||%`
-normalize_unit <- function(u) nutricalc:::normalize_unit(u, canonical_unit = canonical_unit)
-to_canonical_from_unit <- function(vals, unit_in) {
-  nutricalc:::to_canonical_from_unit(vals, unit_in, canonical_unit = canonical_unit)
-}
-from_canonical_to_unit <- function(vals, unit_out) {
-  nutricalc:::from_canonical_to_unit(vals, unit_out, canonical_unit = canonical_unit)
-}
 
 default_targets_mmol <- {
   v <- as.numeric(default_expr)
@@ -1570,7 +1562,7 @@ server <- function(input, output, session) {
     if (exists("ph_from_achieved", mode = "function")) {
       ph_fn <- ph_from_achieved
     } else if (requireNamespace("nutricalc", quietly = TRUE)) {
-      ph_fn <- nutricalc::ph_from_achieved
+      ph_fn <- ph_from_achieved
     }
     if (is.null(ph_fn)) {
       return(tags$p("pH calculation not available."))
@@ -1691,7 +1683,7 @@ server <- function(input, output, session) {
     if (exists("ec_from_ph", mode = "function")) {
       ec_fn <- ec_from_ph
     } else if (requireNamespace("nutricalc", quietly = TRUE)) {
-      ec_fn <- nutricalc::ec_from_ph
+      ec_fn <- ec_from_ph
     }
     if (!is.null(ec_fn)) {
       ec_res <- tryCatch(
