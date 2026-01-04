@@ -23,7 +23,7 @@ add_fertilizer <- function(formula, nutrient_matrix) {
   nutrients <- colnames(nutrient_matrix)
 
   # Initialize row
-  new_row <- setNames(numeric(length(nutrients)), nutrients)
+  new_row <- stats::setNames(numeric(length(nutrients)), nutrients)
 
   # Populate matching values
   for (el in names(element_counts)) {

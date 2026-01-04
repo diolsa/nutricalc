@@ -702,7 +702,7 @@ dicots = list(
 # ------------------------------------------------------------------------------
 # Validation and normalization helpers
 normalize_targets <- function(x, nutrients) {
-  out <- setNames(numeric(length(nutrients)), nutrients)
+  out <- stats::setNames(numeric(length(nutrients)), nutrients)
   stopifnot(is.numeric(x$targets), !is.null(names(x$targets)))
   out[names(x$targets)] <- as.numeric(x$targets)
   out[is.na(out)] <- 0
