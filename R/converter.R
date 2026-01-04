@@ -17,7 +17,7 @@
 #' converte("SO4", "S")        # Convert sulfate to elemental sulfur
 #' converte("Na", "NaCl")      # Convert sodium to sodium chloride
 #' converte("P2O5", "P")       # Convert phosphorus pentoxide to elemental phosphorus
-#' converte("Ca", "CaCl2·2H2O", 10)  # Convert 10 mmol of Ca to CaCl2·2H2O
+#' converte("Ca", "CaCl2\u00b72H2O", 10)  # Convert 10 mmol of Ca to CaCl2\u00b72H2O
 #' converte("(NH4)2HPO4", "NH4H2PO4", element = "P")  # Disambiguate using P as the anchor
 #'
 #' @export

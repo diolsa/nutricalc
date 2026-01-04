@@ -1,6 +1,6 @@
 #' Add a fertilizer to the nutrient matrix
 #'
-#' @param formula Chemical formula (e.g. "NaCl", "Ca(NO3)2", "CuSO4·5H2O")
+#' @param formula Chemical formula (e.g. "NaCl", "Ca(NO3)2", "CuSO4\u00b75H2O")
 #' @param nutrient_matrix Existing nutrient matrix [fertilizer x nutrients]
 #' @return Updated nutrient matrix with new fertilizer row
 #' @export

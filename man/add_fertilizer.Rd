@@ -7,7 +7,7 @@
 add_fertilizer(formula, nutrient_matrix)
 }
 \arguments{
-\item{formula}{Chemical formula (e.g. "NaCl", "Ca(NO3)2", "CuSO4·5H2O")}
+\item{formula}{Chemical formula (e.g. "NaCl", "Ca(NO3)2", "CuSO4\u00b75H2O")}
 
 \item{nutrient_matrix}{Existing nutrient matrix [fertilizer x nutrients]}
 }

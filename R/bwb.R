@@ -182,11 +182,11 @@ normalize_bwb_unit <- function(unit) {
   u <- gsub(",", ".", u, fixed = TRUE)
   if (!nzchar(u)) return(NA_character_)
 
-  u <- sub("^ug/l$", "\u00b5g/l", u)  # normalize plain 'ug/l' to 'µg/l'
+  u <- sub("^ug/l$", "\u00b5g/l", u)  # normalize plain 'ug/l' to '\u00b5g/l'
   switch(u,
          "mmol/l" = "mmol/L",
          "mg/l" = "mg/L",
-         "\u00b5g/l" = "µg/L",
+         "\u00b5g/l" = "\u00b5g/L",
          NA_character_)
 }
 
@@ -200,7 +200,7 @@ convert_mittelwert <- function(value, unit, nutrient) {
     if (identical(unit, "mg/L")) {
       return(value / molar_mass_co2)
     }
-    if (identical(unit, "µg/L")) {
+    if (identical(unit, "\u00b5g/L")) {
       return(value / 1000 / molar_mass_co2)
     }
   }
@@ -209,7 +209,7 @@ convert_mittelwert <- function(value, unit, nutrient) {
     return(convert_units(stats::setNames(value, nutrient), to = "mmol/L")[[1]])
   }
 
-  if (identical(unit, "µg/L")) {
+  if (identical(unit, "\u00b5g/L")) {
     mg_value <- value / 1000
     return(convert_units(stats::setNames(mg_value, nutrient), to = "mmol/L")[[1]])
   }

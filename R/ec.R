@@ -117,7 +117,7 @@ make_ec_ions <- function(achieved, ph_res) {
 #' Units:
 #' - c is in mmol/L (mM); numerically identical to mol/m^3, used directly as such.
 #' - D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
-#' - Output: EC in mS/cm and µS/cm.
+#' - Output: EC in mS/cm and \u00b5S/cm.
 #'
 #' @param achieved Named numeric vector (mmol/L) or data.frame with columns
 #'   Nutrient and Achieved.
@@ -185,7 +185,7 @@ ec_from_ph <- function(
     sqrt(I_mol_L) / abs_z
   )
 
-  # Debye–Huckel (limiting law) gamma at 25 C
+  # Debye\u2013Huckel (limiting law) gamma at 25 C
   gamma_dh <- function(z, I_mol_L, A) {
     10^(-A * z^2 * sqrt(I_mol_L))
   }

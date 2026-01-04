@@ -10,13 +10,13 @@
 #'
 #' @return An object of class 'nutrient_optimization_result' with elements:
 #'   \itemize{
-#'     \item amounts — named numeric (mmol/L) of each compound (same order as rownames of input)
-#'     \item achieved — named numeric (mmol/L) delivered per nutrient
-#'     \item target — named numeric (mmol/L) target per nutrient
-#'     \item abs_error — achieved - target (mmol/L)
-#'     \item percent_error — 100 * abs_error / target (NA when target == 0)
-#'     \item squared_error — sum(abs_error^2)
-#'     \item rel_squared_error — sum((abs_error/target)^2, na.rm = TRUE)
+#'     \item amounts \u2014 named numeric (mmol/L) of each compound (same order as rownames of input)
+#'     \item achieved \u2014 named numeric (mmol/L) delivered per nutrient
+#'     \item target \u2014 named numeric (mmol/L) target per nutrient
+#'     \item abs_error \u2014 achieved - target (mmol/L)
+#'     \item percent_error \u2014 100 * abs_error / target (NA when target == 0)
+#'     \item squared_error \u2014 sum(abs_error^2)
+#'     \item rel_squared_error \u2014 sum((abs_error/target)^2, na.rm = TRUE)
 #'   }
 #' @export
 optimize_nutrients <- function(nutrient_matrix, target, importance) {
@@ -109,7 +109,7 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
     stop("`vol` must be a single positive number.", call. = FALSE)
   }
 
-  cat("🧪 Fertilizer amounts:\n")
+  cat("\U0001f9ea Fertilizer amounts:\n")
 
   # Keep only positive amounts
   amounts <- x$amounts[x$amounts > 0]
@@ -120,24 +120,24 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   if (length(amounts) == 0L) {
     print(data.frame(Message = "All amounts are zero.", check.names = FALSE))
   } else if (has_mm) {
-    molar_masses <- sapply(formulas, compute_molar_mass)  # g mol⁻¹
-    mg_l <- amounts * molar_masses                        # mg L⁻¹
+    molar_masses <- sapply(formulas, compute_molar_mass)  # g mol\u207b\u00b9
+    mg_l <- amounts * molar_masses                        # mg L\u207b\u00b9
     df <- data.frame(
       Formula    = formulas,
-      "mmol l⁻¹" = round(amounts, 3),
-      "g mol⁻¹"  = round(molar_masses, 2),
-      "mg l⁻¹"   = round(mg_l, 2),
       row.names  = NULL,
       check.names = FALSE
     )
+    df[["mmol l\u207b\u00b9"]] <- round(amounts, 3)
+    df[["g mol\u207b\u00b9"]] <- round(molar_masses, 2)
+    df[["mg l\u207b\u00b9"]] <- round(mg_l, 2)
 
     # Only add total grams if vol > 1
     if (vol > 1) {
       g_total <- mg_l * vol / 1000
 
-      # Format volume label scientifically: "g 40 l⁻¹"
+      # Format volume label scientifically: "g 40 l\u207b\u00b9"
       vol_label <- if (abs(vol - round(vol)) < 1e-9) as.integer(vol) else vol
-      g_colname <- sprintf("g %s l⁻¹", vol_label)
+      g_colname <- sprintf("g %s l\u207b\u00b9", vol_label)
 
       df[[g_colname]] <- round(g_total, 3)
     }
@@ -146,15 +146,15 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   } else {
     df <- data.frame(
       Formula    = formulas,
-      "mmol l⁻¹" = round(amounts, 3),
       row.names  = NULL,
       check.names = FALSE
     )
+    df[["mmol l\u207b\u00b9"]] <- round(amounts, 3)
     print(df)
-    cat("\nℹ️ Tip: define compute_molar_mass(formula) to show mg L⁻¹ and gram totals.\n")
+    cat("\n\u2139\ufe0f Tip: define compute_molar_mass(formula) to show mg L\u207b\u00b9 and gram totals.\n")
   }
 
-  cat("\n🎯 Nutrient delivery vs. target (per liter):\n")
+  cat("\n\U0001f3af Nutrient delivery vs. target (per liter):\n")
 
   nutrients_df <- data.frame(
     Nutrient      = names(x$target),
@@ -166,9 +166,9 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   )
   print(nutrients_df, row.names = FALSE)
 
-  cat("\n🧮 Total squared error:", round(x$squared_error, 6), "\n")
-  cat("📊 Total squared error (relative):", round(x$rel_squared_error, 6), "\n")
-  if (vol > 1) cat("🧴 Volume used for totals:", vol, "L\n")
+  cat("\n\U0001f9ee Total squared error:", round(x$squared_error, 6), "\n")
+  cat("\U0001f4ca Total squared error (relative):", round(x$rel_squared_error, 6), "\n")
+  if (vol > 1) cat("\U0001f9f4 Volume used for totals:", vol, "L\n")
 }
 
 #---------Second Solver------------
@@ -296,7 +296,7 @@ two_stage_optimize_nutrients <- function(
   need_big <- residual > pmax(tol_abs, tol_rel * target, na.rm = TRUE)
   need_fix_fixable <- need_big & (names(target) %in% fixable)
 
-  # ----- 4) If no fixable nutrient is off by much → skip acids/bases -----
+  # ----- 4) If no fixable nutrient is off by much \u2192 skip acids/bases -----
   if (!any(need_fix_fixable)) {
     return(assemble_result(res_salts$amounts, amounts_acid = numeric(length(acid_idx))))
   }
