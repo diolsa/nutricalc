@@ -32,10 +32,10 @@ recipes <- list(
     notes = "Standard solution of the Humboldt University of Berlin, Faculty of plant nutrition.",
     unit  = "mmol/L",
     salts = c(
-    "KH2PO4", "K2SO4", "MgSO4·7H2O", "KCl",
-    "CuSO4·5H2O", "H3BO3", "MnSO4·H2O",
-    "ZnSO4·7H2O", "NH4H2PO4", "Ca(NO3)2·4H2O", "C10H12N2O8FeNa·3H2O",
-    "((NH4)6)Mo7O24·4H2O" ),
+    "KH2PO4", "K2SO4", "MgSO4\u00b77H2O", "KCl",
+    "CuSO4\u00b75H2O", "H3BO3", "MnSO4\u00b7H2O",
+    "ZnSO4\u00b77H2O", "NH4H2PO4", "Ca(NO3)2\u00b74H2O", "C10H12N2O8FeNa\u00b73H2O",
+    "((NH4)6)Mo7O24\u00b74H2O" ),
 
     targets = c(
       NO3_N=5, NH4_N=0, P=0.5, K=1.6, Ca=2.5, Mg=0.6, S=1.1,
@@ -46,9 +46,9 @@ recipes <- list(
   knop_1865 = list(
     name  = "Knop (1865)",
     category = "Standard Formulations",
-    notes = "1 g Ca(NO3)2, 0.25 g MgSO4·7H2O, 0.25 g KH2PO4, 0.25 g KNO3 per 1 L water",
+    notes = "1 g Ca(NO3)2, 0.25 g MgSO4\u00b77H2O, 0.25 g KH2PO4, 0.25 g KNO3 per 1 L water",
     unit  = "mg/L",
-    salts = c("KNO3","Ca(NO3)2","KH2PO4","MgSO4·7H2O"),
+    salts = c("KNO3","Ca(NO3)2","KH2PO4","MgSO4\u00b77H2O"),
     targets = c(
       NO3_N=206, NH4_N=0, P=57, K=168, Ca=244, Mg=24, S=32,
       Na=0, Cl=0, Fe=0, Mn=0, Zn=0, B=0, Cu=0, Mo=0, Si=0
@@ -68,7 +68,7 @@ note: For MgSO4 Heptahydrate is selected here
 
 ",
     unit  = "mmol/L",
-    salts = c("Ca(NO3)2","KH2PO4","MgSO4·7H2O"),
+    salts = c("Ca(NO3)2","KH2PO4","MgSO4\u00b77H2O"),
     targets = c(
       NO3_N=10.4, NH4_N=0, P=18, K=18, Ca=5.2, Mg=15, S=15,
       Na=0, Cl=0, Fe=0, Mn=0, Zn=0, B=0, Cu=0, Mo=0, Si=0
@@ -78,7 +78,7 @@ note: For MgSO4 Heptahydrate is selected here
   shive_1915_2 = list(
     name  = "Shive (1915) [Buckwheat]",
     category = "Standard Formulations",
-    notes = "Historic formulation known as Shive´s Solution and reported as such by Hewitt.
+    notes = "Historic formulation known as Shive\u00b4s Solution and reported as such by Hewitt.
 
 In the solution yielding the greatest dry weight of buckwheat tops the volume-
 molecular partial concentrations of the three salts were: KH2PO4,
@@ -89,7 +89,7 @@ note: For MgSO4 Heptahydrate is selected here
 
 ",
     unit  = "mmol/L",
-    salts = c("Ca(NO3)2","KH2PO4","MgSO4·7H2O"),
+    salts = c("Ca(NO3)2","KH2PO4","MgSO4\u00b77H2O"),
     targets = c(
       NO3_N=10.4, NH4_N=0, P=14.4, K=14.4, Ca=5.2, Mg=20, S=20,
       Na=0, Cl=0, Fe=0, Mn=0, Zn=0, B=0, Cu=0, Mo=0, Si=0
@@ -155,9 +155,9 @@ note: For MgSO4 Heptahydrate is selected here
   # Pomology
 
   strawberry_peaty_substrate = list(
-    name  = "🍓 Strawberry in Peaty Substrates",
+    name  = "\U0001f353 Strawberry in Peaty Substrates",
     category = "Fruticulture",
-    notes = "EC (25°C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -168,9 +168,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   strawberry_recirculating_water = list(
-    name  = "🍓 Strawberry in Recirculating Water",
+    name  = "\U0001f353 Strawberry in Recirculating Water",
     category = "Fruticulture",
-    notes = "EC (25°C): 1.5 Appendix B; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.5 Appendix B; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -180,9 +180,9 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
   melon_rockwool = list(
-    name  = "🍈 Melon in Rockwool",
+    name  = "\U0001f348 Melon in Rockwool",
     category = "Fruticulture",
-    notes = "EC (25°C): 2.2 Appendix B; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.2 Appendix B; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -196,9 +196,9 @@ note: For MgSO4 Heptahydrate is selected here
   # Olericulture
 
   endive_recirculating_water = list(
-    name  = "🥬 Endive in Recirculating Water",
+    name  = "\U0001f96c Endive in Recirculating Water",
     category = "Olericulture",
-    notes = "EC (25°C): 2.6 Appendix C; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.6 Appendix C; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -209,9 +209,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   eggplant_rockwool = list(
-    name  = "🍆 Eggplant in Rockwool",
+    name  = "\U0001f346 Eggplant in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.1 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.1 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -222,9 +222,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   eggplant_rockwool_reuse_drainage = list(
-    name  = "🍆 Eggplant in Rockwool (Reuse Drainage Water)",
+    name  = "\U0001f346 Eggplant in Rockwool (Reuse Drainage Water)",
     category = "Olericulture",
-    notes = "EC (25°C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -234,9 +234,9 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
   bean_rockwool = list(
-    name  = "🫘 Bean in Rockwool",
+    name  = "\U0001fad8 Bean in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -246,9 +246,9 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
   courgette_rockwool = list(
-    name  = "🥒 Courgette in Rockwool",
+    name  = "\U0001f952 Courgette in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -258,9 +258,9 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
   cucumber_rockwool = list(
-    name  = "🥒 Cucumber in Rockwool",
+    name  = "\U0001f952 Cucumber in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -270,9 +270,9 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
   cucumber_rockwool_reuse_drainage = list(
-    name  = "🥒 Cucumber in Rockwool (Reuse Drainage Water)",
+    name  = "\U0001f952 Cucumber in Rockwool (Reuse Drainage Water)",
     category = "Olericulture",
-    notes = "EC (25°C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -284,9 +284,9 @@ note: For MgSO4 Heptahydrate is selected here
 
 
   propagation_rockwool = list(
-    name  = "🌿 Propagation vegetable plants in rockwool",
+    name  = "\U0001f33f Propagation vegetable plants in rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.4 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.4 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -297,9 +297,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   sweet_pepper_rockwool = list(
-    name  = "🫑 Sweet Pepper in Rockwool",
+    name  = "\U0001fad1 Sweet Pepper in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.2 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -310,9 +310,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   sweet_pepper_rockwool_reuse_drainage = list(
-    name  = "🫑 Sweet Pepper in Rockwool (Reuse Drainage Water)",
+    name  = "\U0001fad1 Sweet Pepper in Rockwool (Reuse Drainage Water)",
     category = "Olericulture",
-    notes = "EC (25°C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -323,9 +323,9 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   lettuce_recirculating_water = list(
-    name  = "🥬 Lettuce in Recirculating Water",
+    name  = "\U0001f96c Lettuce in Recirculating Water",
     category = "Olericulture",
-    notes = "EC (25°C): 2.6 Appendix A; if peat cubes are used no manganese will be added, otherwise 5 umol is
+    notes = "EC (25\u00b0C): 2.6 Appendix A; if peat cubes are used no manganese will be added, otherwise 5 umol is
   advisable. from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
@@ -337,7 +337,7 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
 lettuce_bht = list(
-  name  = "🥬 Lettuce BHT",
+  name  = "\U0001f96c Lettuce BHT",
   category = "Olericulture",
   notes = "Demo crop-specific setting.",
   unit  = "mmol/L",
@@ -350,9 +350,9 @@ lettuce_bht = list(
 ),
 
   tomato_rockwool = list(
-    name  = "🍅 Tomato in Rockwool",
+    name  = "\U0001f345 Tomato in Rockwool",
     category = "Olericulture",
-    notes = "EC (25°C): 2.3 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 2.3 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -364,9 +364,9 @@ lettuce_bht = list(
 
 
   tomato_rockwool_drainage_water = list(
-    name  = "🍅 Tomato in Rockwool (Reuse Drainage Water)",
+    name  = "\U0001f345 Tomato in Rockwool (Reuse Drainage Water)",
     category = "Olericulture",
-    notes = "EC (25°C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
+    notes = "EC (25\u00b0C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
     unit  = "mmol/L",
     salts = TRUE,
     targets = c(
@@ -382,9 +382,9 @@ lettuce_bht = list(
 
 
 alstroemeria_rockwool = list(
-  name  = "💐 Alstroemeria in Rockwool",
+  name  = "\U0001f490 Alstroemeria in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.7 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -396,9 +396,9 @@ alstroemeria_rockwool = list(
 
 
 alstroemeria_rockwool_reuse_drainage = list(
-  name  = "💐 Alstroemeria in Rockwool (Reuse Drainage Water)",
+  name  = "\U0001f490 Alstroemeria in Rockwool (Reuse Drainage Water)",
   category = "Floriculture",
-  notes = "EC (25°C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -410,9 +410,9 @@ alstroemeria_rockwool_reuse_drainage = list(
 
 
 anemone_rockwool = list(
-  name  = "💐 Anemone in Rockwool",
+  name  = "\U0001f490 Anemone in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.9 Appendix C; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.9 Appendix C; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -424,9 +424,9 @@ anemone_rockwool = list(
 
 
 carnation_rockwool_or_peat = list(
-  name  = "💐 Carnation in Rockwool or Peat",
+  name  = "\U0001f490 Carnation in Rockwool or Peat",
   category = "Floriculture",
-  notes = "EC (25°C): 1.8 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.8 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -437,9 +437,9 @@ carnation_rockwool_or_peat = list(
 ),
 
 carnation_rockwool__reuse_drainage = list(
-  name  = "💐 Carnation in Rockwool (reuse drainage)",
+  name  = "\U0001f490 Carnation in Rockwool (reuse drainage)",
   category = "Floriculture",
-  notes = "EC (25°C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -450,9 +450,9 @@ carnation_rockwool__reuse_drainage = list(
 ),
 
 anthurium_andreanum_rockwool_or_peat = list(
-  name  = "💐 Anthurium andreanum in Rockwool or Peat",
+  name  = "\U0001f490 Anthurium andreanum in Rockwool or Peat",
   category = "Floriculture",
-  notes = "EC (25°C): 0.8 Appendix A; Mn is given as 0 µmol, with an optional 3 µmol if necessary; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 0.8 Appendix A; Mn is given as 0 \u00b5mol, with an optional 3 \u00b5mol if necessary; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -464,9 +464,9 @@ anthurium_andreanum_rockwool_or_peat = list(
 
 
 aster_rockwool_or_peat = list(
-  name  = "💐 Aster in Rockwool or Peat",
+  name  = "\U0001f490 Aster in Rockwool or Peat",
   category = "Floriculture",
-  notes = "EC (25°C): 1.8 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.8 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -478,9 +478,9 @@ aster_rockwool_or_peat = list(
 
 
 bouvardia_rockwool = list(
-  name  = "💐 Bouvardia in Rockwool",
+  name  = "\U0001f490 Bouvardia in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.9 Appendix C; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.9 Appendix C; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -492,9 +492,9 @@ bouvardia_rockwool = list(
 
 
 bouvardia_rockwool_reuse_drainage = list(
-  name  = "💐 Bouvardia in Rockwool (Reuse Drainage Water)",
+  name  = "\U0001f490 Bouvardia in Rockwool (Reuse Drainage Water)",
   category = "Floriculture",
-  notes = "EC (25°C): 1.2 Appendix C; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.2 Appendix C; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -506,9 +506,9 @@ bouvardia_rockwool_reuse_drainage = list(
 
 
 chrysanthemum_recirculating_water = list(
-  name  = "💐 Chrysanthemum in Recirculating Water",
+  name  = "\U0001f490 Chrysanthemum in Recirculating Water",
   category = "Floriculture",
-  notes = "EC (25°C): 1.8 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.8 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -519,9 +519,9 @@ chrysanthemum_recirculating_water = list(
 ),
 
 cymbidium_phenol_foam = list(
-  name  = "💐 Cymbidium in phenol foam",
+  name  = "\U0001f490 Cymbidium in phenol foam",
   category = "Floriculture",
-  notes = "EC (25°C): 0.8 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 0.8 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -532,9 +532,9 @@ cymbidium_phenol_foam = list(
 ),
 
 cymbidium_rockwool_urethane_foam = list(
-  name  = "💐 Cymbidium in rockwool/urethane foam",
+  name  = "\U0001f490 Cymbidium in rockwool/urethane foam",
   category = "Floriculture",
-  notes = "EC (25°C): 0.8 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 0.8 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -546,9 +546,9 @@ cymbidium_rockwool_urethane_foam = list(
 
 
 euphorbia_fulgens_rockwool = list(
-  name  = "💐 Euphorbia fulgens in Rockwool",
+  name  = "\U0001f490 Euphorbia fulgens in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -560,9 +560,9 @@ euphorbia_fulgens_rockwool = list(
 
 
 freesia_rockwool_or_sand = list(
-  name  = "💐 Freesia in Rockwool or Sand",
+  name  = "\U0001f490 Freesia in Rockwool or Sand",
   category = "Floriculture",
-  notes = "EC (25°C): 2.1 Appendix C; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 2.1 Appendix C; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -574,9 +574,9 @@ freesia_rockwool_or_sand = list(
 
 
 gerbera_rockwool = list(
-  name  = "🏵️ Gerbera in Rockwool",
+  name  = "\U0001f3f5\ufe0f Gerbera in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.7 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -588,9 +588,9 @@ gerbera_rockwool = list(
 
 
 gerbera_rockwool_reuse_drainage = list(
-  name  = "🏵️ Gerbera in Rockwool (Reuse Drainage Water)",
+  name  = "\U0001f3f5\ufe0f Gerbera in Rockwool (Reuse Drainage Water)",
   category = "Floriculture",
-  notes = "EC (25°C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.1 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -603,9 +603,9 @@ gerbera_rockwool_reuse_drainage = list(
 
 
 gypsophila_rockwool = list(
-  name  = "💐 Gypsophila in Rockwool",
+  name  = "\U0001f490 Gypsophila in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 2.2 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 2.2 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -617,9 +617,9 @@ gypsophila_rockwool = list(
 
 
 hippeastrum_pumice = list(
-  name  = "💐 Hippeastrum in Pumice",
+  name  = "\U0001f490 Hippeastrum in Pumice",
   category = "Floriculture",
-  notes = "EC (25°C): 1.9 Appendix B; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.9 Appendix B; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -632,9 +632,9 @@ hippeastrum_pumice = list(
 
 
 pot_plants_expanded_clay = list(
-  name  = "🪴 Pot Plants in Expanded Clay",
+  name  = "\U0001fab4 Pot Plants in Expanded Clay",
   category = "Floriculture",
-  notes = "EC (25°C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -646,9 +646,9 @@ pot_plants_expanded_clay = list(
 
 
 rose_rockwool = list(
-  name  = "🌹 Rose in Rockwool",
+  name  = "\U0001f339 Rose in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.6 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -659,9 +659,9 @@ rose_rockwool = list(
 ),
 
 rose_rockwool__reuse_drainage = list(
-  name  = "🌹 Rose in Rockwool (Reuse Drainage Water)",
+  name  = "\U0001f339 Rose in Rockwool (Reuse Drainage Water)",
   category = "Floriculture",
-  notes = "EC (25°C): 0.7 Appendix A; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 0.7 Appendix A; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -672,9 +672,9 @@ rose_rockwool__reuse_drainage = list(
 ),
 
 statice_rockwool = list(
-  name  = "💐 Statice in Rockwool",
+  name  = "\U0001f490 Statice in Rockwool",
   category = "Floriculture",
-  notes = "EC (25°C): 1.7 Appendix C; from: (Sonneveld and Straver, 1994)",
+  notes = "EC (25\u00b0C): 1.7 Appendix C; from: (Sonneveld and Straver, 1994)",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
@@ -687,7 +687,7 @@ statice_rockwool = list(
 dicots = list(
   name  = "Bugbee [Dicots]",
   category = "Standard Formulations",
-  notes = "Water use efficiency 3 g l-1 (ambient 44ppm Co2); from: (Bugbee, ????). o.1 µmmol/l Ni has to be added and N +1 mmol as ph control",
+  notes = "Water use efficiency 3 g l-1 (ambient 44ppm Co2); from: (Bugbee, ????). o.1 \u00b5mmol/l Ni has to be added and N +1 mmol as ph control",
   unit  = "mmol/L",
   salts = TRUE,
   targets = c(
