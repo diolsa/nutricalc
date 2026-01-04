@@ -30,11 +30,11 @@ fetch_bwb_mittelwert <- function(plz) {
   }
 
   url <- sprintf("https://www.bwb.de/de/analysedaten-nach-postleitzahlen.php?PLZ=%s", plz_chr)
-  page <- tryCatch(read_html(url), error = function(e) {
+  page <- tryCatch(xml2::read_html(url), error = function(e) {
     stop("Failed to retrieve data from BWB: ", conditionMessage(e), call. = FALSE)
   })
 
-  tables <- xml_find_all(page, ".//table")
+  tables <- xml2::xml_find_all(page, ".//table")
   parsed_tables <- lapply(tables, parse_html_table)
 
   table_matches <- vapply(parsed_tables, function(tbl) {
@@ -106,13 +106,13 @@ fetch_bwb_mittelwert <- function(plz) {
 }
 
 parse_html_table <- function(tbl) {
-  rows <- xml_find_all(tbl, ".//tr")
+  rows <- xml2::xml_find_all(tbl, ".//tr")
   if (!length(rows)) return(NULL)
 
   rows_info <- lapply(rows, function(r) {
     list(
-      has_header = length(xml_find_all(r, "./th")) > 0,
-      cells = trimws(xml_text(xml_find_all(r, "./th|./td")))
+      has_header = length(xml2::xml_find_all(r, "./th")) > 0,
+      cells = trimws(xml2::xml_text(xml2::xml_find_all(r, "./th|./td")))
     )
   })
 

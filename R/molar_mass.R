@@ -15,7 +15,7 @@ compute_molar_mass <- function(formula) {
 }
 
 # Internal: element molar mass vector
-.molar_mass <- setNames(element_molar_mass_df$MolarMass_g_per_mol, element_molar_mass_df$Element)
+.molar_mass <- stats::setNames(element_molar_mass_df$MolarMass_g_per_mol, element_molar_mass_df$Element)
 
 # Internal: sanitize inputs like "CuSO4 5H2O" -> "CuSO4\u00b75H2O"
 sanitize_formula_input <- function(formula) {
@@ -32,7 +32,7 @@ parse_simple_formula <- function(formula) {
   counts <- as.numeric(matches[, 3])
   counts[is.na(counts)] <- 1
   summed <- tapply(counts, elements, sum)
-  setNames(as.numeric(summed), names(summed))
+  stats::setNames(as.numeric(summed), names(summed))
 }
 
 # Internal: expand brackets like (NO3)2 -> N2O6
