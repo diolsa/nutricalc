@@ -12,7 +12,7 @@ recipes
 }
 \description{
 A named list of recipe definitions. Each element is a list with:
-\itemize{
+\describe{
   \item{name}{Display name}
   \item{category}{Category such as "Olericulture", "Fruticulture", ...}
   \item{notes}{Free text notes / citation}
