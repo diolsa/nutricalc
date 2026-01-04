@@ -9,6 +9,7 @@
 #' @param col_target,col_achieved Colors.
 #' @param pch_target,pch_achieved Point symbols.
 #' @param cex_points Point size.
+#' @param show_link Logical, draw connector between Target and Achieved.
 #' @param lty_link,lwd_link Style for connector if shown.
 #' @param legend_pos Legend position.
 #' @param show_axis_drops Logical, draw constant-component drops from Achieved to sides.
