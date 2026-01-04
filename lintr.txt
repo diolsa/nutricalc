@@ -1,0 +1,1774 @@
+                     file line col                linter
+1          inst/app/app.R   18  81    line_length_linter
+2          inst/app/app.R   93   2    indentation_linter
+3          inst/app/app.R   93  81    line_length_linter
+4          inst/app/app.R   96  13         commas_linter
+5          inst/app/app.R   96  21         commas_linter
+6          inst/app/app.R   96  25         commas_linter
+7          inst/app/app.R   96  29         commas_linter
+8          inst/app/app.R   96  34         commas_linter
+9          inst/app/app.R   96  39         commas_linter
+10         inst/app/app.R   96  43         commas_linter
+11         inst/app/app.R   96  48         commas_linter
+12         inst/app/app.R   97  10         commas_linter
+13         inst/app/app.R   97  15         commas_linter
+14         inst/app/app.R   97  20         commas_linter
+15         inst/app/app.R   97  24         commas_linter
+16         inst/app/app.R   97  29         commas_linter
+17         inst/app/app.R   97  34         commas_linter
+18         inst/app/app.R  101   8         commas_linter
+19         inst/app/app.R  101  15         commas_linter
+20         inst/app/app.R  101  21         commas_linter
+21         inst/app/app.R  101  25         commas_linter
+22         inst/app/app.R  101  29         commas_linter
+23         inst/app/app.R  101  36         commas_linter
+24         inst/app/app.R  101  42         commas_linter
+25         inst/app/app.R  101  46         commas_linter
+26         inst/app/app.R  102  11         commas_linter
+27         inst/app/app.R  102  18         commas_linter
+28         inst/app/app.R  102  26         commas_linter
+29         inst/app/app.R  102  34         commas_linter
+30         inst/app/app.R  102  44         commas_linter
+31         inst/app/app.R  102  53         commas_linter
+32         inst/app/app.R  114  81    line_length_linter
+33         inst/app/app.R  116  81    line_length_linter
+34         inst/app/app.R  119  81    line_length_linter
+35         inst/app/app.R  143  81    line_length_linter
+36         inst/app/app.R  170  68          brace_linter
+37         inst/app/app.R  170  81    line_length_linter
+38         inst/app/app.R  170 104      semicolon_linter
+39         inst/app/app.R  171   2    indentation_linter
+40         inst/app/app.R  171  41      semicolon_linter
+41         inst/app/app.R  171  81    line_length_linter
+42         inst/app/app.R  172  81    line_length_linter
+43         inst/app/app.R  173  81    line_length_linter
+44         inst/app/app.R  173 112      semicolon_linter
+45         inst/app/app.R  173 120          brace_linter
+46         inst/app/app.R  201   2    indentation_linter
+47         inst/app/app.R  207  81    line_length_linter
+48         inst/app/app.R  210  81    line_length_linter
+49         inst/app/app.R  221  81    line_length_linter
+50         inst/app/app.R  224  81    line_length_linter
+51         inst/app/app.R  240  81    line_length_linter
+52         inst/app/app.R  242  81    line_length_linter
+53         inst/app/app.R  243  81    line_length_linter
+54         inst/app/app.R  244  81    line_length_linter
+55         inst/app/app.R  245  81    line_length_linter
+56         inst/app/app.R  246  81    line_length_linter
+57         inst/app/app.R  247  81    line_length_linter
+58         inst/app/app.R  279   2    indentation_linter
+59         inst/app/app.R  281   2    indentation_linter
+60         inst/app/app.R  281  81    line_length_linter
+61         inst/app/app.R  283   2    indentation_linter
+62         inst/app/app.R  288  10    indentation_linter
+63         inst/app/app.R  290  22    indentation_linter
+64         inst/app/app.R  291  31    indentation_linter
+65         inst/app/app.R  292  10    indentation_linter
+66         inst/app/app.R  294  16    indentation_linter
+67         inst/app/app.R  299  42    indentation_linter
+68         inst/app/app.R  299  81    line_length_linter
+69         inst/app/app.R  300  81    line_length_linter
+70         inst/app/app.R  301  81    line_length_linter
+71         inst/app/app.R  302  40    indentation_linter
+72         inst/app/app.R  303  33    indentation_linter
+73         inst/app/app.R  304  10    indentation_linter
+74         inst/app/app.R  305  16    indentation_linter
+75         inst/app/app.R  307  81    line_length_linter
+76         inst/app/app.R  308  10    indentation_linter
+77         inst/app/app.R  309  31    indentation_linter
+78         inst/app/app.R  316  22    indentation_linter
+79         inst/app/app.R  318  31    indentation_linter
+80         inst/app/app.R  320  81    line_length_linter
+81         inst/app/app.R  321  81    line_length_linter
+82         inst/app/app.R  322  33    indentation_linter
+83         inst/app/app.R  325  81    line_length_linter
+84         inst/app/app.R  326  81    line_length_linter
+85         inst/app/app.R  327  81    line_length_linter
+86         inst/app/app.R  330  31    indentation_linter
+87         inst/app/app.R  352  81    line_length_linter
+88         inst/app/app.R  353  81    line_length_linter
+89         inst/app/app.R  354  33    indentation_linter
+90         inst/app/app.R  360  81    line_length_linter
+91         inst/app/app.R  365  81    line_length_linter
+92         inst/app/app.R  370  81    line_length_linter
+93         inst/app/app.R  373  22    indentation_linter
+94         inst/app/app.R  375  31    indentation_linter
+95         inst/app/app.R  376  47    indentation_linter
+96         inst/app/app.R  376  81    line_length_linter
+97         inst/app/app.R  377  51    indentation_linter
+98         inst/app/app.R  377  81    line_length_linter
+99         inst/app/app.R  378  81    line_length_linter
+100        inst/app/app.R  379  47    indentation_linter
+101        inst/app/app.R  380  31    indentation_linter
+102        inst/app/app.R  383  35    indentation_linter
+103        inst/app/app.R  383  81    line_length_linter
+104        inst/app/app.R  384  81    line_length_linter
+105        inst/app/app.R  385  31    indentation_linter
+106        inst/app/app.R  389  22    indentation_linter
+107        inst/app/app.R  391  31    indentation_linter
+108        inst/app/app.R  397  81    line_length_linter
+109        inst/app/app.R  398  81    line_length_linter
+110        inst/app/app.R  399  81    line_length_linter
+111        inst/app/app.R  400  81    line_length_linter
+112        inst/app/app.R  409  81    line_length_linter
+113        inst/app/app.R  416  81    line_length_linter
+114        inst/app/app.R  418  22    indentation_linter
+115        inst/app/app.R  420  31    indentation_linter
+116        inst/app/app.R  425  81    line_length_linter
+117        inst/app/app.R  426  35    indentation_linter
+118        inst/app/app.R  427  81    line_length_linter
+119        inst/app/app.R  438  81    line_length_linter
+120        inst/app/app.R  444  81    line_length_linter
+121        inst/app/app.R  459  81    line_length_linter
+122        inst/app/app.R  460  35    indentation_linter
+123        inst/app/app.R  460  81    line_length_linter
+124        inst/app/app.R  461  81    line_length_linter
+125        inst/app/app.R  462  35    indentation_linter
+126        inst/app/app.R  462  81    line_length_linter
+127        inst/app/app.R  463  81    line_length_linter
+128        inst/app/app.R  464  35    indentation_linter
+129        inst/app/app.R  471  81    line_length_linter
+130        inst/app/app.R  472  35    indentation_linter
+131        inst/app/app.R  474  81    line_length_linter
+132        inst/app/app.R  475  81    line_length_linter
+133        inst/app/app.R  476  33    indentation_linter
+134        inst/app/app.R  478  22    indentation_linter
+135        inst/app/app.R  480  10    indentation_linter
+136        inst/app/app.R  505  81    line_length_linter
+137        inst/app/app.R  518  10    indentation_linter
+138        inst/app/app.R  521   6    indentation_linter
+139        inst/app/app.R  526   4    indentation_linter
+140        inst/app/app.R  530  10    indentation_linter
+141        inst/app/app.R  532  22    indentation_linter
+142        inst/app/app.R  533  31    indentation_linter
+143        inst/app/app.R  534  22    indentation_linter
+144        inst/app/app.R  536  31    indentation_linter
+145        inst/app/app.R  539  81    line_length_linter
+146        inst/app/app.R  540  81    line_length_linter
+147        inst/app/app.R  541  31    indentation_linter
+148        inst/app/app.R  543  22    indentation_linter
+149        inst/app/app.R  545  31    indentation_linter
+150        inst/app/app.R  550  81    line_length_linter
+151        inst/app/app.R  557  81    line_length_linter
+152        inst/app/app.R  564  81    line_length_linter
+153        inst/app/app.R  569  22    indentation_linter
+154        inst/app/app.R  571  22    indentation_linter
+155        inst/app/app.R  573  31    indentation_linter
+156        inst/app/app.R  573  81    line_length_linter
+157        inst/app/app.R  575  46    indentation_linter
+158        inst/app/app.R  575  81    line_length_linter
+159        inst/app/app.R  578  81    line_length_linter
+160        inst/app/app.R  579  31    indentation_linter
+161        inst/app/app.R  580  81    line_length_linter
+162        inst/app/app.R  581  81    line_length_linter
+163        inst/app/app.R  582  22    indentation_linter
+164        inst/app/app.R  584  31    indentation_linter
+165        inst/app/app.R  584  81    line_length_linter
+166        inst/app/app.R  586  46    indentation_linter
+167        inst/app/app.R  586  81    line_length_linter
+168        inst/app/app.R  589  81    line_length_linter
+169        inst/app/app.R  590  31    indentation_linter
+170        inst/app/app.R  591  81    line_length_linter
+171        inst/app/app.R  592  81    line_length_linter
+172        inst/app/app.R  593  22    indentation_linter
+173        inst/app/app.R  594  10    indentation_linter
+174        inst/app/app.R  595   6    indentation_linter
+175        inst/app/app.R  628   8    indentation_linter
+176        inst/app/app.R  628  32         commas_linter
+177        inst/app/app.R  630  81    line_length_linter
+178        inst/app/app.R  631  81    line_length_linter
+179        inst/app/app.R  633  79         commas_linter
+180        inst/app/app.R  633  81         commas_linter
+181        inst/app/app.R  633  81    line_length_linter
+182        inst/app/app.R  634  81    line_length_linter
+183        inst/app/app.R  635   8    indentation_linter
+184        inst/app/app.R  643  81    line_length_linter
+185        inst/app/app.R  653  81    line_length_linter
+186        inst/app/app.R  667  81    line_length_linter
+187        inst/app/app.R  681  81    line_length_linter
+188        inst/app/app.R  693  81    line_length_linter
+189        inst/app/app.R  704  81    line_length_linter
+190        inst/app/app.R  711  81    line_length_linter
+191        inst/app/app.R  723  81    line_length_linter
+192        inst/app/app.R  745  81    line_length_linter
+193        inst/app/app.R  761   5   object_usage_linter
+194        inst/app/app.R  762   5   object_usage_linter
+195        inst/app/app.R  794  81    line_length_linter
+196        inst/app/app.R  801  81    line_length_linter
+197        inst/app/app.R  849  81    line_length_linter
+198        inst/app/app.R  864  81    line_length_linter
+199        inst/app/app.R  881  81    line_length_linter
+200        inst/app/app.R  882  81    line_length_linter
+201        inst/app/app.R  902  81    line_length_linter
+202        inst/app/app.R  903  81    line_length_linter
+203        inst/app/app.R  934  81    line_length_linter
+204        inst/app/app.R  973   3    object_name_linter
+205        inst/app/app.R  990   7 commented_code_linter
+206        inst/app/app.R  991   5    object_name_linter
+207        inst/app/app.R  992  11    object_name_linter
+208        inst/app/app.R 1006   5    object_name_linter
+209        inst/app/app.R 1073  81    line_length_linter
+210        inst/app/app.R 1105   7          brace_linter
+211        inst/app/app.R 1120  10    indentation_linter
+212        inst/app/app.R 1151  81    line_length_linter
+213        inst/app/app.R 1160  81    line_length_linter
+214        inst/app/app.R 1186  22  spaces_inside_linter
+215        inst/app/app.R 1207  36          brace_linter
+216        inst/app/app.R 1207  81    line_length_linter
+217        inst/app/app.R 1213  81    line_length_linter
+218        inst/app/app.R 1244  15   infix_spaces_linter
+219        inst/app/app.R 1253   5          brace_linter
+220        inst/app/app.R 1262  81    line_length_linter
+221        inst/app/app.R 1263  81    line_length_linter
+222        inst/app/app.R 1264  81    line_length_linter
+223        inst/app/app.R 1310  81    line_length_linter
+224        inst/app/app.R 1314  81    line_length_linter
+225        inst/app/app.R 1320  81    line_length_linter
+226        inst/app/app.R 1336  81    line_length_linter
+227        inst/app/app.R 1337  81    line_length_linter
+228        inst/app/app.R 1345  81    line_length_linter
+229        inst/app/app.R 1361  81    line_length_linter
+230        inst/app/app.R 1362  81    line_length_linter
+231        inst/app/app.R 1370  81    line_length_linter
+232        inst/app/app.R 1387   5    object_name_linter
+233        inst/app/app.R 1390   5    object_name_linter
+234        inst/app/app.R 1414  81    line_length_linter
+235        inst/app/app.R 1435  28      semicolon_linter
+236        inst/app/app.R 1508  81    line_length_linter
+237        inst/app/app.R 1509  81    line_length_linter
+238        inst/app/app.R 1510  81    line_length_linter
+239        inst/app/app.R 1555  81    line_length_linter
+240        inst/app/app.R 1556  81    line_length_linter
+241        inst/app/app.R 1579   2    indentation_linter
+242        inst/app/app.R 1598   5 commented_code_linter
+243        inst/app/app.R 1600   2    indentation_linter
+244        inst/app/app.R 1606  81    line_length_linter
+245        inst/app/app.R 1631   8    indentation_linter
+246        inst/app/app.R 1632  81    line_length_linter
+247        inst/app/app.R 1638  81    line_length_linter
+248        inst/app/app.R 1646  81    line_length_linter
+249        inst/app/app.R 1654  81    line_length_linter
+250        inst/app/app.R 1670  81    line_length_linter
+251        inst/app/app.R 1684  81    line_length_linter
+252        inst/app/app.R 1706  81    line_length_linter
+253        inst/app/app.R 1712  81    line_length_linter
+254        inst/app/app.R 1733  81    line_length_linter
+255        inst/app/app.R 1751  81    line_length_linter
+256        inst/app/app.R 1757  81    line_length_linter
+257        inst/app/app.R 1772  81    line_length_linter
+258        inst/app/app.R 1859  81    line_length_linter
+259        inst/app/app.R 1863  81    line_length_linter
+260        inst/app/app.R 1864  81    line_length_linter
+261        inst/app/app.R 1910  81    line_length_linter
+262        inst/app/app.R 1965  18      semicolon_linter
+263        inst/app/app.R 1969  81    line_length_linter
+264        inst/app/app.R 1974  18      semicolon_linter
+265        inst/app/app.R 1978  81    line_length_linter
+266         R/bak_logic.R   35  81    line_length_linter
+267         R/bak_logic.R   42  81    line_length_linter
+268         R/bak_logic.R   46  81    line_length_linter
+269         R/bak_logic.R   52  81    line_length_linter
+270         R/bak_logic.R   56  81    line_length_linter
+271         R/bak_logic.R   72  81    line_length_linter
+272         R/bak_logic.R  120  81    line_length_linter
+273         R/bak_logic.R  186  29 commented_code_linter
+274      R/build_matrix.R    3  81    line_length_linter
+275      R/build_matrix.R    5  81    line_length_linter
+276      R/build_matrix.R   23   0    indentation_linter
+277      R/build_matrix.R   29  81    line_length_linter
+278      R/build_matrix.R   30  81    line_length_linter
+279      R/build_matrix.R   32  81    line_length_linter
+280      R/build_matrix.R   33  81    line_length_linter
+281      R/build_matrix.R   36  81    line_length_linter
+282      R/build_matrix.R   37  81    line_length_linter
+283      R/build_matrix.R   38  81    line_length_linter
+284      R/build_matrix.R   40  81    line_length_linter
+285      R/build_matrix.R   41  81    line_length_linter
+286      R/build_matrix.R   42  81    line_length_linter
+287      R/build_matrix.R   43  81    line_length_linter
+288      R/build_matrix.R   44  81    line_length_linter
+289      R/build_matrix.R   45  81    line_length_linter
+290      R/build_matrix.R   50  81    line_length_linter
+291      R/build_matrix.R   52  81    line_length_linter
+292      R/build_matrix.R   55  81    line_length_linter
+293      R/build_matrix.R   72  81    line_length_linter
+294      R/build_matrix.R   73  81    line_length_linter
+295      R/build_matrix.R   74  81    line_length_linter
+296      R/build_matrix.R   75  63         commas_linter
+297      R/build_matrix.R   75  72         commas_linter
+298      R/build_matrix.R   75  79         commas_linter
+299      R/build_matrix.R   75  81    line_length_linter
+300      R/build_matrix.R   75  92         commas_linter
+301      R/build_matrix.R   76  32         commas_linter
+302      R/build_matrix.R   76  40         commas_linter
+303      R/build_matrix.R   76  58         commas_linter
+304      R/build_matrix.R   76  66         commas_linter
+305      R/build_matrix.R   76  74         commas_linter
+306      R/build_matrix.R   76  81    line_length_linter
+307      R/build_matrix.R   77  12         commas_linter
+308      R/build_matrix.R   77  18         commas_linter
+309      R/build_matrix.R   77  33         commas_linter
+310      R/build_matrix.R   77  41         commas_linter
+311      R/build_matrix.R   77  48         commas_linter
+312      R/build_matrix.R   77  56         commas_linter
+313      R/build_matrix.R   90  81    line_length_linter
+314      R/build_matrix.R  107  81    line_length_linter
+315      R/build_matrix.R  108  81    line_length_linter
+316      R/build_matrix.R  109  81    line_length_linter
+317      R/build_matrix.R  110  81    line_length_linter
+318      R/build_matrix.R  111  81    line_length_linter
+319      R/build_matrix.R  112  81    line_length_linter
+320      R/build_matrix.R  113  81    line_length_linter
+321      R/build_matrix.R  114  81    line_length_linter
+322      R/build_matrix.R  115  81    line_length_linter
+323      R/build_matrix.R  116  81    line_length_linter
+324      R/build_matrix.R  117  81    line_length_linter
+325      R/build_matrix.R  119  81    line_length_linter
+326      R/build_matrix.R  120  81    line_length_linter
+327      R/build_matrix.R  121  81    line_length_linter
+328      R/build_matrix.R  122  81    line_length_linter
+329      R/build_matrix.R  123  81    line_length_linter
+330      R/build_matrix.R  124  81    line_length_linter
+331      R/build_matrix.R  125  81    line_length_linter
+332      R/build_matrix.R  126  81    line_length_linter
+333      R/build_matrix.R  127  81    line_length_linter
+334      R/build_matrix.R  128  81    line_length_linter
+335      R/build_matrix.R  129  81    line_length_linter
+336      R/build_matrix.R  130  81    line_length_linter
+337      R/build_matrix.R  131  81    line_length_linter
+338      R/build_matrix.R  132  81    line_length_linter
+339      R/build_matrix.R  133  81    line_length_linter
+340      R/build_matrix.R  134  81    line_length_linter
+341      R/build_matrix.R  135  81    line_length_linter
+342      R/build_matrix.R  136  81    line_length_linter
+343      R/build_matrix.R  137  81    line_length_linter
+344      R/build_matrix.R  138  81    line_length_linter
+345      R/build_matrix.R  140  81    line_length_linter
+346      R/build_matrix.R  141  81    line_length_linter
+347      R/build_matrix.R  142  81    line_length_linter
+348      R/build_matrix.R  143  81    line_length_linter
+349      R/build_matrix.R  144  81    line_length_linter
+350      R/build_matrix.R  145  81    line_length_linter
+351      R/build_matrix.R  146  81    line_length_linter
+352      R/build_matrix.R  149  81    line_length_linter
+353               R/bwb.R   12  81    line_length_linter
+354               R/bwb.R   13  81    line_length_linter
+355               R/bwb.R   14  81    line_length_linter
+356               R/bwb.R   32  81    line_length_linter
+357               R/bwb.R   34  81    line_length_linter
+358               R/bwb.R   47  29         commas_linter
+359               R/bwb.R   47  37         commas_linter
+360               R/bwb.R   47  41         commas_linter
+361               R/bwb.R   47  45         commas_linter
+362               R/bwb.R   47  50         commas_linter
+363               R/bwb.R   47  55         commas_linter
+364               R/bwb.R   47  59         commas_linter
+365               R/bwb.R   47  64         commas_linter
+366               R/bwb.R   48  26         commas_linter
+367               R/bwb.R   48  31         commas_linter
+368               R/bwb.R   48  36         commas_linter
+369               R/bwb.R   48  40         commas_linter
+370               R/bwb.R   48  45         commas_linter
+371               R/bwb.R   48  50         commas_linter
+372               R/bwb.R   48  55         commas_linter
+373               R/bwb.R   48  63         commas_linter
+374               R/bwb.R   49  81    line_length_linter
+375               R/bwb.R   52  81    line_length_linter
+376               R/bwb.R   72  81    line_length_linter
+377               R/bwb.R   73  81    line_length_linter
+378               R/bwb.R   74  81    line_length_linter
+379               R/bwb.R   75  81    line_length_linter
+380               R/bwb.R   79  81    line_length_linter
+381               R/bwb.R  122  81    line_length_linter
+382               R/bwb.R  131  81    line_length_linter
+383               R/bwb.R  170  81    line_length_linter
+384               R/bwb.R  174   6    indentation_linter
+385               R/bwb.R  214  81    line_length_linter
+386         R/constants.R    9   1    object_name_linter
+387     R/converte_unit.R   21   5    object_name_linter
+388     R/converte_unit.R   26  25         return_linter
+389     R/converte_unit.R   59  81    line_length_linter
+390     R/converte_unit.R   67  54         commas_linter
+391     R/converte_unit.R   80   3    object_name_linter
+392     R/converte_unit.R   85   5    object_name_linter
+393     R/converte_unit.R   86   5    object_name_linter
+394     R/converte_unit.R   88   5    object_name_linter
+395     R/converte_unit.R   89   5    object_name_linter
+396         R/converter.R    3  81    line_length_linter
+397         R/converter.R    4  81    line_length_linter
+398         R/converter.R    7  81    line_length_linter
+399         R/converter.R    9  81    line_length_linter
+400         R/converter.R   10  81    line_length_linter
+401         R/converter.R   11  81    line_length_linter
+402         R/converter.R   14  81    line_length_linter
+403         R/converter.R   19  81    line_length_linter
+404         R/converter.R   20  81    line_length_linter
+405         R/converter.R   21  81    line_length_linter
+406         R/converter.R   47  81    line_length_linter
+407         R/converter.R   71   3         return_linter
+408                R/ec.R    3  81    line_length_linter
+409                R/ec.R    8   1    object_name_linter
+410                R/ec.R   48  81    line_length_linter
+411                R/ec.R   54   3    object_name_linter
+412                R/ec.R   55   3    object_name_linter
+413                R/ec.R   56   3    object_name_linter
+414                R/ec.R   57   3    object_name_linter
+415                R/ec.R   58   3    object_name_linter
+416                R/ec.R   59   3    object_name_linter
+417                R/ec.R   60   3    object_name_linter
+418                R/ec.R   61   3    object_name_linter
+419                R/ec.R   62   3    object_name_linter
+420                R/ec.R   63   3    object_name_linter
+421                R/ec.R   66   3    object_name_linter
+422                R/ec.R   72   3    object_name_linter
+423                R/ec.R   73   3    object_name_linter
+424                R/ec.R   74   3    object_name_linter
+425                R/ec.R   76   3    object_name_linter
+426                R/ec.R   77   3    object_name_linter
+427                R/ec.R   79   3    object_name_linter
+428                R/ec.R   80   3    object_name_linter
+429                R/ec.R   82   3    object_name_linter
+430                R/ec.R   83   3    object_name_linter
+431                R/ec.R   84   3    object_name_linter
+432                R/ec.R  118  81    line_length_linter
+433                R/ec.R  128  81    line_length_linter
+434                R/ec.R  136   4    indentation_linter
+435                R/ec.R  139   5    object_name_linter
+436                R/ec.R  142   5    object_name_linter
+437                R/ec.R  153   3    object_name_linter
+438                R/ec.R  156  33    object_name_linter
+439                R/ec.R  160   5    object_name_linter
+440                R/ec.R  161   5    object_name_linter
+441                R/ec.R  166  81    line_length_linter
+442                R/ec.R  173  81    line_length_linter
+443                R/ec.R  178   3    object_name_linter
+444                R/ec.R  189  27    object_name_linter
+445                R/ec.R  189  36    object_name_linter
+446                R/ec.R  206  81    line_length_linter
+447                R/ec.R  212  81    line_length_linter
+448                R/ec.R  229   3    object_name_linter
+449                R/ec.R  230   3    object_name_linter
+450                R/ec.R  231   3    object_name_linter
+451                R/ec.R  235   3    object_name_linter
+452                R/ec.R  241   3    object_name_linter
+453                R/ec.R  246   3    object_name_linter
+454                R/ec.R  247   3    object_name_linter
+455          R/elements.R    4  81    line_length_linter
+456          R/elements.R    9  81    line_length_linter
+457          R/elements.R   18  81    line_length_linter
+458        R/molar_mass.R   11  81    line_length_linter
+459        R/molar_mass.R   18  81    line_length_linter
+460        R/molar_mass.R   25   3         return_linter
+461           R/newsalt.R   39   3         return_linter
+462 R/percentage_matrix.R   23  81    line_length_linter
+463 R/percentage_matrix.R   25  81    line_length_linter
+464 R/percentage_matrix.R   26  81    line_length_linter
+465 R/percentage_matrix.R   39  81    line_length_linter
+466 R/percentage_matrix.R   41  81    line_length_linter
+467 R/percentage_matrix.R   59  31   infix_spaces_linter
+468 R/percentage_matrix.R   63   3         return_linter
+469                R/ph.R    7  81    line_length_linter
+470                R/ph.R    9  81    line_length_linter
+471                R/ph.R   24   3    object_name_linter
+472                R/ph.R   32  81    line_length_linter
+473                R/ph.R   33   6    indentation_linter
+474                R/ph.R   42   3    object_name_linter
+475                R/ph.R   43   3    object_name_linter
+476                R/ph.R   46   3    object_name_linter
+477                R/ph.R   47   3    object_name_linter
+478                R/ph.R   49   3    object_name_linter
+479                R/ph.R   50   3    object_name_linter
+480                R/ph.R   51   3    object_name_linter
+481                R/ph.R   52   3    object_name_linter
+482                R/ph.R   53   3    object_name_linter
+483                R/ph.R   54   3    object_name_linter
+484                R/ph.R   55   3    object_name_linter
+485                R/ph.R   58  28    object_name_linter
+486                R/ph.R   74   3    object_name_linter
+487                R/ph.R   75   3    object_name_linter
+488                R/ph.R   76   3    object_name_linter
+489                R/ph.R   77   3    object_name_linter
+490                R/ph.R   78   3    object_name_linter
+491                R/ph.R   79   3    object_name_linter
+492                R/ph.R   80   3    object_name_linter
+493                R/ph.R   81   3    object_name_linter
+494                R/ph.R   82   3    object_name_linter
+495                R/ph.R   84   3    object_name_linter
+496                R/ph.R   85   3    object_name_linter
+497                R/ph.R   87   3    object_name_linter
+498                R/ph.R   88   3    object_name_linter
+499                R/ph.R   89   3    object_name_linter
+500                R/ph.R   90   3    object_name_linter
+501                R/ph.R   91   3    object_name_linter
+502                R/ph.R   92   3    object_name_linter
+503                R/ph.R   93   3    object_name_linter
+504                R/ph.R   94   3    object_name_linter
+505                R/ph.R   95   3    object_name_linter
+506                R/ph.R  103   3    object_name_linter
+507                R/ph.R  112   3    object_name_linter
+508                R/ph.R  114  81    line_length_linter
+509                R/ph.R  115   3    object_name_linter
+510                R/ph.R  124   3    object_name_linter
+511                R/ph.R  127   3    object_name_linter
+512                R/ph.R  127  23    object_name_linter
+513                R/ph.R  129  81    line_length_linter
+514                R/ph.R  156   5    object_name_linter
+515                R/ph.R  156  22 commented_code_linter
+516                R/ph.R  159   5    object_name_linter
+517                R/ph.R  183   7    object_name_linter
+518                R/ph.R  183  42 commented_code_linter
+519                R/ph.R  186   7    object_name_linter
+520                R/ph.R  187   7    object_name_linter
+521                R/ph.R  188   7    object_name_linter
+522                R/ph.R  191   7    object_name_linter
+523                R/ph.R  192   7    object_name_linter
+524                R/ph.R  193   7    object_name_linter
+525                R/ph.R  196   7    object_name_linter
+526                R/ph.R  197   7    object_name_linter
+527                R/ph.R  198   7    object_name_linter
+528                R/ph.R  200   7    object_name_linter
+529                R/ph.R  201   7    object_name_linter
+530                R/ph.R  202   7    object_name_linter
+531                R/ph.R  203   7    object_name_linter
+532                R/ph.R  204   7    object_name_linter
+533                R/ph.R  207   7    object_name_linter
+534                R/ph.R  208   7    object_name_linter
+535                R/ph.R  210   9    object_name_linter
+536                R/ph.R  211   9    object_name_linter
+537                R/ph.R  212   9    object_name_linter
+538                R/ph.R  214   9    object_name_linter
+539                R/ph.R  219   9    object_name_linter
+540                R/ph.R  221   9    object_name_linter
+541                R/ph.R  222   9    object_name_linter
+542                R/ph.R  223   9    object_name_linter
+543                R/ph.R  225   9    object_name_linter
+544                R/ph.R  226   9    object_name_linter
+545                R/ph.R  227   9    object_name_linter
+546                R/ph.R  231   7    object_name_linter
+547                R/ph.R  232   7    object_name_linter
+548                R/ph.R  233   7    object_name_linter
+549                R/ph.R  234   7    object_name_linter
+550                R/ph.R  237   7    object_name_linter
+551                R/ph.R  238   7    object_name_linter
+552                R/ph.R  239   7    object_name_linter
+553                R/ph.R  242   7    object_name_linter
+554                R/ph.R  244   9    object_name_linter
+555                R/ph.R  246   7    object_name_linter
+556                R/ph.R  259   7    object_name_linter
+557                R/ph.R  272   9    object_name_linter
+558                R/ph.R  275   7    object_name_linter
+559                R/ph.R  319   5    object_name_linter
+560                R/ph.R  320   5    object_name_linter
+561                R/ph.R  321   5    object_name_linter
+562                R/ph.R  322   5    object_name_linter
+563                R/ph.R  323   5    object_name_linter
+564                R/ph.R  324   5    object_name_linter
+565                R/ph.R  325   5    object_name_linter
+566                R/ph.R  326   5    object_name_linter
+567                R/ph.R  327   5    object_name_linter
+568                R/ph.R  328   5    object_name_linter
+569                R/ph.R  329   5    object_name_linter
+570                R/ph.R  330   5    object_name_linter
+571                R/ph.R  389   8    indentation_linter
+572                R/ph.R  389  81    line_length_linter
+573                R/ph.R  390  81    line_length_linter
+574                R/ph.R  391  81    line_length_linter
+575                R/ph.R  394  81    line_length_linter
+576                R/ph.R  396  81    line_length_linter
+577                R/ph.R  398  81    line_length_linter
+578                R/ph.R  417  81    line_length_linter
+579                R/ph.R  425  81    line_length_linter
+580                R/ph.R  426  81    line_length_linter
+581                R/ph.R  427  81    line_length_linter
+582                R/ph.R  430  81    line_length_linter
+583                R/ph.R  433  81    line_length_linter
+584                R/ph.R  436  81    line_length_linter
+585                R/ph.R  446   3   object_usage_linter
+586                R/ph.R  470   3    object_name_linter
+587                R/ph.R  471   3    object_name_linter
+588                R/ph.R  472   3    object_name_linter
+589                R/ph.R  476   3    object_name_linter
+590                R/ph.R  538  81    line_length_linter
+591                R/ph.R  544  81    line_length_linter
+592                R/ph.R  546  81    line_length_linter
+593                R/ph.R  580   3 commented_code_linter
+594                R/ph.R  581   3 commented_code_linter
+595                R/ph.R  582   3 commented_code_linter
+596                R/ph.R  583   3 commented_code_linter
+597                R/ph.R  584   3 commented_code_linter
+598           R/recipes.R   32  81    line_length_linter
+599           R/recipes.R   35   4    indentation_linter
+600           R/recipes.R   37  81    line_length_linter
+601           R/recipes.R   38  31  spaces_inside_linter
+602           R/recipes.R   41  12   infix_spaces_linter
+603           R/recipes.R   41  21   infix_spaces_linter
+604           R/recipes.R   41  26   infix_spaces_linter
+605           R/recipes.R   41  33   infix_spaces_linter
+606           R/recipes.R   41  41   infix_spaces_linter
+607           R/recipes.R   41  49   infix_spaces_linter
+608           R/recipes.R   41  56   infix_spaces_linter
+609           R/recipes.R   42   9   infix_spaces_linter
+610           R/recipes.R   42  17   infix_spaces_linter
+611           R/recipes.R   42  25   infix_spaces_linter
+612           R/recipes.R   42  33   infix_spaces_linter
+613           R/recipes.R   42  44   infix_spaces_linter
+614           R/recipes.R   42  54   infix_spaces_linter
+615           R/recipes.R   42  64   infix_spaces_linter
+616           R/recipes.R   42  75   infix_spaces_linter
+617           R/recipes.R   42  81    line_length_linter
+618           R/recipes.R   42  88   infix_spaces_linter
+619           R/recipes.R   49  81    line_length_linter
+620           R/recipes.R   51  22         commas_linter
+621           R/recipes.R   51  33         commas_linter
+622           R/recipes.R   51  42         commas_linter
+623           R/recipes.R   53  12   infix_spaces_linter
+624           R/recipes.R   53  23   infix_spaces_linter
+625           R/recipes.R   53  28   infix_spaces_linter
+626           R/recipes.R   53  34   infix_spaces_linter
+627           R/recipes.R   53  42   infix_spaces_linter
+628           R/recipes.R   53  50   infix_spaces_linter
+629           R/recipes.R   53  56   infix_spaces_linter
+630           R/recipes.R   54   9   infix_spaces_linter
+631           R/recipes.R   54  15   infix_spaces_linter
+632           R/recipes.R   54  21   infix_spaces_linter
+633           R/recipes.R   54  27   infix_spaces_linter
+634           R/recipes.R   54  33   infix_spaces_linter
+635           R/recipes.R   54  38   infix_spaces_linter
+636           R/recipes.R   54  44   infix_spaces_linter
+637           R/recipes.R   54  50   infix_spaces_linter
+638           R/recipes.R   54  56   infix_spaces_linter
+639           R/recipes.R   71  26         commas_linter
+640           R/recipes.R   71  35         commas_linter
+641           R/recipes.R   73  12   infix_spaces_linter
+642           R/recipes.R   73  24   infix_spaces_linter
+643           R/recipes.R   73  29   infix_spaces_linter
+644           R/recipes.R   73  35   infix_spaces_linter
+645           R/recipes.R   73  42   infix_spaces_linter
+646           R/recipes.R   73  50   infix_spaces_linter
+647           R/recipes.R   73  56   infix_spaces_linter
+648           R/recipes.R   74   9   infix_spaces_linter
+649           R/recipes.R   74  15   infix_spaces_linter
+650           R/recipes.R   74  21   infix_spaces_linter
+651           R/recipes.R   74  27   infix_spaces_linter
+652           R/recipes.R   74  33   infix_spaces_linter
+653           R/recipes.R   74  38   infix_spaces_linter
+654           R/recipes.R   74  44   infix_spaces_linter
+655           R/recipes.R   74  50   infix_spaces_linter
+656           R/recipes.R   74  56   infix_spaces_linter
+657           R/recipes.R   81  81    line_length_linter
+658           R/recipes.R   92  26         commas_linter
+659           R/recipes.R   92  35         commas_linter
+660           R/recipes.R   94  12   infix_spaces_linter
+661           R/recipes.R   94  24   infix_spaces_linter
+662           R/recipes.R   94  29   infix_spaces_linter
+663           R/recipes.R   94  37   infix_spaces_linter
+664           R/recipes.R   94  46   infix_spaces_linter
+665           R/recipes.R   94  54   infix_spaces_linter
+666           R/recipes.R   94  60   infix_spaces_linter
+667           R/recipes.R   95   9   infix_spaces_linter
+668           R/recipes.R   95  15   infix_spaces_linter
+669           R/recipes.R   95  21   infix_spaces_linter
+670           R/recipes.R   95  27   infix_spaces_linter
+671           R/recipes.R   95  33   infix_spaces_linter
+672           R/recipes.R   95  38   infix_spaces_linter
+673           R/recipes.R   95  44   infix_spaces_linter
+674           R/recipes.R   95  50   infix_spaces_linter
+675           R/recipes.R   95  56   infix_spaces_linter
+676           R/recipes.R  107  12   infix_spaces_linter
+677           R/recipes.R  107  23   infix_spaces_linter
+678           R/recipes.R  107  28   infix_spaces_linter
+679           R/recipes.R  107  34   infix_spaces_linter
+680           R/recipes.R  107  42   infix_spaces_linter
+681           R/recipes.R  107  50   infix_spaces_linter
+682           R/recipes.R  107  56   infix_spaces_linter
+683           R/recipes.R  108   9   infix_spaces_linter
+684           R/recipes.R  108  16   infix_spaces_linter
+685           R/recipes.R  108  23   infix_spaces_linter
+686           R/recipes.R  108  29   infix_spaces_linter
+687           R/recipes.R  108  35   infix_spaces_linter
+688           R/recipes.R  108  40   infix_spaces_linter
+689           R/recipes.R  108  46   infix_spaces_linter
+690           R/recipes.R  108  52   infix_spaces_linter
+691           R/recipes.R  108  58   infix_spaces_linter
+692           R/recipes.R  119  12   infix_spaces_linter
+693           R/recipes.R  119  23   infix_spaces_linter
+694           R/recipes.R  119  29   infix_spaces_linter
+695           R/recipes.R  119  35   infix_spaces_linter
+696           R/recipes.R  119  43   infix_spaces_linter
+697           R/recipes.R  119  51   infix_spaces_linter
+698           R/recipes.R  119  58   infix_spaces_linter
+699           R/recipes.R  120   9   infix_spaces_linter
+700           R/recipes.R  120  15   infix_spaces_linter
+701           R/recipes.R  120  21   infix_spaces_linter
+702           R/recipes.R  120  29   infix_spaces_linter
+703           R/recipes.R  120  35   infix_spaces_linter
+704           R/recipes.R  121   8   infix_spaces_linter
+705           R/recipes.R  121  14   infix_spaces_linter
+706           R/recipes.R  121  20   infix_spaces_linter
+707           R/recipes.R  121  26   infix_spaces_linter
+708           R/recipes.R  130  81    line_length_linter
+709           R/recipes.R  134  12   infix_spaces_linter
+710           R/recipes.R  134  23   infix_spaces_linter
+711           R/recipes.R  134  28   infix_spaces_linter
+712           R/recipes.R  134  34   infix_spaces_linter
+713           R/recipes.R  134  42   infix_spaces_linter
+714           R/recipes.R  134  50   infix_spaces_linter
+715           R/recipes.R  134  56   infix_spaces_linter
+716           R/recipes.R  135   9   infix_spaces_linter
+717           R/recipes.R  135  15   infix_spaces_linter
+718           R/recipes.R  135  21   infix_spaces_linter
+719           R/recipes.R  135  27   infix_spaces_linter
+720           R/recipes.R  135  35   infix_spaces_linter
+721           R/recipes.R  136   8   infix_spaces_linter
+722           R/recipes.R  136  16   infix_spaces_linter
+723           R/recipes.R  136  25   infix_spaces_linter
+724           R/recipes.R  136  34   infix_spaces_linter
+725           R/recipes.R  142   0    indentation_linter
+726           R/recipes.R  143   6 commented_code_linter
+727           R/recipes.R  144   6 commented_code_linter
+728           R/recipes.R  145   6 commented_code_linter
+729           R/recipes.R  146   6 commented_code_linter
+730           R/recipes.R  147   6 commented_code_linter
+731           R/recipes.R  160  81    line_length_linter
+732           R/recipes.R  164  81    line_length_linter
+733           R/recipes.R  173  81    line_length_linter
+734           R/recipes.R  177  81    line_length_linter
+735           R/recipes.R  185  81    line_length_linter
+736           R/recipes.R  189  81    line_length_linter
+737           R/recipes.R  201  81    line_length_linter
+738           R/recipes.R  205  81    line_length_linter
+739           R/recipes.R  214  81    line_length_linter
+740           R/recipes.R  218  81    line_length_linter
+741           R/recipes.R  227  81    line_length_linter
+742           R/recipes.R  231  81    line_length_linter
+743           R/recipes.R  239  81    line_length_linter
+744           R/recipes.R  243  81    line_length_linter
+745           R/recipes.R  251  81    line_length_linter
+746           R/recipes.R  255  81    line_length_linter
+747           R/recipes.R  263  81    line_length_linter
+748           R/recipes.R  267  81    line_length_linter
+749           R/recipes.R  275  81    line_length_linter
+750           R/recipes.R  279  81    line_length_linter
+751           R/recipes.R  289  81    line_length_linter
+752           R/recipes.R  293  81    line_length_linter
+753           R/recipes.R  302  81    line_length_linter
+754           R/recipes.R  306  81    line_length_linter
+755           R/recipes.R  315  81    line_length_linter
+756           R/recipes.R  319  81    line_length_linter
+757           R/recipes.R  328  81    line_length_linter
+758           R/recipes.R  333  81    line_length_linter
+759           R/recipes.R  339   0    indentation_linter
+760           R/recipes.R  346  10   infix_spaces_linter
+761           R/recipes.R  346  22   infix_spaces_linter
+762           R/recipes.R  346  30   infix_spaces_linter
+763           R/recipes.R  346  37   infix_spaces_linter
+764           R/recipes.R  346  43   infix_spaces_linter
+765           R/recipes.R  346  51   infix_spaces_linter
+766           R/recipes.R  346  58   infix_spaces_linter
+767           R/recipes.R  347   7   infix_spaces_linter
+768           R/recipes.R  347  13   infix_spaces_linter
+769           R/recipes.R  347  21   infix_spaces_linter
+770           R/recipes.R  347  30   infix_spaces_linter
+771           R/recipes.R  347  41   infix_spaces_linter
+772           R/recipes.R  348   6   infix_spaces_linter
+773           R/recipes.R  348  16   infix_spaces_linter
+774           R/recipes.R  348  27   infix_spaces_linter
+775           R/recipes.R  348  38   infix_spaces_linter
+776           R/recipes.R  355  81    line_length_linter
+777           R/recipes.R  359  81    line_length_linter
+778           R/recipes.R  369  81    line_length_linter
+779           R/recipes.R  373  81    line_length_linter
+780           R/recipes.R  378   0    indentation_linter
+781           R/recipes.R  380   0    indentation_linter
+782           R/recipes.R  384   0    indentation_linter
+783           R/recipes.R  391  81    line_length_linter
+784           R/recipes.R  398   0    indentation_linter
+785           R/recipes.R  412   0    indentation_linter
+786           R/recipes.R  426   0    indentation_linter
+787           R/recipes.R  433  81    line_length_linter
+788           R/recipes.R  439   0    indentation_linter
+789           R/recipes.R  452   0    indentation_linter
+790           R/recipes.R  455  81    line_length_linter
+791           R/recipes.R  466   0    indentation_linter
+792           R/recipes.R  473  81    line_length_linter
+793           R/recipes.R  480   0    indentation_linter
+794           R/recipes.R  494   0    indentation_linter
+795           R/recipes.R  508   0    indentation_linter
+796           R/recipes.R  521   0    indentation_linter
+797           R/recipes.R  534   0    indentation_linter
+798           R/recipes.R  548   0    indentation_linter
+799           R/recipes.R  562   0    indentation_linter
+800           R/recipes.R  569  81    line_length_linter
+801           R/recipes.R  576   0    indentation_linter
+802           R/recipes.R  590   0    indentation_linter
+803           R/recipes.R  605   0    indentation_linter
+804           R/recipes.R  619   0    indentation_linter
+805           R/recipes.R  626  81    line_length_linter
+806           R/recipes.R  634   0    indentation_linter
+807           R/recipes.R  648   0    indentation_linter
+808           R/recipes.R  655  81    line_length_linter
+809           R/recipes.R  661   0    indentation_linter
+810           R/recipes.R  674   0    indentation_linter
+811           R/recipes.R  687   0    indentation_linter
+812           R/recipes.R  690  81    line_length_linter
+813           R/recipes.R  715  58         commas_linter
+814       R/remove_salt.R   11  81    line_length_linter
+815       R/remove_salt.R   12   3         return_linter
+816       R/save_matrix.R    5  81    line_length_linter
+817            R/solver.R    4  81    line_length_linter
+818            R/solver.R    6  81    line_length_linter
+819            R/solver.R    9  81    line_length_linter
+820            R/solver.R   13  81    line_length_linter
+821            R/solver.R   23  81    line_length_linter
+822            R/solver.R   33  81    line_length_linter
+823            R/solver.R   38   3    object_name_linter
+824            R/solver.R   41   3    object_name_linter
+825            R/solver.R   42   3    object_name_linter
+826            R/solver.R   98  81    line_length_linter
+827            R/solver.R   99  81    line_length_linter
+828            R/solver.R  102  81    line_length_linter
+829            R/solver.R  154  81    line_length_linter
+830            R/solver.R  161  81    line_length_linter
+831            R/solver.R  162  81    line_length_linter
+832            R/solver.R  163  81    line_length_linter
+833            R/solver.R  170  81    line_length_linter
+834            R/solver.R  181  81    line_length_linter
+835            R/solver.R  183  81    line_length_linter
+836            R/solver.R  184  81    line_length_linter
+837            R/solver.R  185  81    line_length_linter
+838            R/solver.R  190   4    indentation_linter
+839            R/solver.R  205   5    object_name_linter
+840            R/solver.R  271  41 commented_code_linter
+841            R/solver.R  284  81    line_length_linter
+842            R/solver.R  301  81    line_length_linter
+843            R/solver.R  304  81    line_length_linter
+844           R/ternary.R    7  81    line_length_linter
+845           R/ternary.R   15  81    line_length_linter
+846           R/ternary.R   17  81    line_length_linter
+847           R/ternary.R   23   4    indentation_linter
+848           R/ternary.R   67  49      semicolon_linter
+849           R/ternary.R   68  53      semicolon_linter
+850           R/ternary.R   71  25      semicolon_linter
+851           R/ternary.R   71  81    line_length_linter
+852           R/ternary.R   74  15      semicolon_linter
+853           R/ternary.R   76  25      semicolon_linter
+854           R/ternary.R   89  18      semicolon_linter
+855           R/ternary.R   89  35      semicolon_linter
+856           R/ternary.R  108  81    line_length_linter
+857           R/ternary.R  109  81    line_length_linter
+858           R/ternary.R  113  81    line_length_linter
+859           R/ternary.R  118   5    object_name_linter
+860           R/ternary.R  119   5    object_name_linter
+861           R/ternary.R  120   5    object_name_linter
+862           R/ternary.R  123  27          brace_linter
+863           R/ternary.R  123  40      semicolon_linter
+864           R/ternary.R  123  81    line_length_linter
+865           R/ternary.R  123  85          brace_linter
+866           R/ternary.R  126   5    object_name_linter
+867           R/ternary.R  127   5    object_name_linter
+868           R/ternary.R  127  81    line_length_linter
+869           R/ternary.R  128   5    object_name_linter
+870           R/ternary.R  149   7    object_name_linter
+871           R/ternary.R  149  33      semicolon_linter
+872           R/ternary.R  149  35    object_name_linter
+873           R/ternary.R  149  61      semicolon_linter
+874           R/ternary.R  149  63    object_name_linter
+875           R/ternary.R  149  81    line_length_linter
+876             R/utils.R    3  81    line_length_linter
+877             R/utils.R    6  81    line_length_linter
+878             R/utils.R   51  81    line_length_linter
+879             R/utils.R   60  81    line_length_linter
+880             R/utils.R   78  81    line_length_linter
+881             R/utils.R  108   5         return_linter
+882             R/utils.R  113   5         return_linter
+883             R/utils.R  115   5         return_linter
+884             R/utils.R  131   5         return_linter
+885             R/utils.R  136   5         return_linter
+886             R/utils.R  138   5         return_linter
+                                                                                                message
+1                              Lines should not be more than 80 characters. This line is 83 characters.
+2                                                      Indentation should be 19 spaces but is 2 spaces.
+3                              Lines should not be more than 80 characters. This line is 86 characters.
+4                                                                            Put a space after a comma.
+5                                                                            Put a space after a comma.
+6                                                                            Put a space after a comma.
+7                                                                            Put a space after a comma.
+8                                                                            Put a space after a comma.
+9                                                                            Put a space after a comma.
+10                                                                           Put a space after a comma.
+11                                                                           Put a space after a comma.
+12                                                                           Put a space after a comma.
+13                                                                           Put a space after a comma.
+14                                                                           Put a space after a comma.
+15                                                                           Put a space after a comma.
+16                                                                           Put a space after a comma.
+17                                                                           Put a space after a comma.
+18                                                                           Put a space after a comma.
+19                                                                           Put a space after a comma.
+20                                                                           Put a space after a comma.
+21                                                                           Put a space after a comma.
+22                                                                           Put a space after a comma.
+23                                                                           Put a space after a comma.
+24                                                                           Put a space after a comma.
+25                                                                           Put a space after a comma.
+26                                                                           Put a space after a comma.
+27                                                                           Put a space after a comma.
+28                                                                           Put a space after a comma.
+29                                                                           Put a space after a comma.
+30                                                                           Put a space after a comma.
+31                                                                           Put a space after a comma.
+32                             Lines should not be more than 80 characters. This line is 92 characters.
+33                             Lines should not be more than 80 characters. This line is 84 characters.
+34                             Lines should not be more than 80 characters. This line is 85 characters.
+35                             Lines should not be more than 80 characters. This line is 84 characters.
+36  Opening curly braces should never go on their own line and should always be followed by a new line.
+37                            Lines should not be more than 80 characters. This line is 141 characters.
+38                                                            Replace compound semicolons by a newline.
+39                                                  Hanging indent should be 68 spaces but is 2 spaces.
+40                                                            Replace compound semicolons by a newline.
+41                             Lines should not be more than 80 characters. This line is 83 characters.
+42                            Lines should not be more than 80 characters. This line is 109 characters.
+43                            Lines should not be more than 80 characters. This line is 120 characters.
+44                                                            Replace compound semicolons by a newline.
+45        Closing curly-braces should always be on their own line, unless they are followed by an else.
+46                                                  Hanging indent should be 16 spaces but is 2 spaces.
+47                            Lines should not be more than 80 characters. This line is 113 characters.
+48                             Lines should not be more than 80 characters. This line is 84 characters.
+49                             Lines should not be more than 80 characters. This line is 85 characters.
+50                             Lines should not be more than 80 characters. This line is 91 characters.
+51                            Lines should not be more than 80 characters. This line is 141 characters.
+52                            Lines should not be more than 80 characters. This line is 377 characters.
+53                            Lines should not be more than 80 characters. This line is 140 characters.
+54                            Lines should not be more than 80 characters. This line is 117 characters.
+55                             Lines should not be more than 80 characters. This line is 81 characters.
+56                            Lines should not be more than 80 characters. This line is 117 characters.
+57                            Lines should not be more than 80 characters. This line is 140 characters.
+58                                                  Hanging indent should be 16 spaces but is 2 spaces.
+59                                                  Hanging indent should be 16 spaces but is 2 spaces.
+60                             Lines should not be more than 80 characters. This line is 93 characters.
+61                                                  Hanging indent should be 16 spaces but is 2 spaces.
+62                                                    Indentation should be 22 spaces but is 10 spaces.
+63                                                    Indentation should be 24 spaces but is 22 spaces.
+64                                                    Indentation should be 26 spaces but is 31 spaces.
+65                                                    Indentation should be 28 spaces but is 10 spaces.
+66                                                    Indentation should be 30 spaces but is 16 spaces.
+67                                                    Indentation should be 32 spaces but is 42 spaces.
+68                             Lines should not be more than 80 characters. This line is 82 characters.
+69                            Lines should not be more than 80 characters. This line is 100 characters.
+70                             Lines should not be more than 80 characters. This line is 91 characters.
+71                                                    Indentation should be 30 spaces but is 40 spaces.
+72                                                    Indentation should be 28 spaces but is 33 spaces.
+73                                                    Indentation should be 28 spaces but is 10 spaces.
+74                                                    Indentation should be 30 spaces but is 16 spaces.
+75                             Lines should not be more than 80 characters. This line is 83 characters.
+76                                                    Indentation should be 28 spaces but is 10 spaces.
+77                                                    Indentation should be 26 spaces but is 31 spaces.
+78                                                    Indentation should be 24 spaces but is 22 spaces.
+79                                                    Indentation should be 26 spaces but is 31 spaces.
+80                            Lines should not be more than 80 characters. This line is 128 characters.
+81                            Lines should not be more than 80 characters. This line is 127 characters.
+82                                                    Indentation should be 28 spaces but is 33 spaces.
+83                             Lines should not be more than 80 characters. This line is 95 characters.
+84                            Lines should not be more than 80 characters. This line is 130 characters.
+85                            Lines should not be more than 80 characters. This line is 115 characters.
+86                                                    Indentation should be 26 spaces but is 31 spaces.
+87                             Lines should not be more than 80 characters. This line is 88 characters.
+88                            Lines should not be more than 80 characters. This line is 128 characters.
+89                                                    Indentation should be 28 spaces but is 33 spaces.
+90                             Lines should not be more than 80 characters. This line is 93 characters.
+91                             Lines should not be more than 80 characters. This line is 93 characters.
+92                             Lines should not be more than 80 characters. This line is 97 characters.
+93                                                    Indentation should be 24 spaces but is 22 spaces.
+94                                                    Indentation should be 26 spaces but is 31 spaces.
+95                                                    Indentation should be 28 spaces but is 47 spaces.
+96                            Lines should not be more than 80 characters. This line is 129 characters.
+97                                                    Indentation should be 30 spaces but is 51 spaces.
+98                            Lines should not be more than 80 characters. This line is 139 characters.
+99                            Lines should not be more than 80 characters. This line is 178 characters.
+100                                                   Indentation should be 28 spaces but is 47 spaces.
+101                                                   Indentation should be 26 spaces but is 31 spaces.
+102                                                   Indentation should be 28 spaces but is 35 spaces.
+103                           Lines should not be more than 80 characters. This line is 175 characters.
+104                           Lines should not be more than 80 characters. This line is 162 characters.
+105                                                   Indentation should be 26 spaces but is 31 spaces.
+106                                                   Indentation should be 24 spaces but is 22 spaces.
+107                                                   Indentation should be 26 spaces but is 31 spaces.
+108                            Lines should not be more than 80 characters. This line is 92 characters.
+109                            Lines should not be more than 80 characters. This line is 92 characters.
+110                            Lines should not be more than 80 characters. This line is 92 characters.
+111                           Lines should not be more than 80 characters. This line is 102 characters.
+112                           Lines should not be more than 80 characters. This line is 113 characters.
+113                           Lines should not be more than 80 characters. This line is 156 characters.
+114                                                   Indentation should be 24 spaces but is 22 spaces.
+115                                                   Indentation should be 26 spaces but is 31 spaces.
+116                            Lines should not be more than 80 characters. This line is 84 characters.
+117                                                   Indentation should be 30 spaces but is 35 spaces.
+118                           Lines should not be more than 80 characters. This line is 104 characters.
+119                            Lines should not be more than 80 characters. This line is 90 characters.
+120                           Lines should not be more than 80 characters. This line is 101 characters.
+121                            Lines should not be more than 80 characters. This line is 90 characters.
+122                                                   Indentation should be 30 spaces but is 35 spaces.
+123                            Lines should not be more than 80 characters. This line is 82 characters.
+124                            Lines should not be more than 80 characters. This line is 97 characters.
+125                                                   Indentation should be 30 spaces but is 35 spaces.
+126                            Lines should not be more than 80 characters. This line is 87 characters.
+127                            Lines should not be more than 80 characters. This line is 97 characters.
+128                                                   Indentation should be 30 spaces but is 35 spaces.
+129                           Lines should not be more than 80 characters. This line is 103 characters.
+130                                                   Indentation should be 30 spaces but is 35 spaces.
+131                            Lines should not be more than 80 characters. This line is 81 characters.
+132                            Lines should not be more than 80 characters. This line is 81 characters.
+133                                                   Indentation should be 28 spaces but is 33 spaces.
+134                                                   Indentation should be 24 spaces but is 22 spaces.
+135                                                   Indentation should be 22 spaces but is 10 spaces.
+136                            Lines should not be more than 80 characters. This line is 96 characters.
+137                                                   Indentation should be 22 spaces but is 10 spaces.
+138                                                    Indentation should be 20 spaces but is 6 spaces.
+139                                                    Indentation should be 18 spaces but is 4 spaces.
+140                                                   Indentation should be 22 spaces but is 10 spaces.
+141                                                   Indentation should be 24 spaces but is 22 spaces.
+142                                                   Indentation should be 26 spaces but is 31 spaces.
+143                                                   Indentation should be 24 spaces but is 22 spaces.
+144                                                   Indentation should be 26 spaces but is 31 spaces.
+145                           Lines should not be more than 80 characters. This line is 112 characters.
+146                           Lines should not be more than 80 characters. This line is 108 characters.
+147                                                   Indentation should be 26 spaces but is 31 spaces.
+148                                                   Indentation should be 24 spaces but is 22 spaces.
+149                                                   Indentation should be 26 spaces but is 31 spaces.
+150                            Lines should not be more than 80 characters. This line is 81 characters.
+151                            Lines should not be more than 80 characters. This line is 83 characters.
+152                            Lines should not be more than 80 characters. This line is 83 characters.
+153                                                   Indentation should be 24 spaces but is 22 spaces.
+154                                                   Indentation should be 24 spaces but is 22 spaces.
+155                                                   Indentation should be 26 spaces but is 31 spaces.
+156                           Lines should not be more than 80 characters. This line is 121 characters.
+157                                                   Indentation should be 28 spaces but is 46 spaces.
+158                            Lines should not be more than 80 characters. This line is 83 characters.
+159                           Lines should not be more than 80 characters. This line is 107 characters.
+160                                                   Indentation should be 26 spaces but is 31 spaces.
+161                           Lines should not be more than 80 characters. This line is 103 characters.
+162                            Lines should not be more than 80 characters. This line is 82 characters.
+163                                                   Indentation should be 24 spaces but is 22 spaces.
+164                                                   Indentation should be 26 spaces but is 31 spaces.
+165                           Lines should not be more than 80 characters. This line is 115 characters.
+166                                                   Indentation should be 28 spaces but is 46 spaces.
+167                            Lines should not be more than 80 characters. This line is 90 characters.
+168                           Lines should not be more than 80 characters. This line is 107 characters.
+169                                                   Indentation should be 26 spaces but is 31 spaces.
+170                           Lines should not be more than 80 characters. This line is 103 characters.
+171                            Lines should not be more than 80 characters. This line is 83 characters.
+172                                                   Indentation should be 24 spaces but is 22 spaces.
+173                                                   Indentation should be 22 spaces but is 10 spaces.
+174                                                    Indentation should be 20 spaces but is 6 spaces.
+175                                                 Hanging indent should be 10 spaces but is 8 spaces.
+176                                                                          Put a space after a comma.
+177                           Lines should not be more than 80 characters. This line is 104 characters.
+178                           Lines should not be more than 80 characters. This line is 116 characters.
+179                                                                       Remove spaces before a comma.
+180                                                                          Put a space after a comma.
+181                            Lines should not be more than 80 characters. This line is 94 characters.
+182                           Lines should not be more than 80 characters. This line is 102 characters.
+183                                                 Hanging indent should be 10 spaces but is 8 spaces.
+184                           Lines should not be more than 80 characters. This line is 105 characters.
+185                           Lines should not be more than 80 characters. This line is 100 characters.
+186                           Lines should not be more than 80 characters. This line is 141 characters.
+187                           Lines should not be more than 80 characters. This line is 141 characters.
+188                            Lines should not be more than 80 characters. This line is 84 characters.
+189                            Lines should not be more than 80 characters. This line is 81 characters.
+190                            Lines should not be more than 80 characters. This line is 86 characters.
+191                           Lines should not be more than 80 characters. This line is 107 characters.
+192                            Lines should not be more than 80 characters. This line is 82 characters.
+193                                            local variable 'w1_display' assigned but may not be used
+194                                            local variable 'w2_display' assigned but may not be used
+195                            Lines should not be more than 80 characters. This line is 86 characters.
+196                            Lines should not be more than 80 characters. This line is 86 characters.
+197                            Lines should not be more than 80 characters. This line is 88 characters.
+198                            Lines should not be more than 80 characters. This line is 86 characters.
+199                            Lines should not be more than 80 characters. This line is 87 characters.
+200                            Lines should not be more than 80 characters. This line is 99 characters.
+201                            Lines should not be more than 80 characters. This line is 88 characters.
+202                           Lines should not be more than 80 characters. This line is 100 characters.
+203                            Lines should not be more than 80 characters. This line is 86 characters.
+204                                Variable and function name style should match snake_case or symbols.
+205                                                                              Remove commented code.
+206                                Variable and function name style should match snake_case or symbols.
+207                                Variable and function name style should match snake_case or symbols.
+208                                Variable and function name style should match snake_case or symbols.
+209                            Lines should not be more than 80 characters. This line is 81 characters.
+210                               Either both or neither branch in `if`/`else` should use curly braces.
+211                                                Hanging indent should be 16 spaces but is 10 spaces.
+212                            Lines should not be more than 80 characters. This line is 81 characters.
+213                            Lines should not be more than 80 characters. This line is 89 characters.
+214                                                              Do not place spaces after parentheses.
+215 Opening curly braces should never go on their own line and should always be followed by a new line.
+216                            Lines should not be more than 80 characters. This line is 91 characters.
+217                            Lines should not be more than 80 characters. This line is 89 characters.
+218                                                              Put spaces around all infix operators.
+219                               Either both or neither branch in `if`/`else` should use curly braces.
+220                            Lines should not be more than 80 characters. This line is 91 characters.
+221                            Lines should not be more than 80 characters. This line is 83 characters.
+222                            Lines should not be more than 80 characters. This line is 86 characters.
+223                           Lines should not be more than 80 characters. This line is 108 characters.
+224                            Lines should not be more than 80 characters. This line is 84 characters.
+225                            Lines should not be more than 80 characters. This line is 93 characters.
+226                            Lines should not be more than 80 characters. This line is 90 characters.
+227                            Lines should not be more than 80 characters. This line is 89 characters.
+228                            Lines should not be more than 80 characters. This line is 91 characters.
+229                            Lines should not be more than 80 characters. This line is 88 characters.
+230                            Lines should not be more than 80 characters. This line is 87 characters.
+231                           Lines should not be more than 80 characters. This line is 114 characters.
+232                                Variable and function name style should match snake_case or symbols.
+233                                Variable and function name style should match snake_case or symbols.
+234                            Lines should not be more than 80 characters. This line is 88 characters.
+235                                                           Replace compound semicolons by a newline.
+236                            Lines should not be more than 80 characters. This line is 82 characters.
+237                            Lines should not be more than 80 characters. This line is 82 characters.
+238                            Lines should not be more than 80 characters. This line is 83 characters.
+239                            Lines should not be more than 80 characters. This line is 95 characters.
+240                           Lines should not be more than 80 characters. This line is 116 characters.
+241                                                     Indentation should be 4 spaces but is 2 spaces.
+242                                                                              Remove commented code.
+243                                                     Indentation should be 4 spaces but is 2 spaces.
+244                            Lines should not be more than 80 characters. This line is 93 characters.
+245                                                    Indentation should be 10 spaces but is 8 spaces.
+246                            Lines should not be more than 80 characters. This line is 89 characters.
+247                            Lines should not be more than 80 characters. This line is 99 characters.
+248                            Lines should not be more than 80 characters. This line is 98 characters.
+249                            Lines should not be more than 80 characters. This line is 94 characters.
+250                            Lines should not be more than 80 characters. This line is 96 characters.
+251                            Lines should not be more than 80 characters. This line is 92 characters.
+252                            Lines should not be more than 80 characters. This line is 86 characters.
+253                            Lines should not be more than 80 characters. This line is 81 characters.
+254                            Lines should not be more than 80 characters. This line is 87 characters.
+255                            Lines should not be more than 80 characters. This line is 91 characters.
+256                            Lines should not be more than 80 characters. This line is 83 characters.
+257                            Lines should not be more than 80 characters. This line is 90 characters.
+258                           Lines should not be more than 80 characters. This line is 109 characters.
+259                            Lines should not be more than 80 characters. This line is 81 characters.
+260                            Lines should not be more than 80 characters. This line is 81 characters.
+261                            Lines should not be more than 80 characters. This line is 98 characters.
+262                                                           Replace compound semicolons by a newline.
+263                            Lines should not be more than 80 characters. This line is 92 characters.
+264                                                           Replace compound semicolons by a newline.
+265                            Lines should not be more than 80 characters. This line is 93 characters.
+266                            Lines should not be more than 80 characters. This line is 81 characters.
+267                            Lines should not be more than 80 characters. This line is 94 characters.
+268                           Lines should not be more than 80 characters. This line is 104 characters.
+269                           Lines should not be more than 80 characters. This line is 100 characters.
+270                            Lines should not be more than 80 characters. This line is 81 characters.
+271                            Lines should not be more than 80 characters. This line is 85 characters.
+272                            Lines should not be more than 80 characters. This line is 84 characters.
+273                                                                              Remove commented code.
+274                            Lines should not be more than 80 characters. This line is 82 characters.
+275                            Lines should not be more than 80 characters. This line is 81 characters.
+276                                                     Indentation should be 2 spaces but is 0 spaces.
+277                            Lines should not be more than 80 characters. This line is 82 characters.
+278                            Lines should not be more than 80 characters. This line is 82 characters.
+279                            Lines should not be more than 80 characters. This line is 82 characters.
+280                            Lines should not be more than 80 characters. This line is 82 characters.
+281                            Lines should not be more than 80 characters. This line is 81 characters.
+282                            Lines should not be more than 80 characters. This line is 84 characters.
+283                            Lines should not be more than 80 characters. This line is 82 characters.
+284                            Lines should not be more than 80 characters. This line is 85 characters.
+285                            Lines should not be more than 80 characters. This line is 85 characters.
+286                            Lines should not be more than 80 characters. This line is 91 characters.
+287                            Lines should not be more than 80 characters. This line is 82 characters.
+288                            Lines should not be more than 80 characters. This line is 85 characters.
+289                            Lines should not be more than 80 characters. This line is 81 characters.
+290                            Lines should not be more than 80 characters. This line is 91 characters.
+291                            Lines should not be more than 80 characters. This line is 82 characters.
+292                            Lines should not be more than 80 characters. This line is 99 characters.
+293                            Lines should not be more than 80 characters. This line is 97 characters.
+294                           Lines should not be more than 80 characters. This line is 102 characters.
+295                           Lines should not be more than 80 characters. This line is 106 characters.
+296                                                                          Put a space after a comma.
+297                                                                          Put a space after a comma.
+298                                                                          Put a space after a comma.
+299                            Lines should not be more than 80 characters. This line is 99 characters.
+300                                                                          Put a space after a comma.
+301                                                                          Put a space after a comma.
+302                                                                          Put a space after a comma.
+303                                                                          Put a space after a comma.
+304                                                                          Put a space after a comma.
+305                                                                          Put a space after a comma.
+306                           Lines should not be more than 80 characters. This line is 108 characters.
+307                                                                          Put a space after a comma.
+308                                                                          Put a space after a comma.
+309                                                                          Put a space after a comma.
+310                                                                          Put a space after a comma.
+311                                                                          Put a space after a comma.
+312                                                                          Put a space after a comma.
+313                            Lines should not be more than 80 characters. This line is 81 characters.
+314                            Lines should not be more than 80 characters. This line is 83 characters.
+315                            Lines should not be more than 80 characters. This line is 84 characters.
+316                           Lines should not be more than 80 characters. This line is 102 characters.
+317                            Lines should not be more than 80 characters. This line is 85 characters.
+318                            Lines should not be more than 80 characters. This line is 85 characters.
+319                           Lines should not be more than 80 characters. This line is 103 characters.
+320                            Lines should not be more than 80 characters. This line is 99 characters.
+321                            Lines should not be more than 80 characters. This line is 86 characters.
+322                            Lines should not be more than 80 characters. This line is 98 characters.
+323                           Lines should not be more than 80 characters. This line is 104 characters.
+324                            Lines should not be more than 80 characters. This line is 84 characters.
+325                           Lines should not be more than 80 characters. This line is 106 characters.
+326                            Lines should not be more than 80 characters. This line is 99 characters.
+327                            Lines should not be more than 80 characters. This line is 98 characters.
+328                            Lines should not be more than 80 characters. This line is 97 characters.
+329                           Lines should not be more than 80 characters. This line is 101 characters.
+330                           Lines should not be more than 80 characters. This line is 102 characters.
+331                           Lines should not be more than 80 characters. This line is 105 characters.
+332                            Lines should not be more than 80 characters. This line is 97 characters.
+333                           Lines should not be more than 80 characters. This line is 111 characters.
+334                            Lines should not be more than 80 characters. This line is 90 characters.
+335                            Lines should not be more than 80 characters. This line is 86 characters.
+336                            Lines should not be more than 80 characters. This line is 83 characters.
+337                            Lines should not be more than 80 characters. This line is 97 characters.
+338                            Lines should not be more than 80 characters. This line is 87 characters.
+339                           Lines should not be more than 80 characters. This line is 109 characters.
+340                            Lines should not be more than 80 characters. This line is 81 characters.
+341                           Lines should not be more than 80 characters. This line is 108 characters.
+342                            Lines should not be more than 80 characters. This line is 85 characters.
+343                            Lines should not be more than 80 characters. This line is 82 characters.
+344                           Lines should not be more than 80 characters. This line is 145 characters.
+345                            Lines should not be more than 80 characters. This line is 87 characters.
+346                            Lines should not be more than 80 characters. This line is 81 characters.
+347                            Lines should not be more than 80 characters. This line is 85 characters.
+348                            Lines should not be more than 80 characters. This line is 83 characters.
+349                            Lines should not be more than 80 characters. This line is 84 characters.
+350                            Lines should not be more than 80 characters. This line is 86 characters.
+351                            Lines should not be more than 80 characters. This line is 85 characters.
+352                            Lines should not be more than 80 characters. This line is 92 characters.
+353                            Lines should not be more than 80 characters. This line is 90 characters.
+354                            Lines should not be more than 80 characters. This line is 86 characters.
+355                            Lines should not be more than 80 characters. This line is 88 characters.
+356                            Lines should not be more than 80 characters. This line is 94 characters.
+357                            Lines should not be more than 80 characters. This line is 82 characters.
+358                                                                          Put a space after a comma.
+359                                                                          Put a space after a comma.
+360                                                                          Put a space after a comma.
+361                                                                          Put a space after a comma.
+362                                                                          Put a space after a comma.
+363                                                                          Put a space after a comma.
+364                                                                          Put a space after a comma.
+365                                                                          Put a space after a comma.
+366                                                                          Put a space after a comma.
+367                                                                          Put a space after a comma.
+368                                                                          Put a space after a comma.
+369                                                                          Put a space after a comma.
+370                                                                          Put a space after a comma.
+371                                                                          Put a space after a comma.
+372                                                                          Put a space after a comma.
+373                                                                          Put a space after a comma.
+374                            Lines should not be more than 80 characters. This line is 84 characters.
+375                            Lines should not be more than 80 characters. This line is 93 characters.
+376                            Lines should not be more than 80 characters. This line is 86 characters.
+377                            Lines should not be more than 80 characters. This line is 93 characters.
+378                            Lines should not be more than 80 characters. This line is 86 characters.
+379                            Lines should not be more than 80 characters. This line is 88 characters.
+380                            Lines should not be more than 80 characters. This line is 88 characters.
+381                            Lines should not be more than 80 characters. This line is 86 characters.
+382                           Lines should not be more than 80 characters. This line is 104 characters.
+383                           Lines should not be more than 80 characters. This line is 112 characters.
+384                                                     Indentation should be 8 spaces but is 6 spaces.
+385                            Lines should not be more than 80 characters. This line is 82 characters.
+386                                Variable and function name style should match snake_case or symbols.
+387                                Variable and function name style should match snake_case or symbols.
+388                                      Use implicit return behavior; explicit return() is not needed.
+389                            Lines should not be more than 80 characters. This line is 90 characters.
+390                                                                          Put a space after a comma.
+391                                Variable and function name style should match snake_case or symbols.
+392                                Variable and function name style should match snake_case or symbols.
+393                                Variable and function name style should match snake_case or symbols.
+394                                Variable and function name style should match snake_case or symbols.
+395                                Variable and function name style should match snake_case or symbols.
+396                            Lines should not be more than 80 characters. This line is 89 characters.
+397                            Lines should not be more than 80 characters. This line is 90 characters.
+398                           Lines should not be more than 80 characters. This line is 105 characters.
+399                            Lines should not be more than 80 characters. This line is 93 characters.
+400                            Lines should not be more than 80 characters. This line is 86 characters.
+401                            Lines should not be more than 80 characters. This line is 87 characters.
+402                           Lines should not be more than 80 characters. This line is 109 characters.
+403                            Lines should not be more than 80 characters. This line is 85 characters.
+404                            Lines should not be more than 80 characters. This line is 84 characters.
+405                            Lines should not be more than 80 characters. This line is 90 characters.
+406                           Lines should not be more than 80 characters. This line is 103 characters.
+407                                      Use implicit return behavior; explicit return() is not needed.
+408                            Lines should not be more than 80 characters. This line is 82 characters.
+409                                Variable and function name style should match snake_case or symbols.
+410                            Lines should not be more than 80 characters. This line is 87 characters.
+411                                Variable and function name style should match snake_case or symbols.
+412                                Variable and function name style should match snake_case or symbols.
+413                                Variable and function name style should match snake_case or symbols.
+414                                Variable and function name style should match snake_case or symbols.
+415                                Variable and function name style should match snake_case or symbols.
+416                                Variable and function name style should match snake_case or symbols.
+417                                Variable and function name style should match snake_case or symbols.
+418                                Variable and function name style should match snake_case or symbols.
+419                                Variable and function name style should match snake_case or symbols.
+420                                Variable and function name style should match snake_case or symbols.
+421                                Variable and function name style should match snake_case or symbols.
+422                                Variable and function name style should match snake_case or symbols.
+423                                Variable and function name style should match snake_case or symbols.
+424                                Variable and function name style should match snake_case or symbols.
+425                                Variable and function name style should match snake_case or symbols.
+426                                Variable and function name style should match snake_case or symbols.
+427                                Variable and function name style should match snake_case or symbols.
+428                                Variable and function name style should match snake_case or symbols.
+429                                Variable and function name style should match snake_case or symbols.
+430                                Variable and function name style should match snake_case or symbols.
+431                                Variable and function name style should match snake_case or symbols.
+432                            Lines should not be more than 80 characters. This line is 82 characters.
+433                            Lines should not be more than 80 characters. This line is 81 characters.
+434                                                     Indentation should be 2 spaces but is 4 spaces.
+435                                Variable and function name style should match snake_case or symbols.
+436                                Variable and function name style should match snake_case or symbols.
+437                                Variable and function name style should match snake_case or symbols.
+438                                Variable and function name style should match snake_case or symbols.
+439                                Variable and function name style should match snake_case or symbols.
+440                                Variable and function name style should match snake_case or symbols.
+441                            Lines should not be more than 80 characters. This line is 85 characters.
+442                            Lines should not be more than 80 characters. This line is 97 characters.
+443                                Variable and function name style should match snake_case or symbols.
+444                                Variable and function name style should match snake_case or symbols.
+445                                Variable and function name style should match snake_case or symbols.
+446                            Lines should not be more than 80 characters. This line is 94 characters.
+447                           Lines should not be more than 80 characters. This line is 103 characters.
+448                                Variable and function name style should match snake_case or symbols.
+449                                Variable and function name style should match snake_case or symbols.
+450                                Variable and function name style should match snake_case or symbols.
+451                                Variable and function name style should match snake_case or symbols.
+452                                Variable and function name style should match snake_case or symbols.
+453                                Variable and function name style should match snake_case or symbols.
+454                                Variable and function name style should match snake_case or symbols.
+455                            Lines should not be more than 80 characters. This line is 81 characters.
+456                            Lines should not be more than 80 characters. This line is 90 characters.
+457                            Lines should not be more than 80 characters. This line is 83 characters.
+458                            Lines should not be more than 80 characters. This line is 86 characters.
+459                           Lines should not be more than 80 characters. This line is 104 characters.
+460                                      Use implicit return behavior; explicit return() is not needed.
+461                                      Use implicit return behavior; explicit return() is not needed.
+462                            Lines should not be more than 80 characters. This line is 83 characters.
+463                            Lines should not be more than 80 characters. This line is 85 characters.
+464                            Lines should not be more than 80 characters. This line is 81 characters.
+465                            Lines should not be more than 80 characters. This line is 86 characters.
+466                            Lines should not be more than 80 characters. This line is 92 characters.
+467                                                              Put spaces around all infix operators.
+468                                      Use implicit return behavior; explicit return() is not needed.
+469                            Lines should not be more than 80 characters. This line is 85 characters.
+470                            Lines should not be more than 80 characters. This line is 85 characters.
+471                                Variable and function name style should match snake_case or symbols.
+472                            Lines should not be more than 80 characters. This line is 92 characters.
+473                                                     Indentation should be 8 spaces but is 6 spaces.
+474                                Variable and function name style should match snake_case or symbols.
+475                                Variable and function name style should match snake_case or symbols.
+476                                Variable and function name style should match snake_case or symbols.
+477                                Variable and function name style should match snake_case or symbols.
+478                                Variable and function name style should match snake_case or symbols.
+479                                Variable and function name style should match snake_case or symbols.
+480                                Variable and function name style should match snake_case or symbols.
+481                                Variable and function name style should match snake_case or symbols.
+482                                Variable and function name style should match snake_case or symbols.
+483                                Variable and function name style should match snake_case or symbols.
+484                                Variable and function name style should match snake_case or symbols.
+485                                Variable and function name style should match snake_case or symbols.
+486                                Variable and function name style should match snake_case or symbols.
+487                                Variable and function name style should match snake_case or symbols.
+488                                Variable and function name style should match snake_case or symbols.
+489                                Variable and function name style should match snake_case or symbols.
+490                                Variable and function name style should match snake_case or symbols.
+491                                Variable and function name style should match snake_case or symbols.
+492                                Variable and function name style should match snake_case or symbols.
+493                                Variable and function name style should match snake_case or symbols.
+494                                Variable and function name style should match snake_case or symbols.
+495                                Variable and function name style should match snake_case or symbols.
+496                                Variable and function name style should match snake_case or symbols.
+497                                Variable and function name style should match snake_case or symbols.
+498                                Variable and function name style should match snake_case or symbols.
+499                                Variable and function name style should match snake_case or symbols.
+500                                Variable and function name style should match snake_case or symbols.
+501                                Variable and function name style should match snake_case or symbols.
+502                                Variable and function name style should match snake_case or symbols.
+503                                Variable and function name style should match snake_case or symbols.
+504                                Variable and function name style should match snake_case or symbols.
+505                                Variable and function name style should match snake_case or symbols.
+506                                Variable and function name style should match snake_case or symbols.
+507                                Variable and function name style should match snake_case or symbols.
+508                            Lines should not be more than 80 characters. This line is 83 characters.
+509                                Variable and function name style should match snake_case or symbols.
+510                                Variable and function name style should match snake_case or symbols.
+511                                Variable and function name style should match snake_case or symbols.
+512                                Variable and function name style should match snake_case or symbols.
+513                            Lines should not be more than 80 characters. This line is 82 characters.
+514                                Variable and function name style should match snake_case or symbols.
+515                                                                              Remove commented code.
+516                                Variable and function name style should match snake_case or symbols.
+517                                Variable and function name style should match snake_case or symbols.
+518                                                                              Remove commented code.
+519                                Variable and function name style should match snake_case or symbols.
+520                                Variable and function name style should match snake_case or symbols.
+521                                Variable and function name style should match snake_case or symbols.
+522                                Variable and function name style should match snake_case or symbols.
+523                                Variable and function name style should match snake_case or symbols.
+524                                Variable and function name style should match snake_case or symbols.
+525                                Variable and function name style should match snake_case or symbols.
+526                                Variable and function name style should match snake_case or symbols.
+527                                Variable and function name style should match snake_case or symbols.
+528                                Variable and function name style should match snake_case or symbols.
+529                                Variable and function name style should match snake_case or symbols.
+530                                Variable and function name style should match snake_case or symbols.
+531                                Variable and function name style should match snake_case or symbols.
+532                                Variable and function name style should match snake_case or symbols.
+533                                Variable and function name style should match snake_case or symbols.
+534                                Variable and function name style should match snake_case or symbols.
+535                                Variable and function name style should match snake_case or symbols.
+536                                Variable and function name style should match snake_case or symbols.
+537                                Variable and function name style should match snake_case or symbols.
+538                                Variable and function name style should match snake_case or symbols.
+539                                Variable and function name style should match snake_case or symbols.
+540                                Variable and function name style should match snake_case or symbols.
+541                                Variable and function name style should match snake_case or symbols.
+542                                Variable and function name style should match snake_case or symbols.
+543                                Variable and function name style should match snake_case or symbols.
+544                                Variable and function name style should match snake_case or symbols.
+545                                Variable and function name style should match snake_case or symbols.
+546                                Variable and function name style should match snake_case or symbols.
+547                                Variable and function name style should match snake_case or symbols.
+548                                Variable and function name style should match snake_case or symbols.
+549                                Variable and function name style should match snake_case or symbols.
+550                                Variable and function name style should match snake_case or symbols.
+551                                Variable and function name style should match snake_case or symbols.
+552                                Variable and function name style should match snake_case or symbols.
+553                                Variable and function name style should match snake_case or symbols.
+554                                Variable and function name style should match snake_case or symbols.
+555                                Variable and function name style should match snake_case or symbols.
+556                                Variable and function name style should match snake_case or symbols.
+557                                Variable and function name style should match snake_case or symbols.
+558                                Variable and function name style should match snake_case or symbols.
+559                                Variable and function name style should match snake_case or symbols.
+560                                Variable and function name style should match snake_case or symbols.
+561                                Variable and function name style should match snake_case or symbols.
+562                                Variable and function name style should match snake_case or symbols.
+563                                Variable and function name style should match snake_case or symbols.
+564                                Variable and function name style should match snake_case or symbols.
+565                                Variable and function name style should match snake_case or symbols.
+566                                Variable and function name style should match snake_case or symbols.
+567                                Variable and function name style should match snake_case or symbols.
+568                                Variable and function name style should match snake_case or symbols.
+569                                Variable and function name style should match snake_case or symbols.
+570                                Variable and function name style should match snake_case or symbols.
+571                                                    Indentation should be 10 spaces but is 8 spaces.
+572                           Lines should not be more than 80 characters. This line is 144 characters.
+573                           Lines should not be more than 80 characters. This line is 144 characters.
+574                           Lines should not be more than 80 characters. This line is 145 characters.
+575                           Lines should not be more than 80 characters. This line is 108 characters.
+576                           Lines should not be more than 80 characters. This line is 108 characters.
+577                           Lines should not be more than 80 characters. This line is 115 characters.
+578                            Lines should not be more than 80 characters. This line is 90 characters.
+579                           Lines should not be more than 80 characters. This line is 179 characters.
+580                           Lines should not be more than 80 characters. This line is 179 characters.
+581                           Lines should not be more than 80 characters. This line is 180 characters.
+582                            Lines should not be more than 80 characters. This line is 97 characters.
+583                            Lines should not be more than 80 characters. This line is 97 characters.
+584                           Lines should not be more than 80 characters. This line is 104 characters.
+585                                                    local variable 'fb' assigned but may not be used
+586                                Variable and function name style should match snake_case or symbols.
+587                                Variable and function name style should match snake_case or symbols.
+588                                Variable and function name style should match snake_case or symbols.
+589                                Variable and function name style should match snake_case or symbols.
+590                           Lines should not be more than 80 characters. This line is 101 characters.
+591                            Lines should not be more than 80 characters. This line is 91 characters.
+592                            Lines should not be more than 80 characters. This line is 81 characters.
+593                                                                              Remove commented code.
+594                                                                              Remove commented code.
+595                                                                              Remove commented code.
+596                                                                              Remove commented code.
+597                                                                              Remove commented code.
+598                            Lines should not be more than 80 characters. This line is 98 characters.
+599                                                 Hanging indent should be 14 spaces but is 4 spaces.
+600                            Lines should not be more than 80 characters. This line is 84 characters.
+601                                                             Do not place spaces before parentheses.
+602                                                              Put spaces around all infix operators.
+603                                                              Put spaces around all infix operators.
+604                                                              Put spaces around all infix operators.
+605                                                              Put spaces around all infix operators.
+606                                                              Put spaces around all infix operators.
+607                                                              Put spaces around all infix operators.
+608                                                              Put spaces around all infix operators.
+609                                                              Put spaces around all infix operators.
+610                                                              Put spaces around all infix operators.
+611                                                              Put spaces around all infix operators.
+612                                                              Put spaces around all infix operators.
+613                                                              Put spaces around all infix operators.
+614                                                              Put spaces around all infix operators.
+615                                                              Put spaces around all infix operators.
+616                                                              Put spaces around all infix operators.
+617                            Lines should not be more than 80 characters. This line is 89 characters.
+618                                                              Put spaces around all infix operators.
+619                            Lines should not be more than 80 characters. This line is 93 characters.
+620                                                                          Put a space after a comma.
+621                                                                          Put a space after a comma.
+622                                                                          Put a space after a comma.
+623                                                              Put spaces around all infix operators.
+624                                                              Put spaces around all infix operators.
+625                                                              Put spaces around all infix operators.
+626                                                              Put spaces around all infix operators.
+627                                                              Put spaces around all infix operators.
+628                                                              Put spaces around all infix operators.
+629                                                              Put spaces around all infix operators.
+630                                                              Put spaces around all infix operators.
+631                                                              Put spaces around all infix operators.
+632                                                              Put spaces around all infix operators.
+633                                                              Put spaces around all infix operators.
+634                                                              Put spaces around all infix operators.
+635                                                              Put spaces around all infix operators.
+636                                                              Put spaces around all infix operators.
+637                                                              Put spaces around all infix operators.
+638                                                              Put spaces around all infix operators.
+639                                                                          Put a space after a comma.
+640                                                                          Put a space after a comma.
+641                                                              Put spaces around all infix operators.
+642                                                              Put spaces around all infix operators.
+643                                                              Put spaces around all infix operators.
+644                                                              Put spaces around all infix operators.
+645                                                              Put spaces around all infix operators.
+646                                                              Put spaces around all infix operators.
+647                                                              Put spaces around all infix operators.
+648                                                              Put spaces around all infix operators.
+649                                                              Put spaces around all infix operators.
+650                                                              Put spaces around all infix operators.
+651                                                              Put spaces around all infix operators.
+652                                                              Put spaces around all infix operators.
+653                                                              Put spaces around all infix operators.
+654                                                              Put spaces around all infix operators.
+655                                                              Put spaces around all infix operators.
+656                                                              Put spaces around all infix operators.
+657                            Lines should not be more than 80 characters. This line is 96 characters.
+658                                                                          Put a space after a comma.
+659                                                                          Put a space after a comma.
+660                                                              Put spaces around all infix operators.
+661                                                              Put spaces around all infix operators.
+662                                                              Put spaces around all infix operators.
+663                                                              Put spaces around all infix operators.
+664                                                              Put spaces around all infix operators.
+665                                                              Put spaces around all infix operators.
+666                                                              Put spaces around all infix operators.
+667                                                              Put spaces around all infix operators.
+668                                                              Put spaces around all infix operators.
+669                                                              Put spaces around all infix operators.
+670                                                              Put spaces around all infix operators.
+671                                                              Put spaces around all infix operators.
+672                                                              Put spaces around all infix operators.
+673                                                              Put spaces around all infix operators.
+674                                                              Put spaces around all infix operators.
+675                                                              Put spaces around all infix operators.
+676                                                              Put spaces around all infix operators.
+677                                                              Put spaces around all infix operators.
+678                                                              Put spaces around all infix operators.
+679                                                              Put spaces around all infix operators.
+680                                                              Put spaces around all infix operators.
+681                                                              Put spaces around all infix operators.
+682                                                              Put spaces around all infix operators.
+683                                                              Put spaces around all infix operators.
+684                                                              Put spaces around all infix operators.
+685                                                              Put spaces around all infix operators.
+686                                                              Put spaces around all infix operators.
+687                                                              Put spaces around all infix operators.
+688                                                              Put spaces around all infix operators.
+689                                                              Put spaces around all infix operators.
+690                                                              Put spaces around all infix operators.
+691                                                              Put spaces around all infix operators.
+692                                                              Put spaces around all infix operators.
+693                                                              Put spaces around all infix operators.
+694                                                              Put spaces around all infix operators.
+695                                                              Put spaces around all infix operators.
+696                                                              Put spaces around all infix operators.
+697                                                              Put spaces around all infix operators.
+698                                                              Put spaces around all infix operators.
+699                                                              Put spaces around all infix operators.
+700                                                              Put spaces around all infix operators.
+701                                                              Put spaces around all infix operators.
+702                                                              Put spaces around all infix operators.
+703                                                              Put spaces around all infix operators.
+704                                                              Put spaces around all infix operators.
+705                                                              Put spaces around all infix operators.
+706                                                              Put spaces around all infix operators.
+707                                                              Put spaces around all infix operators.
+708                            Lines should not be more than 80 characters. This line is 93 characters.
+709                                                              Put spaces around all infix operators.
+710                                                              Put spaces around all infix operators.
+711                                                              Put spaces around all infix operators.
+712                                                              Put spaces around all infix operators.
+713                                                              Put spaces around all infix operators.
+714                                                              Put spaces around all infix operators.
+715                                                              Put spaces around all infix operators.
+716                                                              Put spaces around all infix operators.
+717                                                              Put spaces around all infix operators.
+718                                                              Put spaces around all infix operators.
+719                                                              Put spaces around all infix operators.
+720                                                              Put spaces around all infix operators.
+721                                                              Put spaces around all infix operators.
+722                                                              Put spaces around all infix operators.
+723                                                              Put spaces around all infix operators.
+724                                                              Put spaces around all infix operators.
+725                                                     Indentation should be 2 spaces but is 0 spaces.
+726                                                                              Remove commented code.
+727                                                                              Remove commented code.
+728                                                                              Remove commented code.
+729                                                                              Remove commented code.
+730                                                                              Remove commented code.
+731                            Lines should not be more than 80 characters. This line is 82 characters.
+732                            Lines should not be more than 80 characters. This line is 81 characters.
+733                            Lines should not be more than 80 characters. This line is 82 characters.
+734                            Lines should not be more than 80 characters. This line is 86 characters.
+735                            Lines should not be more than 80 characters. This line is 82 characters.
+736                            Lines should not be more than 80 characters. This line is 83 characters.
+737                            Lines should not be more than 80 characters. This line is 82 characters.
+738                            Lines should not be more than 80 characters. This line is 82 characters.
+739                            Lines should not be more than 80 characters. This line is 82 characters.
+740                            Lines should not be more than 80 characters. This line is 82 characters.
+741                            Lines should not be more than 80 characters. This line is 82 characters.
+742                            Lines should not be more than 80 characters. This line is 81 characters.
+743                            Lines should not be more than 80 characters. This line is 82 characters.
+744                            Lines should not be more than 80 characters. This line is 84 characters.
+745                            Lines should not be more than 80 characters. This line is 82 characters.
+746                            Lines should not be more than 80 characters. This line is 85 characters.
+747                            Lines should not be more than 80 characters. This line is 82 characters.
+748                            Lines should not be more than 80 characters. This line is 85 characters.
+749                            Lines should not be more than 80 characters. This line is 82 characters.
+750                            Lines should not be more than 80 characters. This line is 82 characters.
+751                            Lines should not be more than 80 characters. This line is 82 characters.
+752                            Lines should not be more than 80 characters. This line is 83 characters.
+753                            Lines should not be more than 80 characters. This line is 82 characters.
+754                            Lines should not be more than 80 characters. This line is 83 characters.
+755                            Lines should not be more than 80 characters. This line is 82 characters.
+756                            Lines should not be more than 80 characters. This line is 85 characters.
+757                           Lines should not be more than 80 characters. This line is 115 characters.
+758                            Lines should not be more than 80 characters. This line is 83 characters.
+759                                                     Indentation should be 2 spaces but is 0 spaces.
+760                                                              Put spaces around all infix operators.
+761                                                              Put spaces around all infix operators.
+762                                                              Put spaces around all infix operators.
+763                                                              Put spaces around all infix operators.
+764                                                              Put spaces around all infix operators.
+765                                                              Put spaces around all infix operators.
+766                                                              Put spaces around all infix operators.
+767                                                              Put spaces around all infix operators.
+768                                                              Put spaces around all infix operators.
+769                                                              Put spaces around all infix operators.
+770                                                              Put spaces around all infix operators.
+771                                                              Put spaces around all infix operators.
+772                                                              Put spaces around all infix operators.
+773                                                              Put spaces around all infix operators.
+774                                                              Put spaces around all infix operators.
+775                                                              Put spaces around all infix operators.
+776                            Lines should not be more than 80 characters. This line is 82 characters.
+777                            Lines should not be more than 80 characters. This line is 85 characters.
+778                            Lines should not be more than 80 characters. This line is 82 characters.
+779                            Lines should not be more than 80 characters. This line is 82 characters.
+780                                                     Indentation should be 2 spaces but is 0 spaces.
+781                                                     Indentation should be 2 spaces but is 0 spaces.
+782                                                     Indentation should be 2 spaces but is 0 spaces.
+783                            Lines should not be more than 80 characters. This line is 83 characters.
+784                                                     Indentation should be 2 spaces but is 0 spaces.
+785                                                     Indentation should be 2 spaces but is 0 spaces.
+786                                                     Indentation should be 2 spaces but is 0 spaces.
+787                            Lines should not be more than 80 characters. This line is 81 characters.
+788                                                     Indentation should be 2 spaces but is 0 spaces.
+789                                                     Indentation should be 2 spaces but is 0 spaces.
+790                           Lines should not be more than 80 characters. This line is 151 characters.
+791                                                     Indentation should be 2 spaces but is 0 spaces.
+792                            Lines should not be more than 80 characters. This line is 81 characters.
+793                                                     Indentation should be 2 spaces but is 0 spaces.
+794                                                     Indentation should be 2 spaces but is 0 spaces.
+795                                                     Indentation should be 2 spaces but is 0 spaces.
+796                                                     Indentation should be 2 spaces but is 0 spaces.
+797                                                     Indentation should be 2 spaces but is 0 spaces.
+798                                                     Indentation should be 2 spaces but is 0 spaces.
+799                                                     Indentation should be 2 spaces but is 0 spaces.
+800                            Lines should not be more than 80 characters. This line is 82 characters.
+801                                                     Indentation should be 2 spaces but is 0 spaces.
+802                                                     Indentation should be 2 spaces but is 0 spaces.
+803                                                     Indentation should be 2 spaces but is 0 spaces.
+804                                                     Indentation should be 2 spaces but is 0 spaces.
+805                            Lines should not be more than 80 characters. This line is 81 characters.
+806                                                     Indentation should be 2 spaces but is 0 spaces.
+807                                                     Indentation should be 2 spaces but is 0 spaces.
+808                            Lines should not be more than 80 characters. This line is 82 characters.
+809                                                     Indentation should be 2 spaces but is 0 spaces.
+810                                                     Indentation should be 2 spaces but is 0 spaces.
+811                                                     Indentation should be 2 spaces but is 0 spaces.
+812                           Lines should not be more than 80 characters. This line is 148 characters.
+813                                                                          Put a space after a comma.
+814                            Lines should not be more than 80 characters. This line is 87 characters.
+815                                      Use implicit return behavior; explicit return() is not needed.
+816                            Lines should not be more than 80 characters. This line is 86 characters.
+817                            Lines should not be more than 80 characters. This line is 86 characters.
+818                           Lines should not be more than 80 characters. This line is 107 characters.
+819                            Lines should not be more than 80 characters. This line is 94 characters.
+820                            Lines should not be more than 80 characters. This line is 96 characters.
+821                            Lines should not be more than 80 characters. This line is 83 characters.
+822                            Lines should not be more than 80 characters. This line is 81 characters.
+823                                Variable and function name style should match snake_case or symbols.
+824                                Variable and function name style should match snake_case or symbols.
+825                                Variable and function name style should match snake_case or symbols.
+826                            Lines should not be more than 80 characters. This line is 86 characters.
+827                           Lines should not be more than 80 characters. This line is 104 characters.
+828                           Lines should not be more than 80 characters. This line is 103 characters.
+829                           Lines should not be more than 80 characters. This line is 109 characters.
+830                            Lines should not be more than 80 characters. This line is 82 characters.
+831                            Lines should not be more than 80 characters. This line is 84 characters.
+832                            Lines should not be more than 80 characters. This line is 85 characters.
+833                            Lines should not be more than 80 characters. This line is 88 characters.
+834                           Lines should not be more than 80 characters. This line is 108 characters.
+835                            Lines should not be more than 80 characters. This line is 94 characters.
+836                           Lines should not be more than 80 characters. This line is 105 characters.
+837                           Lines should not be more than 80 characters. This line is 117 characters.
+838                                                     Indentation should be 2 spaces but is 4 spaces.
+839                                Variable and function name style should match snake_case or symbols.
+840                                                                              Remove commented code.
+841                            Lines should not be more than 80 characters. This line is 88 characters.
+842                            Lines should not be more than 80 characters. This line is 88 characters.
+843                            Lines should not be more than 80 characters. This line is 83 characters.
+844                            Lines should not be more than 80 characters. This line is 82 characters.
+845                            Lines should not be more than 80 characters. This line is 88 characters.
+846                            Lines should not be more than 80 characters. This line is 82 characters.
+847                                                     Indentation should be 2 spaces but is 4 spaces.
+848                                                           Replace compound semicolons by a newline.
+849                                                           Replace compound semicolons by a newline.
+850                                                           Replace compound semicolons by a newline.
+851                            Lines should not be more than 80 characters. This line is 82 characters.
+852                                                           Replace compound semicolons by a newline.
+853                                                           Replace compound semicolons by a newline.
+854                                                           Replace compound semicolons by a newline.
+855                                                           Replace compound semicolons by a newline.
+856                            Lines should not be more than 80 characters. This line is 90 characters.
+857                            Lines should not be more than 80 characters. This line is 92 characters.
+858                            Lines should not be more than 80 characters. This line is 90 characters.
+859                                Variable and function name style should match snake_case or symbols.
+860                                Variable and function name style should match snake_case or symbols.
+861                                Variable and function name style should match snake_case or symbols.
+862 Opening curly braces should never go on their own line and should always be followed by a new line.
+863                                                           Replace compound semicolons by a newline.
+864                            Lines should not be more than 80 characters. This line is 85 characters.
+865       Closing curly-braces should always be on their own line, unless they are followed by an else.
+866                                Variable and function name style should match snake_case or symbols.
+867                                Variable and function name style should match snake_case or symbols.
+868                            Lines should not be more than 80 characters. This line is 81 characters.
+869                                Variable and function name style should match snake_case or symbols.
+870                                Variable and function name style should match snake_case or symbols.
+871                                                           Replace compound semicolons by a newline.
+872                                Variable and function name style should match snake_case or symbols.
+873                                                           Replace compound semicolons by a newline.
+874                                Variable and function name style should match snake_case or symbols.
+875                            Lines should not be more than 80 characters. This line is 88 characters.
+876                            Lines should not be more than 80 characters. This line is 81 characters.
+877                            Lines should not be more than 80 characters. This line is 82 characters.
+878                            Lines should not be more than 80 characters. This line is 84 characters.
+879                           Lines should not be more than 80 characters. This line is 114 characters.
+880                            Lines should not be more than 80 characters. This line is 95 characters.
+881                                      Use implicit return behavior; explicit return() is not needed.
+882                                      Use implicit return behavior; explicit return() is not needed.
+883                                      Use implicit return behavior; explicit return() is not needed.
+884                                      Use implicit return behavior; explicit return() is not needed.
+885                                      Use implicit return behavior; explicit return() is not needed.
+886                                      Use implicit return behavior; explicit return() is not needed.
