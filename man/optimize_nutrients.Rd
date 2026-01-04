@@ -17,13 +17,13 @@ optimize_nutrients(nutrient_matrix, target, importance)
 \value{
 An object of class 'nutrient_optimization_result' with elements:
   \itemize{
-    \item amounts \u2014 named numeric (mmol/L) of each compound (same order as rownames of input)
-    \item achieved \u2014 named numeric (mmol/L) delivered per nutrient
-    \item target \u2014 named numeric (mmol/L) target per nutrient
-    \item abs_error \u2014 achieved - target (mmol/L)
-    \item percent_error \u2014 100 * abs_error / target (NA when target == 0)
-    \item squared_error \u2014 sum(abs_error^2)
-    \item rel_squared_error \u2014 sum((abs_error/target)^2, na.rm = TRUE)
+    \item amounts - named numeric (mmol/L) of each compound (same order as rownames of input)
+    \item achieved - named numeric (mmol/L) delivered per nutrient
+    \item target - named numeric (mmol/L) target per nutrient
+    \item abs_error - achieved - target (mmol/L)
+    \item percent_error - 100 * abs_error / target (NA when target == 0)
+    \item squared_error - sum(abs_error^2)
+    \item rel_squared_error - sum((abs_error/target)^2, na.rm = TRUE)
   }
 }
 \description{

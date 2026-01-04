@@ -18,7 +18,7 @@ ph_from_achieved(
 \arguments{
 \item{achieved}{Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
 If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
-from BWB "Basenkapazit\u00e4t KB 8,2" / KS 8.2 and used to fix carbonate speciation.}
+from BWB "Basenkapazitaet KB 8,2" / KS 8.2 and used to fix carbonate speciation.}
 
 \item{temp_C}{Temperature in Celsius (only 25 C supported in this version).}
 
