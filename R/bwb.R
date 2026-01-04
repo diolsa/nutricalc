@@ -71,7 +71,7 @@ fetch_bwb_mittelwert <- function(plz) {
   combined$Parameter <- trimws(combined$Parameter)
   combined$Mittelwert_num <- vapply(combined$Mittelwert, parse_mittelwert, numeric(1))
   combined$Mittelwert_digits <- vapply(combined$Mittelwert, count_decimal_places, integer(1))
-  combined$Einheit_clean <- vapply(combined$Einheit, normalize_unit, character(1))
+  combined$Einheit_clean <- vapply(combined$Einheit, normalize_bwb_unit, character(1))
   combined$Target <- vapply(combined$Parameter, map_parameter_to_nutrient, character(1))
   combined <- combined[nzchar(combined$Target), , drop = FALSE]
 
@@ -177,7 +177,7 @@ map_parameter_to_nutrient <- function(param) {
   ""
 }
 
-normalize_unit <- function(unit) {
+normalize_bwb_unit <- function(unit) {
   u <- tolower(trimws(gsub("\u00a0", "", as.character(unit), fixed = TRUE)))
   u <- gsub(",", ".", u, fixed = TRUE)
   if (!nzchar(u)) return(NA_character_)

@@ -45,48 +45,6 @@ ion_diffusion_25C <- function() {
   )
 }
 
-normalize_nutrient_names <- function(x) {
-  x <- gsub("[–-]", "_", x)
-  x <- gsub("\\s+", "", x)
-  x
-}
-
-to_named_numeric <- function(x) {
-  if (is.data.frame(x)) {
-    if (!all(c("Nutrient", "Achieved") %in% names(x))) {
-      stop("Data frame must have columns 'Nutrient' and 'Achieved'.", call. = FALSE)
-    }
-    nm <- as.character(x$Nutrient)
-    vals <- x$Achieved
-    names(vals) <- nm
-    x <- vals
-  }
-
-  if (is.null(names(x))) {
-    stop("achieved must be a named numeric vector or a data.frame with Nutrient/Achieved columns.", call. = FALSE)
-  }
-
-  vals <- x
-  if (is.character(vals)) {
-    vals[vals == ""] <- NA
-    vals <- suppressWarnings(as.numeric(vals))
-  }
-  if (!is.numeric(vals)) {
-    vals <- suppressWarnings(as.numeric(vals))
-  }
-
-  names(vals) <- normalize_nutrient_names(names(vals))
-
-  na_idx <- is.na(vals)
-  if (any(na_idx)) {
-    bad <- names(vals)[na_idx]
-    bad <- unique(bad[!is.na(bad) & nzchar(bad)])
-    stop(sprintf("achieved has NA values for: %s", paste(bad, collapse = ", ")), call. = FALSE)
-  }
-
-  vals
-}
-
 # Convert achieved totals + pH-speciated species into the ions we want for EC (mmol/L).
 make_ec_ions <- function(achieved, ph_res) {
   achieved <- to_named_numeric(achieved)

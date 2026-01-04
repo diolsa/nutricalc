@@ -98,7 +98,3 @@ recipe_summary <- function(recipe, unit = c("mmol/L","mg/L")) {
     row.names = NULL
   )
 }
-
-#' @keywords internal
-`%||%` <- function(a, b) if (is.null(a)) b else a
-
