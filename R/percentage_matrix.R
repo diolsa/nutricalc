@@ -18,6 +18,18 @@ nutrient_element_map <- list(
   "Si"    = "Si"
 )
 
+#' Nutrient mass percentage matrix
+#'
+#' Mass percentages of nutrients in each fertilizer derived from `nutrient_matrix`.
+#'
+#' @format A numeric matrix with rows as fertilizer formulas and columns as nutrients
+#' (NO3_N, NH4_N, P, K, Ca, Mg, S, Na, Cl, Fe, Mn, Zn, B, Cu, Mo, Si). Each value
+#' is the mass percentage of the nutrient in the fertilizer.
+#' @name percentage_matrix
+#' @docType data
+#' @usage data(percentage_matrix)
+NULL
+
 #' Compute a matrix of mass percentages of nutrients in each fertilizer
 #'
 #' @param nutrient_matrix A [fertilizer x nutrient] matrix in mmol/mol
@@ -50,4 +62,3 @@ compute_percentage_matrix <- function(nutrient_matrix) {
 
   return(percentage_matrix)
 }
-
