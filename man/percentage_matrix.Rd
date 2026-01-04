@@ -6,16 +6,12 @@
 \title{Nutrient mass percentage matrix}
 \format{
 A numeric matrix with rows as fertilizer formulas and columns as nutrients
-(\code{NO3_N}, \code{NH4_N}, \code{P}, \code{K}, \code{Ca}, \code{Mg},
-\code{S}, \code{Na}, \code{Cl}, \code{Fe}, \code{Mn}, \code{Zn},
-\code{B}, \code{Cu}, \code{Mo}, \code{Si}). Each value is the mass percentage
-of the nutrient in the fertilizer.
+(NO3_N, NH4_N, P, K, Ca, Mg, S, Na, Cl, Fe, Mn, Zn, B, Cu, Mo, Si). Each value
+is the mass percentage of the nutrient in the fertilizer.
 }
 \usage{
 data(percentage_matrix)
 }
 \description{
-Mass percentages of nutrients in each fertilizer derived from
-\code{nutrient_matrix}.
+Mass percentages of nutrients in each fertilizer derived from `nutrient_matrix`.
 }
-\keyword{datasets}

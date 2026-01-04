@@ -7,7 +7,7 @@
 run_app(...)
 }
 \arguments{
-\item{...}{Arguments passed to \code{\link[shiny:runApp]{shiny::runApp()}}.}
+\item{...}{Arguments passed to [shiny::runApp()].}
 }
 \description{
 Launch the NutriCalc Shiny App
