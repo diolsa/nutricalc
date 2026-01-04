@@ -1,6 +1,6 @@
 #' Compute molar mass of a chemical formula
 #'
-#' Supports formulas like "NaCl", "Ca(NO3)2", "CuSO4\u00b75H2O", "MgN2O6\u00b76H2O"
+#' Supports formulas like "NaCl", "Ca(NO3)2", "CuSO4·5H2O", "MgN2O6·6H2O"
 #' @param formula Chemical formula string
 #' @return Molar mass in g/mol
 #' @export
