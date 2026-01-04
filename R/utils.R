@@ -28,13 +28,13 @@ strip_negative_zero <- function(x) {
   x
 }
 
-#' @export
+#' @keywords internal
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
 #' Normalize nutrient name keys to match canonical forms
 #'
 #' @param x Character vector of nutrient names.
-#' @export
+#' @keywords internal
 normalize_nutrient_names <- function(x) {
   x <- gsub("[–-]", "_", x)
   x <- gsub("\\s+", "", x)
@@ -44,7 +44,7 @@ normalize_nutrient_names <- function(x) {
 #' Coerce nutrient data into a named numeric vector
 #'
 #' @param x Named numeric vector or data.frame with Nutrient/Achieved columns.
-#' @export
+#' @keywords internal
 to_named_numeric <- function(x) {
   if (is.data.frame(x)) {
     if (!all(c("Nutrient", "Achieved") %in% names(x))) {
@@ -85,7 +85,7 @@ to_named_numeric <- function(x) {
 #'
 #' @param u Unit string.
 #' @param canonical_unit The canonical unit to default to.
-#' @export
+#' @keywords internal
 normalize_unit <- function(u, canonical_unit = "mmol/L") {
   if (is.null(u) || is.na(u) || !nzchar(u)) return(canonical_unit)
   u <- trimws(u)
@@ -100,7 +100,7 @@ normalize_unit <- function(u, canonical_unit = "mmol/L") {
 #' @param vals Numeric vector of values.
 #' @param unit_in Unit string.
 #' @param canonical_unit Canonical unit.
-#' @export
+#' @keywords internal
 to_canonical_from_unit <- function(vals, unit_in, canonical_unit = "mmol/L") {
   unit_in <- normalize_unit(unit_in, canonical_unit = canonical_unit)
 
@@ -123,7 +123,7 @@ to_canonical_from_unit <- function(vals, unit_in, canonical_unit = "mmol/L") {
 #' @param vals Numeric vector of values.
 #' @param unit_out Unit string.
 #' @param canonical_unit Canonical unit.
-#' @export
+#' @keywords internal
 from_canonical_to_unit <- function(vals, unit_out, canonical_unit = "mmol/L") {
   unit_out <- normalize_unit(unit_out, canonical_unit = canonical_unit)
 

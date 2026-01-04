@@ -110,13 +110,13 @@ default_importance <- c(
 
 canonical_unit <- "mmol/L"
 
-`%||%` <- nutricalc::`%||%`
-normalize_unit <- function(u) nutricalc::normalize_unit(u, canonical_unit = canonical_unit)
+`%||%` <- nutricalc:::`%||%`
+normalize_unit <- function(u) nutricalc:::normalize_unit(u, canonical_unit = canonical_unit)
 to_canonical_from_unit <- function(vals, unit_in) {
-  nutricalc::to_canonical_from_unit(vals, unit_in, canonical_unit = canonical_unit)
+  nutricalc:::to_canonical_from_unit(vals, unit_in, canonical_unit = canonical_unit)
 }
 from_canonical_to_unit <- function(vals, unit_out) {
-  nutricalc::from_canonical_to_unit(vals, unit_out, canonical_unit = canonical_unit)
+  nutricalc:::from_canonical_to_unit(vals, unit_out, canonical_unit = canonical_unit)
 }
 
 default_targets_mmol <- {
