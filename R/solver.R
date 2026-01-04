@@ -124,12 +124,12 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
     mg_l <- amounts * molar_masses                        # mg L\u207b\u00b9
     df <- data.frame(
       Formula    = formulas,
-      "mmol l\u207b\u00b9" = round(amounts, 3),
-      "g mol\u207b\u00b9"  = round(molar_masses, 2),
-      "mg l\u207b\u00b9"   = round(mg_l, 2),
       row.names  = NULL,
       check.names = FALSE
     )
+    df[["mmol l\u207b\u00b9"]] <- round(amounts, 3)
+    df[["g mol\u207b\u00b9"]] <- round(molar_masses, 2)
+    df[["mg l\u207b\u00b9"]] <- round(mg_l, 2)
 
     # Only add total grams if vol > 1
     if (vol > 1) {
@@ -146,10 +146,10 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   } else {
     df <- data.frame(
       Formula    = formulas,
-      "mmol l\u207b\u00b9" = round(amounts, 3),
       row.names  = NULL,
       check.names = FALSE
     )
+    df[["mmol l\u207b\u00b9"]] <- round(amounts, 3)
     print(df)
     cat("\n\u2139\ufe0f Tip: define compute_molar_mass(formula) to show mg L\u207b\u00b9 and gram totals.\n")
   }

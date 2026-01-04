@@ -1005,12 +1005,13 @@ server <- function(input, output, session) {
 
     mgL <- tissue_mgL()
 
-    data.frame(
+    df <- data.frame(
       Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
       `Tissue %` = round(perc, 3),
-      `mg l\u207b\u00b9`   = round(mgL, 3),
       check.names = FALSE
     )
+    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
+    df
   }, sanitize.text.function = function(x) x)
 
 
@@ -1832,8 +1833,8 @@ server <- function(input, output, session) {
       g_total_work  <- mg_l * vol / 1000    # g for macros
       mg_total_work <- mg_l * vol           # mg for micros
 
-      df_out$`g mol\u207b\u00b9` <- sprintf("%.2f", mm)
-      df_out$`mg l\u207b\u00b9`  <- sprintf("%.2f", mg_l)
+      df_out[["g mol\u207b\u00b9"]] <- sprintf("%.2f", mm)
+      df_out[["mg l\u207b\u00b9"]]  <- sprintf("%.2f", mg_l)
 
       macro_rows <- amt_df$tank %in% c("A", "B")
       micro_rows <- amt_df$tank == "Micro"
