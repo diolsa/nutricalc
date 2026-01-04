@@ -5,8 +5,6 @@ library(bslib)
 library(Ternary)
 library(xml2)
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
-
 # =========================================================
 # 1) UI HELPERS & CONSTANTS
 # =========================================================
@@ -112,6 +110,15 @@ default_importance <- c(
 
 canonical_unit <- "mmol/L"
 
+`%||%` <- nutricalc:::`%||%`
+normalize_unit <- function(u) nutricalc:::normalize_unit(u, canonical_unit = canonical_unit)
+to_canonical_from_unit <- function(vals, unit_in) {
+  nutricalc:::to_canonical_from_unit(vals, unit_in, canonical_unit = canonical_unit)
+}
+from_canonical_to_unit <- function(vals, unit_out) {
+  nutricalc:::from_canonical_to_unit(vals, unit_out, canonical_unit = canonical_unit)
+}
+
 default_targets_mmol <- {
   v <- as.numeric(default_expr)
   names(v) <- nutrients
@@ -132,49 +139,6 @@ water_extra_keys <- c("HCO3", "KS82")
 water_extra_labels <- c(HCO3 = "KS 4.3", KS82 = "KB 8.2")
 water_extra_formulas <- c(HCO3 = "HCO3", KS82 = "CO2")
 water_keys <- c(nutrients, water_extra_keys)
-
-normalize_unit <- function(u) {
-  if (is.null(u) || is.na(u) || !nzchar(u)) return(canonical_unit)
-  u <- trimws(u)
-  u <- gsub("l-1", "L", u, ignore.case = TRUE)
-  u <- gsub("/l", "/L", u, ignore.case = TRUE)
-  u <- gsub("^umol", "µmol", u, ignore.case = TRUE)
-  u
-}
-
-to_canonical_from_unit <- function(vals, unit_in) {
-  unit_in <- normalize_unit(unit_in)
-
-  if (unit_in == canonical_unit) {
-    return(vals)
-  } else if (unit_in == "mg/L") {
-    if (!exists("convert_units", mode = "function")) {
-      stop("convert_units() not found (check R/convert_unit.R).", call. = FALSE)
-    }
-    return(convert_units(vals, to = canonical_unit))
-  } else if (unit_in == "µmol/L") {
-    return(vals / 1000)
-  } else {
-    stop("Unsupported input unit: ", unit_in, call. = FALSE)
-  }
-}
-
-from_canonical_to_unit <- function(vals, unit_out) {
-  unit_out <- normalize_unit(unit_out)
-
-  if (unit_out == canonical_unit) {
-    return(vals)
-  } else if (unit_out == "mg/L") {
-    if (!exists("convert_units", mode = "function")) {
-      stop("convert_units() not found (check R/convert_unit.R).", call. = FALSE)
-    }
-    return(convert_units(vals, to = "mg/L"))
-  } else if (unit_out == "µmol/L") {
-    return(vals * 1000)
-  } else {
-    stop("Unsupported output unit: ", unit_out, call. = FALSE)
-  }
-}
 
 parse_targets_from_inputs <- function(input, nutrients, unit_in, prefix = "expr_") {
   vals <- sapply(nutrients, function(nm) {
