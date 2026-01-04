@@ -117,7 +117,7 @@ make_ec_ions <- function(achieved, ph_res) {
 #' Units:
 #' - c is in mmol/L (mM); numerically identical to mol/m^3, used directly as such.
 #' - D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
-#' - Output: EC in mS/cm and \u00b5S/cm.
+#' - Output: EC in mS/cm and uS/cm.
 #'
 #' @param achieved Named numeric vector (mmol/L) or data.frame with columns
 #'   Nutrient and Achieved.
