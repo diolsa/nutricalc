@@ -1,6 +1,6 @@
 #' Compute molar mass of a chemical formula
 #'
-#' Supports formulas like "NaCl", "Ca(NO3)2", "CuSO4·5H2O", "MgN2O6·6H2O"
+#' Supports formulas like "NaCl", "Ca(NO3)2", "CuSO4\u00b75H2O", "MgN2O6\u00b76H2O"
 #' @param formula Chemical formula string
 #' @return Molar mass in g/mol
 #' @export
@@ -17,11 +17,11 @@ compute_molar_mass <- function(formula) {
 # Internal: element molar mass vector
 .molar_mass <- setNames(element_molar_mass_df$MolarMass_g_per_mol, element_molar_mass_df$Element)
 
-# Internal: sanitize inputs like "CuSO4 5H2O" -> "CuSO4·5H2O"
+# Internal: sanitize inputs like "CuSO4 5H2O" -> "CuSO4\u00b75H2O"
 sanitize_formula_input <- function(formula) {
   formula <- gsub("\\s+", " ", formula)
-  formula <- gsub("([A-Za-z0-9\\)]+)\\s+([0-9]+H2O)", "\\1·\\2", formula)
-  formula <- gsub("\\s*·\\s*", "·", formula)
+  formula <- gsub("([A-Za-z0-9\\)]+)\\s+([0-9]+H2O)", "\\1\u00b7\\2", formula)
+  formula <- gsub("\\s*\u00b7\\s*", "\u00b7", formula)
   return(formula)
 }
 
@@ -58,10 +58,10 @@ parse_recursive <- function(formula) {
   parse_simple_formula(formula)
 }
 
-# Internal: handles full formula and hydration (e.g. CuSO4·5H2O)
+# Internal: handles full formula and hydration (e.g. CuSO4\u00b75H2O)
 parse_formula <- function(formula) {
   formula <- sanitize_formula_input(formula)
-  formula <- gsub("[·∙.]", "+", formula)
+  formula <- gsub("[\u00b7\u2219.]", "+", formula)
   parts <- unlist(strsplit(formula, "\\+"))
 
   total_counts <- list()

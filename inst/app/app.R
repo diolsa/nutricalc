@@ -1,4 +1,4 @@
-# app.R — NutriCalc
+# app.R \u2014 NutriCalc
 
 library(shiny)
 library(bslib)
@@ -11,7 +11,7 @@ library(xml2)
 
 format_formula_html <- function(x) {
   if (is.na(x) || !nzchar(x)) return(x)
-  x <- gsub("·", "&middot;", x, fixed = TRUE)
+  x <- gsub("\u00b7", "&middot;", x, fixed = TRUE)
   x <- gsub("\\^([0-9]+)?([+-])", "<sup>\\1\\2</sup>", x, perl = TRUE)
   x <- sub("([+-])$", "<sup>\\1</sup>", x, perl = TRUE)
   repeat {
@@ -29,7 +29,7 @@ safe_chr1 <- function(x) {
 }
 
 
-# - Only allows: 0–9, e/E, + - * / ^, parentheses, dot, whitespace
+# - Only allows: 0\u20139, e/E, + - * / ^, parentheses, dot, whitespace
 safe_numeric_expr <- function(txt, default = 0) {
   # normalize to a single character string
   txt <- trimws(as.character(txt)[1L])
@@ -38,7 +38,7 @@ safe_numeric_expr <- function(txt, default = 0) {
   }
 
   # Allow ONLY numbers and basic arithmetic characters.
-  # Anything else → treat as invalid and return default.
+  # Anything else \u2192 treat as invalid and return default.
   if (!grepl("^[-0-9eE+*/().^ \t\r\n]*$", txt)) {
 
     return(default)
@@ -169,8 +169,8 @@ targets_for_display <- function(targets_mmol, unit_out) {
 
 convert_water_value <- function(value, unit_in, unit_out, formula) { unit_in <- normalize_unit(unit_in); unit_out <- normalize_unit(unit_out)
   if (unit_in == unit_out) return(value); molar_mass <- compute_molar_mass(formula)
-  if (unit_in == "mg/L") value <- value / molar_mass else if (unit_in == "µmol/L") value <- value / 1000
-  if (unit_out == "mg/L") value <- value * molar_mass else if (unit_out == "µmol/L") value <- value * 1000; value }
+  if (unit_in == "mg/L") value <- value / molar_mass else if (unit_in == "\u00b5mol/L") value <- value / 1000
+  if (unit_out == "mg/L") value <- value * molar_mass else if (unit_out == "\u00b5mol/L") value <- value * 1000; value }
 
 water_input_id <- function(prefix, key) {
   if (key == "KS82") {
@@ -278,16 +278,16 @@ ui <- fluidPage(
 
   ),
 
-  titlePanel("NutriCalc 🌿 Nutrient Solution Formulation in Horticultural Sciences"),
+  titlePanel("NutriCalc \U0001f33f Nutrient Solution Formulation in Horticultural Sciences"),
 
   fluidRow(
     # LEFT: inputs
     column(
       width = 6,
       div(class = "card p-3",
-          h5("⚗️ Nutrient Targets & Fertilizers"),
+          h5("\u2697\ufe0f Nutrient Targets & Fertilizers"),
           tabsetPanel(id = "input_tabs", type = "tabs",
-                      tabPanel("🎯 Nutrient Targets",
+                      tabPanel("\U0001f3af Nutrient Targets",
                                fluidRow(
           column(2, strong("Nutrient")),
           column(4,
@@ -297,7 +297,7 @@ ui <- fluidPage(
                 ),
                 div(
                                           radioButtons("input_unit", label = NULL,
-                                                       choices = c("mmol/L", "µmol/L", "mg/L"),
+                                                       choices = c("mmol/L", "\u00b5mol/L", "mg/L"),
                                                        selected = "mmol/L", inline = TRUE),
                                         )
                                  ),
@@ -314,7 +314,7 @@ ui <- fluidPage(
 
 
                       ),
-                      tabPanel("💦 Water",
+                      tabPanel("\U0001f4a6 Water",
                                fluidRow(
                                  column(6,
                                         textInput("bwb_plz", "Berlin postal code:", placeholder = "e.g. 14195", width = "100%"),
@@ -371,7 +371,7 @@ ui <- fluidPage(
                                  )
                                )
                       ),
-                      tabPanel("🧂 Fertilizers",
+                      tabPanel("\U0001f9c2 Fertilizers",
                                fluidRow(column(10,
                                                div(class = "search-inline", style = "display:flex; align-items:center; gap:6px;",
                                                    textInput("salt_search", label = NULL, placeholder = "Search salts...", width = "100%"),
@@ -387,17 +387,17 @@ ui <- fluidPage(
                                uiOutput("salt_picker"),
                                uiOutput("sel_status")
                       ),
-                      tabPanel("📚 Recipes",
+                      tabPanel("\U0001f4da Recipes",
                                fluidRow(
                                  column(
                                    width = 4,
                                    radioButtons(
                                      "recipe_category", div(strong("Category")),
                                      choices  = c(
-                                       "🥬 Olericulture"           = "Olericulture",
-                                       "🍓 Fruticulture"           = "Fruticulture",
-                                       "🌸 Floriculture"           = "Floriculture",
-                                       "⚙️ Standard Formulations"  = "Standard Formulations"
+                                       "\U0001f96c Olericulture"           = "Olericulture",
+                                       "\U0001f353 Fruticulture"           = "Fruticulture",
+                                       "\U0001f338 Floriculture"           = "Floriculture",
+                                       "\u2699\ufe0f Standard Formulations"  = "Standard Formulations"
                                      ),
                                      selected = "Olericulture"
                                    )
@@ -416,7 +416,7 @@ ui <- fluidPage(
                                  "Pick a category, then a recipe. Applying a recipe will set the unit, fill targets, and (if defined) select defined salts."
                                )
                       ),
-                      tabPanel("🧬 Tissue",
+                      tabPanel("\U0001f9ec Tissue",
                                fluidRow(
                                  column(
                                    width = 4,
@@ -468,7 +468,7 @@ ui <- fluidPage(
                                    width = 5,
                                    h5("Nutrient solution"),
                                    tags$small(class = "text-muted",
-                                              "Calculated mg L⁻¹ from tissue % × WUE."),
+                                              "Calculated mg L\u207b\u00b9 from tissue % \u00d7 WUE."),
                                    tableOutput("tissue_table"),
                                    br(),
                                    actionButton("tissue_apply", "Use as targets",
@@ -508,7 +508,7 @@ ui <- fluidPage(
             column(
               width = 3,
               actionButton(
-                "run", "🧪 Result",
+                "run", "\U0001f9ea Result",
                 class = "btn btn-primary btn-sm",
                 style = "width:100%; margin:0;"
               )
@@ -527,12 +527,12 @@ ui <- fluidPage(
     column(
       width = 6,
       div(class = "card p-3",
-          h5("🧪 Result & Plots"),
+          h5("\U0001f9ea Result & Plots"),
           tabsetPanel(id = "result_tabs", type = "tabs",
-                      tabPanel("🗒Result",
+                      tabPanel("\U0001f5d2Result",
                                uiOutput("delivery_ui")
                       ),
-                      tabPanel("🧪 pH & EC",
+                      tabPanel("\U0001f9ea pH & EC",
                                tags$div(
                                  class = "text-center mb-2",
                                  tags$strong("Adjust Concentration"),
@@ -541,7 +541,7 @@ ui <- fluidPage(
                                ),
                                uiOutput("ph_ui")
                       ),
-                      tabPanel("🛢️ Solution",
+                      tabPanel("\U0001f6e2\ufe0f Solution",
                                fluidRow(
                                  column(
                                    width = 4,
@@ -553,7 +553,7 @@ ui <- fluidPage(
                                  column(
                                    width = 4,
                                    numericInput(
-                                     "stock_factor", "Stock factor (×)",
+                                     "stock_factor", "Stock factor (\u00d7)",
                                      value = 100, min = 1, step = 1, width = "100%"
                                    )
                                  ),
@@ -569,8 +569,8 @@ ui <- fluidPage(
                       )
 
                       ,
-                      tabPanel("➖ Anions",
-                               tags$p(class = "text-muted", "Select exactly three anions (defaults: NO3–N, P, S)."),
+                      tabPanel("\u2796 Anions",
+                               tags$p(class = "text-muted", "Select exactly three anions (defaults: NO3\u2013N, P, S)."),
                                selectizeInput("anion_keys", label = NULL,
                                               choices = c("NO3_N", "P", "S", "Cl"),
                                               selected = c("NO3_N", "P", "S"),
@@ -580,7 +580,7 @@ ui <- fluidPage(
                                div(style = "display:flex; justify-content:center; align-items:center;",
                                    plotOutput("ternary_anions", height = "666px"))
                       ),
-                      tabPanel("➕ Cations",
+                      tabPanel("\u2795 Cations",
                                tags$p(class = "text-muted", "Select exactly three cations (defaults: K, Ca, Mg)."),
                                selectizeInput("cation_keys", label = NULL,
                                               choices = c("K", "Ca", "Mg", "NH4_N", "Na"),
@@ -798,7 +798,7 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$set_all_zero, {
-    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+    updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
 
     session$onFlushed(function() {
       for (nm in nutrients) {
@@ -861,7 +861,7 @@ server <- function(input, output, session) {
     update_water_inputs("water_expr_", bwb$values, unit_out)
 
     showNotification("BWB water values applied.", type = "message")
-    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+    updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
   })
 
   observeEvent(input$apply_bwb_water1, {
@@ -931,7 +931,7 @@ server <- function(input, output, session) {
     unit_out <- input$input_unit %||% canonical_unit
     update_water_inputs("water_expr_", mix$mixed, unit_out)
     showNotification("Mixed water values applied.", type = "message")
-    updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+    updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
   })
 
   eval_targets <- reactive({
@@ -965,7 +965,7 @@ server <- function(input, output, session) {
 
   output$tissue_wue_text <- renderText({
     w <- tissue_wue()
-    if (is.na(w)) return("WUE: —")
+    if (is.na(w)) return("WUE: \u2014")
     sprintf("WUE: %.2f g dry mass per L water", w)
   })
 
@@ -1005,12 +1005,13 @@ server <- function(input, output, session) {
 
     mgL <- tissue_mgL()
 
-    data.frame(
+    df <- data.frame(
       Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
       `Tissue %` = round(perc, 3),
-      `mg l⁻¹`   = round(mgL, 3),
       check.names = FALSE
     )
+    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
+    df
   }, sanitize.text.function = function(x) x)
 
 
@@ -1024,7 +1025,7 @@ server <- function(input, output, session) {
     salts <- all_salts()
     q <- input$salt_search
 
-    # 1) no search → return all salts (we still sort below)
+    # 1) no search \u2192 return all salts (we still sort below)
     if (is.null(q) || !nzchar(trimws(q))) {
       hits <- rep(TRUE, length(salts))
     } else {
@@ -1073,7 +1074,7 @@ server <- function(input, output, session) {
       ord <- order(tolower(desc))
       salts_sub <- salts_sub[ord]
     } else {
-      # no salt_info → just sort by formula
+      # no salt_info \u2192 just sort by formula
       salts_sub <- sort(salts_sub)
     }
 
@@ -1258,7 +1259,7 @@ server <- function(input, output, session) {
     req(input$recipe_pick)
     rec <- recipes[[input$recipe_pick]]
 
-    if (!is.null(rec$unit) && rec$unit %in% c("mmol/L", "mg/L", "µmol/L", "umol/L")) {
+    if (!is.null(rec$unit) && rec$unit %in% c("mmol/L", "mg/L", "\u00b5mol/L", "umol/L")) {
       if (!identical(normalize_unit(input$input_unit), normalize_unit(rec$unit))) {
         updateRadioButtons(session, "input_unit", selected = normalize_unit(rec$unit))
       }
@@ -1306,7 +1307,7 @@ server <- function(input, output, session) {
     rec <- recipes[[input$recipe_pick]]
     recipe_label <- rec$name %||% input$recipe_pick
 
-    flip_needed <- !is.null(rec$unit) && normalize_unit(rec$unit) %in% c("mmol/L", "mg/L", "µmol/L") &&
+    flip_needed <- !is.null(rec$unit) && normalize_unit(rec$unit) %in% c("mmol/L", "mg/L", "\u00b5mol/L") &&
       !identical(normalize_unit(input$input_unit), normalize_unit(rec$unit))
 
     if (flip_needed) {
@@ -1332,7 +1333,7 @@ server <- function(input, output, session) {
         }
 
         apply_salts(rec)
-        updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+        updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
         showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
       }, once = TRUE)
 
@@ -1357,7 +1358,7 @@ server <- function(input, output, session) {
       }
 
       apply_salts(rec)
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
       showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
     }
 
@@ -1368,13 +1369,13 @@ server <- function(input, output, session) {
     if (length(miss)) {
       tags$p(class = "text-danger", paste("nutrient_matrix missing *columns* for:", paste(miss, collapse = ", ")))
     } else {
-      tags$p(class = "text-success", "✓ Ready.")
+      tags$p(class = "text-success", "\u2713 Ready.")
     }
   })
 
   # When user switches to the Tissue tab, ensure unit is mg/L
   observeEvent(input$input_tabs, {
-    if (identical(input$input_tabs, "🧬 Tissue")) {
+    if (identical(input$input_tabs, "\U0001f9ec Tissue")) {
       if (!identical(normalize_unit(input$input_unit), "mg/L")) {
         updateRadioButtons(session, "input_unit", selected = "mg/L")
       }
@@ -1410,7 +1411,7 @@ server <- function(input, output, session) {
       targets_mmol(vals_mmol)
 
       # 4) jump back to the Targets tab
-      updateTabsetPanel(session, "input_tabs", selected = "🎯 Nutrient Targets")
+      updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
     }
 
     # If unit is not mg/L, first switch unit,
@@ -1422,7 +1423,7 @@ server <- function(input, output, session) {
         apply_mgL()
       }, once = TRUE)
     } else {
-      # already in mg/L → just apply directly
+      # already in mg/L \u2192 just apply directly
       apply_mgL()
     }
   })
@@ -1549,10 +1550,10 @@ server <- function(input, output, session) {
     })
 
     tagList(
-      tags$h5("🎯 Delivery vs target"),
+      tags$h5("\U0001f3af Delivery vs target"),
       tableOutput("tbl_n"),
-      tags$p(strong("🧮 Total squared absolute error: "), round(res$squared_error, 6)),
-      tags$p(strong("📊 Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
+      tags$p(strong("\U0001f9ee Total squared absolute error: "), round(res$squared_error, 6)),
+      tags$p(strong("\U0001f4ca Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
       tags$hr(),
       tags$details(
         tags$summary("Show raw print() output"),
@@ -1612,7 +1613,7 @@ server <- function(input, output, session) {
       mantissa <- parts[[1]]
       exp_raw <- parts[[2]]
       exp_clean <- sub("^\\+?", "", exp_raw)
-      paste0(mantissa, "×10<sup>", exp_clean, "</sup>")
+      paste0(mantissa, "\u00d710<sup>", exp_clean, "</sup>")
     }
 
     fmt_num <- function(x, threshold = 0.01) {
@@ -1714,17 +1715,17 @@ server <- function(input, output, session) {
         character(1)
       )
       if ("Lambda0_eq" %in% names(df)) {
-        names(df)[names(df) == "Lambda0_eq"] <- "λ₀(eq)"
+        names(df)[names(df) == "Lambda0_eq"] <- "\u03bb\u2080(eq)"
       } else if ("Lambda0" %in% names(df)) {
-        names(df)[names(df) == "Lambda0"] <- "λ₀(eq)"
+        names(df)[names(df) == "Lambda0"] <- "\u03bb\u2080(eq)"
       }
-      names(df)[names(df) == "kappa_mS_cm"] <- "κ (mS/cm)"
+      names(df)[names(df) == "kappa_mS_cm"] <- "\u03ba (mS/cm)"
       names(df)[names(df) == "c_mM"] <- "c (mM)"
       df
     }, sanitize.text.function = function(x) x)
 
     tags$div(
-      tags$h5("🧪 pH & EC"),
+      tags$h5("\U0001f9ea pH & EC"),
       fluidRow(
         column(
           5,
@@ -1753,7 +1754,7 @@ server <- function(input, output, session) {
           } else {
             tagList(
               tags$p(strong("EC (mS/cm):"), sprintf("%.2f", ec_res$EC_mS_cm)),
-              tags$p(strong("EC (µS/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
+              tags$p(strong("EC (\u00b5S/cm):"), sprintf("%.2f", ec_res$EC_uS_cm)),
               tags$p(
                 strong("Osmotic Potential (kPa):"),
                 sprintf("%.2f", -0.036 * ec_res$EC_uS_cm)
@@ -1768,7 +1769,7 @@ server <- function(input, output, session) {
       ),
       tags$p(
         class = "text-muted",
-        "Estimated at 25°C with Davies activity correction; no complexation assumed."
+        "Estimated at 25\u00b0C with Davies activity correction; no complexation assumed."
       )
     )
   })
@@ -1816,7 +1817,7 @@ server <- function(input, output, session) {
 
     df_out <- data.frame(
       Formula    = formulas,
-      "mmol l⁻¹" = mmol_str,
+      "mmol l\u207b\u00b9" = mmol_str,
       stringsAsFactors = FALSE,
       check.names = FALSE
     )
@@ -1832,8 +1833,8 @@ server <- function(input, output, session) {
       g_total_work  <- mg_l * vol / 1000    # g for macros
       mg_total_work <- mg_l * vol           # mg for micros
 
-      df_out$`g mol⁻¹` <- sprintf("%.2f", mm)
-      df_out$`mg l⁻¹`  <- sprintf("%.2f", mg_l)
+      df_out[["g mol\u207b\u00b9"]] <- sprintf("%.2f", mm)
+      df_out[["mg l\u207b\u00b9"]]  <- sprintf("%.2f", mg_l)
 
       macro_rows <- amt_df$tank %in% c("A", "B")
       micro_rows <- amt_df$tank == "Micro"
@@ -1951,7 +1952,7 @@ server <- function(input, output, session) {
     })
 
     tagList(
-      tags$h5("🧂 Fertilizer amounts"),
+      tags$h5("\U0001f9c2 Fertilizer amounts"),
       uiOutput("tbl_amt_grouped")
     )
   })

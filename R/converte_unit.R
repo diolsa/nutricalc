@@ -22,8 +22,8 @@ convert_units <- function(x, element = NULL, to = c("mg/L", "mmol/L")) {
       match(element, element_molar_mass_df$Element)
     ]
     if (is.na(M)) stop("Element not found: ", element)
-    if (to == "mg/L")  return(value * M)   # mmol/L → mg/L
-    if (to == "mmol/L") return(value / M)  # mg/L   → mmol/L
+    if (to == "mg/L")  return(value * M)   # mmol/L \u2192 mg/L
+    if (to == "mmol/L") return(value / M)  # mg/L   \u2192 mmol/L
   }
 
   # Named recipe vector
@@ -43,7 +43,7 @@ convert_units <- function(x, element = NULL, to = c("mg/L", "mmol/L")) {
   stop("If x is a scalar, please provide the `element` argument.")
 }
 
-# Nutrient → element mapping (internal)
+# Nutrient \u2192 element mapping (internal)
 #' @keywords internal
 nutrient_element_map <- list(
   "NO3_N" = "N", "NH4_N" = "N", "P" = "P", "K" = "K", "Ca" = "Ca",

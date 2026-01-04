@@ -6,7 +6,7 @@
 #'
 #' @param achieved Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
 #'   If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
-#'   from BWB "Basenkapazität KB 8,2" / KS 8.2 and used to fix carbonate speciation.
+#'   from BWB "Basenkapazit\u00e4t KB 8,2" / KS 8.2 and used to fix carbonate speciation.
 #' @param temp_C Temperature in Celsius (only 25 C supported in this version).
 #' @param phc_bracket Numeric length-2 bracket for pHc = -log10([H+]) search.
 #' @param tol Root tolerance in meq/L.
@@ -111,7 +111,7 @@ ph_from_achieved <- function(
   }
   CT_mM <- max(0, as_scalar_finite0(CT_mM))
 
-  # BWB "Basenkapazität KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
+  # BWB "Basenkapazit\u00e4t KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
   CO2_aq_mM <- if ("CO2_aq" %in% names(achieved)) {
     achieved[["CO2_aq"]]
   } else if ("KB8_2" %in% names(achieved)) {

@@ -36,7 +36,7 @@ strip_negative_zero <- function(x) {
 #' @param x Character vector of nutrient names.
 #' @keywords internal
 normalize_nutrient_names <- function(x) {
-  x <- gsub("[–-]", "_", x)
+  x <- gsub("[\u2013-]", "_", x)
   x <- gsub("\\s+", "", x)
   x
 }
@@ -91,7 +91,7 @@ normalize_unit <- function(u, canonical_unit = "mmol/L") {
   u <- trimws(u)
   u <- gsub("l-1", "L", u, ignore.case = TRUE)
   u <- gsub("/l", "/L", u, ignore.case = TRUE)
-  u <- gsub("^umol", "µmol", u, ignore.case = TRUE)
+  u <- gsub("^umol", "\u00b5mol", u, ignore.case = TRUE)
   u
 }
 
@@ -111,7 +111,7 @@ to_canonical_from_unit <- function(vals, unit_in, canonical_unit = "mmol/L") {
       stop("convert_units() not found (check R/convert_unit.R).", call. = FALSE)
     }
     return(convert_units(vals, to = canonical_unit))
-  } else if (unit_in == "µmol/L") {
+  } else if (unit_in == "\u00b5mol/L") {
     return(vals / 1000)
   } else {
     stop("Unsupported input unit: ", unit_in, call. = FALSE)
@@ -134,7 +134,7 @@ from_canonical_to_unit <- function(vals, unit_out, canonical_unit = "mmol/L") {
       stop("convert_units() not found (check R/convert_unit.R).", call. = FALSE)
     }
     return(convert_units(vals, to = "mg/L"))
-  } else if (unit_out == "µmol/L") {
+  } else if (unit_out == "\u00b5mol/L") {
     return(vals * 1000)
   } else {
     stop("Unsupported output unit: ", unit_out, call. = FALSE)

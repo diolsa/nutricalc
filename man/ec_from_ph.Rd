@@ -43,5 +43,5 @@ coefficients and activity coefficients.
 Units:
 - c is in mmol/L (mM); numerically identical to mol/m^3, used directly as such.
 - D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
-- Output: EC in mS/cm and µS/cm.
+- Output: EC in mS/cm and \u00b5S/cm.
 }
