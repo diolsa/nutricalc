@@ -1,6 +1,6 @@
 Package: nutricalc
 Type: Package
-Title: Nutrient Solution Calculator for Fertilizer Optimization
+Title: Nutrient Solution Formulation in Horticultural Sciences
 Version: 0.1.0
 Authors@R: c(
     person(

@@ -5,6 +5,6 @@ account: nutricalc
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15809197
-bundleId: 11397895
+bundleId: 11397944
 url: https://nutricalc.shinyapps.io/nutricalc-app/
 version: 1
