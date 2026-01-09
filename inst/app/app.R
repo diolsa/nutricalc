@@ -9,6 +9,99 @@ library(xml2)
 # 1) UI HELPERS & CONSTANTS
 # =========================================================
 
+CONSTANTS <- list(
+  ui_heights = list(
+    selected_salts = 590,
+    ternary_plot = 666
+  ),
+  defaults = list(
+    volume_l = 1,
+    stock_factor = 100,
+    stock_volume_l = 1
+  ),
+  debounce_ms = list(
+    salt_search = 250
+  ),
+  multiplier_clamp = 1,
+  numeric_expr = list(
+    max_length = 200,
+    max_exponent = 10,
+    max_operators = 80,
+    max_paren_depth = 20
+  )
+)
+
+log_error <- function(context, err) {
+  message(sprintf("[NutriCalc] %s: %s", context, conditionMessage(err)))
+}
+
+safe_try <- function(expr) {
+  tryCatch(
+    list(ok = TRUE, value = expr),
+    error = function(e) list(ok = FALSE, err = e)
+  )
+}
+
+render_html_table <- function(df, html_cols = character(0), include_header = TRUE,
+                              table_class = "table table-sm", table_style = NULL,
+                              col_align = NULL) {
+  cols <- names(df)
+  align_lookup <- c(l = "left", r = "right", c = "center")
+  align_vec <- NULL
+  if (!is.null(col_align)) {
+    if (length(col_align) == 1L && nchar(col_align) == length(cols)) {
+      align_vec <- strsplit(col_align, "", fixed = TRUE)[[1]]
+    } else if (length(col_align) == length(cols)) {
+      align_vec <- col_align
+    }
+  }
+  if (!is.null(align_vec)) {
+    align_vec <- unname(align_lookup[align_vec])
+  }
+  header <- NULL
+  if (isTRUE(include_header)) {
+    header <- tags$thead(tags$tr(lapply(seq_along(cols), function(i) {
+      style <- if (!is.null(align_vec)) sprintf("text-align:%s;", align_vec[[i]]) else NULL
+      tags$th(cols[[i]], style = style)
+    })))
+  }
+  body <- tags$tbody(lapply(seq_len(nrow(df)), function(i) {
+    tags$tr(lapply(seq_along(cols), function(j) {
+      val <- df[[cols[[j]]]][i]
+      if (is.na(val)) val <- ""
+      style <- if (!is.null(align_vec)) sprintf("text-align:%s;", align_vec[[j]]) else NULL
+      if (cols[[j]] %in% html_cols) {
+        tags$td(HTML(as.character(val)), style = style)
+      } else {
+        tags$td(as.character(val), style = style)
+      }
+    }))
+  }))
+  tags$table(class = table_class, style = table_style, header, body)
+}
+
+count_occurrences <- function(txt, pattern) {
+  hits <- gregexpr(pattern, txt, perl = TRUE)[[1]]
+  if (identical(hits, -1L)) return(0L)
+  length(hits)
+}
+
+max_paren_depth <- function(txt) {
+  depth <- 0L
+  max_depth <- 0L
+  chars <- strsplit(txt, "", fixed = TRUE)[[1]]
+  for (ch in chars) {
+    if (ch == "(") depth <- depth + 1L
+    if (ch == ")") {
+      if (depth == 0L) return(Inf)
+      depth <- depth - 1L
+    }
+    if (depth > max_depth) max_depth <- depth
+  }
+  if (depth != 0L) return(Inf)
+  max_depth
+}
+
 format_formula_html <- function(x) {
   if (is.na(x) || !nzchar(x)) return(x)
   x <- gsub("\u00b7", "&middot;", x, fixed = TRUE)
@@ -37,10 +130,26 @@ safe_numeric_expr <- function(txt, default = 0) {
     return(default)
   }
 
+  if (nchar(txt) > CONSTANTS$numeric_expr$max_length) {
+    return(default)
+  }
+
   # Allow ONLY numbers and basic arithmetic characters.
   # Anything else \u2192 treat as invalid and return default.
   if (!grepl("^[-0-9eE+*/().^ \t\r\n]*$", txt)) {
 
+    return(default)
+  }
+
+  if (count_occurrences(txt, "\\^") > CONSTANTS$numeric_expr$max_exponent) {
+    return(default)
+  }
+
+  if (count_occurrences(txt, "[-+*/^]") > CONSTANTS$numeric_expr$max_operators) {
+    return(default)
+  }
+
+  if (max_paren_depth(txt) > CONSTANTS$numeric_expr$max_paren_depth) {
     return(default)
   }
 
@@ -77,6 +186,47 @@ safe_numeric_expr <- function(txt, default = 0) {
   }
 
   as.numeric(val)
+}
+
+run_self_checks <- function() {
+  cases <- list(
+    list(name = "simple_int", input = "1", expected = 1),
+    list(name = "arithmetic", input = "1+2*3", expected = 7),
+    list(name = "power", input = "2^3", expected = 8),
+    list(name = "blocked_system", input = "system('ls')", expected = 0),
+    list(name = "blocked_semicolon", input = "1;2", expected = 0),
+    list(name = "blocked_pi", input = "pi", expected = 0),
+    list(name = "blocked_alpha", input = "abc", expected = 0),
+    list(
+      name = "too_long",
+      input = strrep("1", CONSTANTS$numeric_expr$max_length + 1),
+      expected = 0
+    ),
+    list(
+      name = "too_many_powers",
+      input = paste(rep("2^2", 20), collapse = "^"),
+      expected = 0
+    ),
+    list(
+      name = "too_deep_paren",
+      input = paste0(strrep("(", CONSTANTS$numeric_expr$max_paren_depth + 5), "1",
+        strrep(")", CONSTANTS$numeric_expr$max_paren_depth + 5)),
+      expected = 0
+    ),
+    list(name = "unbalanced_open", input = "((1", expected = 0),
+    list(name = "unbalanced_close", input = ")1+1(", expected = 0)
+  )
+
+  results <- vapply(cases, function(case) {
+    got <- safe_numeric_expr(case$input, default = 0)
+    isTRUE(all.equal(got, case$expected))
+  }, logical(1))
+
+  for (i in seq_along(cases)) {
+    status <- if (results[[i]]) "PASS" else "FAIL"
+    message(sprintf("[Self-check] %s: %s", status, cases[[i]]$name))
+  }
+  invisible(all(results))
 }
 
 
@@ -191,7 +341,8 @@ water_key_label <- function(key) {
 
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
-  tags$head(tags$style(HTML("
+  tags$head(
+    tags$style(HTML(sprintf("
   body { font-size: 13px; }
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
@@ -228,7 +379,7 @@ ui <- fluidPage(
 
 
 
-  #selected_salts { max-height: 590px; overflow-y: auto; padding: 6px 1px 1px; }
+  #selected_salts { max-height: %dpx; overflow-y: auto; padding: 6px 1px 1px; }
   #input_unit label { color: #6c757d !important; font-size: 0.9em !important; font-weight: normal !important; margin-right: 6px !important; }
   #input_unit .radio-inline { margin-right: 6px !important; }
   #select_all_visible, #deselect_all_salts, #clear_search { width: 30px !important; height: 30px !important; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; background-color: #e9ecef !important; border: 1px solid rgba(0,0,0,0.25) !important; border-radius: 4px !important; box-shadow: inset 0 1px 1px rgba(0,0,0,0.075); margin: 3px; }
@@ -264,7 +415,52 @@ ui <- fluidPage(
 
 
 
-")),
+"), CONSTANTS$ui_heights$selected_salts)),
+    tags$script(HTML("
+      (function(){
+        if (window.__saltPickerInit) return;
+        window.__saltPickerInit = true;
+        if (!window.Shiny || !window.jQuery) return;
+
+        var scrollKey = 'saltPickerScrollTop';
+        var observer = null;
+
+        function restoreScroll() {
+          var el = document.getElementById('selected_salts');
+          if (!el) return;
+          var stored = sessionStorage.getItem(scrollKey);
+          if (stored !== null) {
+            el.scrollTop = parseInt(stored, 10) || 0;
+          }
+          if (!el.dataset.scrollInit) {
+            el.addEventListener('scroll', function(){
+              sessionStorage.setItem(scrollKey, String(this.scrollTop));
+            });
+            el.dataset.scrollInit = '1';
+          }
+        }
+
+        function attachObserver() {
+          var target = document.getElementById('salt_picker');
+          if (!target || observer) return;
+          observer = new MutationObserver(function() {
+            restoreScroll();
+          });
+          observer.observe(target, { childList: true, subtree: true });
+        }
+
+        document.addEventListener('shiny:connected', function() {
+          restoreScroll();
+          attachObserver();
+        });
+
+        window.jQuery(document).on('change', '.salt_check', function() {
+          var vals = [];
+          window.jQuery('.salt_check:checked').each(function(){ vals.push(window.jQuery(this).val()); });
+          window.Shiny.setInputValue('salt_check_values', vals, {priority: 'event'});
+        });
+      })();
+    "))
 
 
 
@@ -359,7 +555,7 @@ ui <- fluidPage(
                                  column(
                                    4,
                                    h6(textOutput("mixed_water_label")),
-                                   div(class = "water-mix-table", tableOutput("water_mix_table"))
+                                   div(class = "water-mix-table", uiOutput("water_mix_table"))
                                  )
                                )
                       ),
@@ -461,7 +657,7 @@ ui <- fluidPage(
                                    h5("Nutrient solution"),
                                    tags$small(class = "text-muted",
                                               "Calculated mg L\u207b\u00b9 from tissue % \u00d7 WUE."),
-                                   tableOutput("tissue_table"),
+                                   uiOutput("tissue_table"),
                                    br(),
                                    actionButton("tissue_apply", "Use as targets",
                                                 class = "btn btn-primary btn-sm")
@@ -539,21 +735,21 @@ ui <- fluidPage(
                                    width = 4,
                                    numericInput(
                                      "vol", "Working volume (L)",
-                                     value = 1, min = 0, step = 1, width = "100%"
+                                     value = CONSTANTS$defaults$volume_l, min = 0, step = 1, width = "100%"
                                    )
                                  ),
                                  column(
                                    width = 4,
                                    numericInput(
                                      "stock_factor", "Stock factor (\u00d7)",
-                                     value = 100, min = 1, step = 1, width = "100%"
+                                     value = CONSTANTS$defaults$stock_factor, min = 1, step = 1, width = "100%"
                                    )
                                  ),
                                  column(
                                    width = 4,
                                    numericInput(
                                      "stock_vol", "Stock volume (L)",
-                                     value = 1, min = 0, step = 0.1, width = "100%"
+                                     value = CONSTANTS$defaults$stock_volume_l, min = 0, step = 0.1, width = "100%"
                                    )
                                  )
                                ),
@@ -570,7 +766,7 @@ ui <- fluidPage(
                                               options = list(maxItems = 3, plugins = list("remove_button"))
                                ),
                                div(style = "display:flex; justify-content:center; align-items:center;",
-                                   plotOutput("ternary_anions", height = "666px"))
+                                   plotOutput("ternary_anions", height = sprintf("%dpx", CONSTANTS$ui_heights$ternary_plot)))
                       ),
                       tabPanel("\u2795 Cations",
                                tags$p(class = "text-muted", "Select exactly three cations (defaults: K, Ca, Mg)."),
@@ -581,7 +777,7 @@ ui <- fluidPage(
                                               options = list(maxItems = 3, plugins = list("remove_button"))
                                ),
                                div(style = "display:flex; justify-content:center; align-items:center;",
-                                   plotOutput("ternary_cations", height = "666px"))
+                                   plotOutput("ternary_cations", height = sprintf("%dpx", CONSTANTS$ui_heights$ternary_plot)))
                       )
           )
       )
@@ -603,6 +799,8 @@ server <- function(input, output, session) {
   water_co2_aq <- reactiveVal(as.numeric(default_water_ks82_expr))
   current_input_unit <- reactiveVal(canonical_unit)
   selected_salts <- reactiveVal(rownames(nutrient_matrix))
+  # Lock avoids re-entrancy while keeping immediate unit feedback (no debounce).
+  updating_unit <- reactiveVal(FALSE)
 
   recipe_categories <- vapply(
     recipes,
@@ -650,32 +848,31 @@ server <- function(input, output, session) {
     tagList(c(rows, list(hco3_row, co2_row)))
   })
 
-  output$water1_inputs <- renderUI({
+  render_water_inputs <- function(prefix) {
     rows <- lapply(water_keys, function(key) {
       div(
         class = "nutrient-row",
         fluidRow(
           column(6, tags$label(HTML(water_key_label(key)))),
-          column(6, textInput(inputId = water_input_id("water1_expr_", key), label = NULL, value = water_input_default(key), width = "100%"))
+          column(6, textInput(
+            inputId = water_input_id(prefix, key),
+            label = NULL,
+            value = water_input_default(key),
+            width = "100%"
+          ))
         )
       )
     })
 
     tagList(rows)
+  }
+
+  output$water1_inputs <- renderUI({
+    render_water_inputs("water1_expr_")
   })
 
   output$water2_inputs <- renderUI({
-    rows <- lapply(water_keys, function(key) {
-      div(
-        class = "nutrient-row",
-        fluidRow(
-          column(6, tags$label(HTML(water_key_label(key)))),
-          column(6, textInput(inputId = water_input_id("water2_expr_", key), label = NULL, value = water_input_default(key), width = "100%"))
-        )
-      )
-    })
-
-    tagList(rows)
+    render_water_inputs("water2_expr_")
   })
 
   inputs_ready <- reactive({
@@ -728,6 +925,35 @@ server <- function(input, output, session) {
     }
   }
 
+  convert_inputs_for_unit <- function(old_unit, new_unit) {
+    vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "expr_")
+    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water_expr_")
+    targets_mmol(vals_mmol)
+    water_mmol(vals_water_mmol)
+
+    water_vals <- parse_water_set("water_expr_", old_unit)
+    water_hco3(water_vals[["HCO3"]])
+    water_co2_aq(water_vals[["KS82"]])
+
+    display_vals <- targets_for_display(vals_mmol, new_unit)
+    for (nm in nutrients) {
+      updateTextInput(
+        session, paste0("expr_", nm),
+        value = format(display_vals[[nm]], trim = TRUE, scientific = FALSE)
+      )
+    }
+    update_water_inputs("water_expr_", water_vals, new_unit)
+
+    if (water_mix_inputs_ready()) {
+      water1_vals <- parse_water_set("water1_expr_", old_unit)
+      water2_vals <- parse_water_set("water2_expr_", old_unit)
+      update_water_inputs("water1_expr_", water1_vals, new_unit)
+      update_water_inputs("water2_expr_", water2_vals, new_unit)
+    }
+
+    current_input_unit(new_unit)
+  }
+
   mixed_water <- reactive({
     req(water_mix_inputs_ready())
     unit_in <- input$input_unit %||% canonical_unit
@@ -747,19 +973,24 @@ server <- function(input, output, session) {
     )
   })
 
-  output$water_mix_table <- renderTable({
+  output$water_mix_table <- renderUI({
     mix <- mixed_water()
     unit_out <- input$input_unit %||% canonical_unit
-    w1_display <- water_values_for_display(mix$w1, unit_out)
-    w2_display <- water_values_for_display(mix$w2, unit_out)
     mix_display <- water_values_for_display(mix$mixed, unit_out)
+    labels <- vapply(water_keys, water_key_label, character(1))
 
-    data.frame(
-      Nutrient = vapply(water_keys, water_key_label, character(1)),
-      Mix = round(mix_display, 4),
-      check.names = FALSE
+    rows <- lapply(seq_along(water_keys), function(i) {
+      tags$tr(
+        tags$td(HTML(labels[[i]])),
+        tags$td(format(round(mix_display[[i]], 4), trim = TRUE, scientific = FALSE))
+      )
+    })
+
+    tags$table(
+      class = "table table-sm",
+      tags$tbody(rows)
     )
-  }, sanitize.text.function = function(x) x, colnames = FALSE)
+  })
 
   output$water1_mix_label <- renderText({
     pct <- 100 - (suppressWarnings(as.numeric(input$water_mix_pct %||% 50)))
@@ -816,13 +1047,14 @@ server <- function(input, output, session) {
       return(NULL)
     }
 
-    vals_mmol <- tryCatch(
-      fetch_bwb_mittelwert(plz),
-      error = function(e) {
-        showNotification(conditionMessage(e), type = "error")
-        NULL
-      }
-    )
+    bwb_res <- safe_try(fetch_bwb_mittelwert(plz))
+    if (!bwb_res$ok) {
+      log_error("BWB fetch failed", bwb_res$err)
+      showNotification(conditionMessage(bwb_res$err), type = "error")
+      return(NULL)
+    }
+
+    vals_mmol <- bwb_res$value
 
     if (is.null(vals_mmol)) return(NULL)
 
@@ -886,36 +1118,18 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
 
   observeEvent(input$input_unit, {
+    req(!isTRUE(updating_unit()))
     req(inputs_ready())
 
     new_unit <- input$input_unit %||% canonical_unit
     old_unit <- current_input_unit() %||% canonical_unit
-
-    vals_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "expr_")
-    vals_water_mmol <- parse_targets_from_inputs(input, nutrients, old_unit, prefix = "water_expr_")
-    targets_mmol(vals_mmol)
-    water_mmol(vals_water_mmol)
-    water_vals <- parse_water_set("water_expr_", old_unit)
-    water_hco3(water_vals[["HCO3"]])
-    water_co2_aq(water_vals[["KS82"]])
-    display_vals <- targets_for_display(vals_mmol, new_unit)
-
-    for (nm in nutrients) {
-      updateTextInput(
-        session, paste0("expr_", nm),
-        value = format(display_vals[[nm]], trim = TRUE, scientific = FALSE)
-      )
+    if (identical(normalize_unit(new_unit), normalize_unit(old_unit))) {
+      return()
     }
-    update_water_inputs("water_expr_", water_vals, new_unit)
+    updating_unit(TRUE)
+    on.exit(updating_unit(FALSE), add = TRUE)
 
-    if (water_mix_inputs_ready()) {
-      water1_vals <- parse_water_set("water1_expr_", old_unit)
-      water2_vals <- parse_water_set("water2_expr_", old_unit)
-      update_water_inputs("water1_expr_", water1_vals, new_unit)
-      update_water_inputs("water2_expr_", water2_vals, new_unit)
-    }
-
-    current_input_unit(new_unit)
+    convert_inputs_for_unit(old_unit, new_unit)
   }, ignoreInit = TRUE)
 
   observeEvent(input$apply_mix_to_water, {
@@ -932,7 +1146,7 @@ server <- function(input, output, session) {
     multiplier_pct <- input$ph_ec_multiplier %||% 0
     multiplier <- suppressWarnings(as.numeric(multiplier_pct)) / 100
     if (!is.numeric(multiplier) || is.na(multiplier)) multiplier <- 0
-    multiplier <- min(max(multiplier, -1), 1)
+    multiplier <- min(max(multiplier, -CONSTANTS$multiplier_clamp), CONSTANTS$multiplier_clamp)
     validate(
       need(!is.null(vals), "Targets not initialized yet."),
       need(!is.null(water_vals), "Water not initialized yet.")
@@ -985,7 +1199,7 @@ server <- function(input, output, session) {
     mgL
   })
 
-  output$tissue_table <- renderTable({
+  output$tissue_table <- renderUI({
     w <- tissue_wue()
 
 
@@ -1000,11 +1214,11 @@ server <- function(input, output, session) {
     df <- data.frame(
       Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
       `Tissue %` = round(perc, 3),
+      `mg l\u207b\u00b9` = round(mgL, 3),
       check.names = FALSE
     )
-    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
-    df
-  }, sanitize.text.function = function(x) x)
+    render_html_table(df, html_cols = "Nutrient")
+  })
 
 
 
@@ -1012,10 +1226,22 @@ server <- function(input, output, session) {
 
   # ---- Salts --------------------------
   all_salts <- reactive(rownames(nutrient_matrix))
+  salt_search_debounced <- debounce(reactive(input$salt_search), CONSTANTS$debounce_ms$salt_search)
+
+  salt_info_data <- reactive({
+    si <- NULL
+    if (exists("salt_info", inherits = TRUE)) {
+      si <- get("salt_info", inherits = TRUE)
+    }
+    if (is.null(si)) {
+      si <- attr(nutrient_matrix, "salt_info")
+    }
+    si
+  })
 
   filtered_salts <- reactive({
     salts <- all_salts()
-    q <- input$salt_search
+    q <- salt_search_debounced()
 
     # 1) no search \u2192 return all salts (we still sort below)
     if (is.null(q) || !nzchar(trimws(q))) {
@@ -1024,13 +1250,7 @@ server <- function(input, output, session) {
       q <- trimws(q)
 
       # --- load salt_info for names ---
-      si <- NULL
-      if (exists("salt_info", inherits = TRUE)) {
-        si <- get("salt_info", inherits = TRUE)
-      }
-      if (is.null(si)) {
-        si <- attr(nutrient_matrix, "salt_info")
-      }
+      si <- salt_info_data()
 
       # --- search by formula (original logic) ---
       hit_formula_raw   <- grepl(q, salts, ignore.case = TRUE)
@@ -1051,13 +1271,7 @@ server <- function(input, output, session) {
     salts_sub <- salts[hits]
 
     # ---- sort by Name (category) alphabetically; fallback: formula ----
-    si <- NULL
-    if (exists("salt_info", inherits = TRUE)) {
-      si <- get("salt_info", inherits = TRUE)
-    }
-    if (is.null(si)) {
-      si <- attr(nutrient_matrix, "salt_info")
-    }
+    si <- salt_info_data()
 
     if (!is.null(si)) {
       desc <- si$category[match(salts_sub, si$salt)]
@@ -1084,13 +1298,7 @@ server <- function(input, output, session) {
     }
 
     # load salt_info (for names)
-    si <- NULL
-    if (exists("salt_info", inherits = TRUE)) {
-      si <- get("salt_info", inherits = TRUE)
-    }
-    if (is.null(si)) {
-      si <- attr(nutrient_matrix, "salt_info")
-    }
+    si <- salt_info_data()
 
     # descriptions
     desc_vec <- vapply(choices, function(s) {
@@ -1122,33 +1330,6 @@ server <- function(input, output, session) {
     })
 
 
-    js <- HTML("
-    <script>
-      (function(){
-        var scrollKey = 'saltPickerScrollTop';
-
-        // Persist scroll position across re-renders
-        var el = document.getElementById('selected_salts');
-        if (el) {
-          el.scrollTop = window[scrollKey] || 0;
-          el.addEventListener('scroll', function(){
-            window[scrollKey] = this.scrollTop;
-          });
-        }
-
-        // Track checkbox changes
-        $(document).off('change.saltCheck', '.salt_check');
-        $(document).on('change.saltCheck', '.salt_check', function() {
-          var vals = [];
-          $('.salt_check:checked').each(function(){ vals.push($(this).val()); });
-          Shiny.setInputValue('salt_check_values', vals, {priority: 'event'});
-        });
-      })();
-
-
-    </script>
-  ")
-
     # wrap table in #selected_salts so your existing CSS (max-height, scroll) still works
     tags$div(
       id = "selected_salts",
@@ -1163,8 +1344,7 @@ server <- function(input, output, session) {
           )
         ),
         tags$tbody(tbl_rows)
-      ),
-      js
+      )
     )
   })
 
@@ -1227,7 +1407,8 @@ server <- function(input, output, session) {
     }
 
     div(
-      style = "max-height: 666px; overflow-y: auto; padding-right: 4px;",
+      style = sprintf("max-height: %dpx; overflow-y: auto; padding-right: 4px;",
+        CONSTANTS$ui_heights$ternary_plot),
       radioButtons(
         "recipe_pick",
         label   = strong("Recipe"),
@@ -1243,12 +1424,14 @@ server <- function(input, output, session) {
     if (is.null(id) || !nzchar(id) || is.null(recipes[[id]])) return(NULL)
     rec <- recipes[[id]]
     if (!is.null(rec$notes) && nzchar(rec$notes)) {
-      tags$p(class = "text-muted", rec$notes)
+      # Escape notes to avoid accidental HTML injection.
+      tags$p(class = "text-muted", htmltools::htmlEscape(rec$notes))
     } else NULL
   })
 
   observeEvent(input$recipe_pick, {
     req(input$recipe_pick)
+    if (isTRUE(updating_unit())) return()
     rec <- recipes[[input$recipe_pick]]
 
     if (!is.null(rec$unit) && rec$unit %in% c("mmol/L", "mg/L", "\u00b5mol/L", "umol/L")) {
@@ -1293,9 +1476,31 @@ server <- function(input, output, session) {
     })
   }
 
+  apply_recipe_targets <- function(rec) {
+    if (is.null(rec$targets)) return()
+
+    for (nm in nutrients) {
+      val <- rec$targets[[nm]]
+      if (!is.null(val)) {
+        updateTextInput(session, paste0("expr_", nm), value = format(val, trim = TRUE))
+      }
+    }
+
+    unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
+    vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
+    for (nm in nutrients) {
+      if (!is.null(rec$targets[[nm]])) {
+        vals_rec[[nm]] <- rec$targets[[nm]]
+      }
+    }
+    vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
+    targets_mmol(vals_mmol)
+  }
+
 
   observeEvent(input$apply_recipe, {
     req(input$recipe_pick)
+    if (isTRUE(updating_unit())) return()
     rec <- recipes[[input$recipe_pick]]
     recipe_label <- rec$name %||% input$recipe_pick
 
@@ -1305,50 +1510,14 @@ server <- function(input, output, session) {
     if (flip_needed) {
       updateRadioButtons(session, "input_unit", selected = normalize_unit(rec$unit))
       session$onFlushed(function() {
-        if (!is.null(rec$targets)) {
-          for (nm in nutrients) {
-            val <- rec$targets[[nm]]
-            if (!is.null(val)) {
-              updateTextInput(session, paste0("expr_", nm), value = format(val, trim = TRUE))
-            }
-          }
-
-          unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
-          vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
-          for (nm in nutrients) {
-            if (!is.null(rec$targets[[nm]])) {
-              vals_rec[[nm]] <- rec$targets[[nm]]
-            }
-          }
-          vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
-          targets_mmol(vals_mmol)
-        }
-
+        apply_recipe_targets(rec)
         apply_salts(rec)
         updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
         showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
       }, once = TRUE)
 
     } else {
-      if (!is.null(rec$targets)) {
-        for (nm in nutrients) {
-          val <- rec$targets[[nm]]
-          if (!is.null(val)) {
-            updateTextInput(session, paste0("expr_", nm), value = format(val, trim = TRUE))
-          }
-        }
-
-        unit_rec <- normalize_unit(rec$unit %||% canonical_unit)
-        vals_rec <- setNames(rep(0, length(nutrients)), nutrients)
-        for (nm in nutrients) {
-          if (!is.null(rec$targets[[nm]])) {
-            vals_rec[[nm]] <- rec$targets[[nm]]
-          }
-        }
-        vals_mmol <- to_canonical_from_unit(vals_rec, unit_rec)
-        targets_mmol(vals_mmol)
-      }
-
+      apply_recipe_targets(rec)
       apply_salts(rec)
       updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
       showNotification(sprintf("Recipe '%s' applied.", recipe_label), type = "message")
@@ -1367,6 +1536,7 @@ server <- function(input, output, session) {
 
   # When user switches to the Tissue tab, ensure unit is mg/L
   observeEvent(input$input_tabs, {
+    if (isTRUE(updating_unit())) return()
     if (identical(input$input_tabs, "\U0001f9ec Tissue")) {
       if (!identical(normalize_unit(input$input_unit), "mg/L")) {
         updateRadioButtons(session, "input_unit", selected = "mg/L")
@@ -1376,6 +1546,7 @@ server <- function(input, output, session) {
 
   # When the user clicks "Use as targets", copy mg/L into the target fields
   observeEvent(input$tissue_apply, {
+    if (isTRUE(updating_unit())) return()
     mgL <- tissue_mgL()
 
     # helper to actually write values + update internal targets
@@ -1464,19 +1635,26 @@ server <- function(input, output, session) {
     }
 
     # Choose solver depending on toggle
-    if (use_acid) {
-      out <- two_stage_optimize_nutrients(
+    opt_try <- if (use_acid) {
+      safe_try(two_stage_optimize_nutrients(
         nutrient_matrix = nm_pad,
         target          = eval_targets(),
         importance      = importance_vec()
-      )
+      ))
     } else {
-      out <- optimize_nutrients(
+      safe_try(optimize_nutrients(
         nutrient_matrix = nm_pad,
         target          = eval_targets(),
         importance      = importance_vec()
-      )
+      ))
     }
+
+    if (!opt_try$ok) {
+      log_error("Optimization failed", opt_try$err)
+      return(NULL)
+    }
+
+    out <- opt_try$value
 
     # Clean dummy
     if (!is.null(out$amounts)) {
@@ -1526,24 +1704,22 @@ server <- function(input, output, session) {
       character(1)
     )
 
-    output$tbl_n <- renderTable(
-      nd,
-      sanitize.text.function = function(x) x,
-      align = "lrrrr"
-    )
+    output$tbl_n <- renderUI({
+      render_html_table(nd, html_cols = "Nutrient", col_align = "lrrrr")
+    })
 
     output$raw_print <- renderPrint({
       res0 <- result()
       if (!is.null(res0)) {
-        vol0 <- input$vol %||% 1
-        if (!is.numeric(vol0) || is.na(vol0) || vol0 <= 0) vol0 <- 1
+        vol0 <- input$vol %||% CONSTANTS$defaults$volume_l
+        if (!is.numeric(vol0) || is.na(vol0) || vol0 <= 0) vol0 <- CONSTANTS$defaults$volume_l
         print(res0, vol = vol0)
       }
     })
 
     tagList(
       tags$h5("\U0001f3af Delivery vs target"),
-      tableOutput("tbl_n"),
+      uiOutput("tbl_n"),
       tags$p(strong("\U0001f9ee Total squared absolute error: "), round(res$squared_error, 6)),
       tags$p(strong("\U0001f4ca Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
       tags$hr(),
@@ -1589,14 +1765,12 @@ server <- function(input, output, session) {
   final_for_ph <- c(final_for_ph, KS4_3 = water_hco3(), CO2_aq = water_co2_aq())
   # Debug: grep("EDTA", names(final_for_ph)); final_for_ph[["EDTA"]]
 
-  ph_res <- tryCatch(
-    ph_fn(final_for_ph, phc_bracket = c(1, 13)),
-    error = function(e) e
-  )
-
-    if (inherits(ph_res, "error")) {
-      return(tags$p(class = "text-warning", paste("pH calculation failed:", ph_res$message)))
-    }
+  ph_try <- safe_try(ph_fn(final_for_ph, phc_bracket = c(1, 13)))
+  if (!ph_try$ok) {
+    log_error("pH calculation failed", ph_try$err)
+    return(tags$p(class = "text-warning", paste("pH calculation failed:", conditionMessage(ph_try$err))))
+  }
+  ph_res <- ph_try$value
 
     fmt_sci_html <- function(x) {
       if (!is.finite(x)) return(as.character(x))
@@ -1624,31 +1798,34 @@ server <- function(input, output, session) {
       charge_equiv <- (totals_meq[["pos_total_meq"]] + totals_meq[["neg_total_meq"]]) / 2
     }
 
-    output$ph_fixed_cations <- renderTable({
-      data.frame(
+    output$ph_fixed_cations <- renderUI({
+      df <- data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_cations_meq),
         `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_cations_meq), fmt_num, character(1)),
         check.names = FALSE
       )
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = "meq/L")
+    })
 
-    output$ph_fixed_anions <- renderTable({
-      data.frame(
+    output$ph_fixed_anions <- renderUI({
+      df <- data.frame(
         Ion = names(ph_res$charge_breakdown$fixed_anions_meq),
         `meq/L` = vapply(unname(ph_res$charge_breakdown$fixed_anions_meq), fmt_num, character(1)),
         check.names = FALSE
       )
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = "meq/L")
+    })
 
-    output$ph_variable <- renderTable({
-      data.frame(
+    output$ph_variable <- renderUI({
+      df <- data.frame(
         Component = names(ph_res$charge_breakdown$variable_meq),
         `meq/L` = vapply(unname(ph_res$charge_breakdown$variable_meq), fmt_num, character(1)),
         check.names = FALSE
       )
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = "meq/L")
+    })
 
-    output$ph_species <- renderTable({
+    output$ph_species <- renderUI({
       species_vals <- ph_res$charge_breakdown$species_mM
       if ("B" %in% names(res$achieved)) {
         species_vals <- c(species_vals, B = as.numeric(res$achieved[["B"]]))
@@ -1663,20 +1840,22 @@ server <- function(input, output, session) {
         }
       }
 
-      data.frame(
+      df <- data.frame(
         Species = names(species_vals),
         `mmol/L` = vapply(unname(species_vals), fmt_num, character(1)),
         check.names = FALSE
       )
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = "mmol/L")
+    })
 
-    output$ph_totals <- renderTable({
-      data.frame(
+    output$ph_totals <- renderUI({
+      df <- data.frame(
         Total = names(ph_res$charge_breakdown$totals_meq),
         `meq/L` = vapply(unname(ph_res$charge_breakdown$totals_meq), fmt_num, character(1)),
         check.names = FALSE
       )
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = "meq/L")
+    })
 
     ec_res <- NULL
     ec_fn <- NULL
@@ -1686,13 +1865,16 @@ server <- function(input, output, session) {
       ec_fn <- ec_from_ph
     }
     if (!is.null(ec_fn)) {
-      ec_res <- tryCatch(
-        ec_fn(final_for_ph, ph_res),
-        error = function(e) e
-      )
+      ec_try <- safe_try(ec_fn(final_for_ph, ph_res))
+      if (!ec_try$ok) {
+        log_error("EC calculation failed", ec_try$err)
+        ec_res <- ec_try$err
+      } else {
+        ec_res <- ec_try$value
+      }
     }
 
-    output$ec_contrib <- renderTable({
+    output$ec_contrib <- renderUI({
       if (inherits(ec_res, "error") || is.null(ec_res)) return(NULL)
       df <- ec_res$contributions
       df <- df[, setdiff(names(df), c("D_1e5_cm2_s", "gamma", "alpha")), drop = FALSE]
@@ -1713,8 +1895,8 @@ server <- function(input, output, session) {
       }
       names(df)[names(df) == "kappa_mS_cm"] <- "\u03ba (mS/cm)"
       names(df)[names(df) == "c_mM"] <- "c (mM)"
-      df
-    }, sanitize.text.function = function(x) x)
+      render_html_table(df, html_cols = c("z", "\u03ba (mS/cm)", "c (mM)"))
+    })
 
     tags$div(
       tags$h5("\U0001f9ea pH & EC"),
@@ -1730,11 +1912,11 @@ server <- function(input, output, session) {
           tags$details(
             tags$summary("Show pH charge breakdown"),
             tags$h6("Fixed cations (meq/L)"),
-            tableOutput("ph_fixed_cations"),
+            uiOutput("ph_fixed_cations"),
             tags$h6("Fixed anions (meq/L)"),
-            tableOutput("ph_fixed_anions"),
+            uiOutput("ph_fixed_anions"),
             tags$h6("Variable components (meq/L)"),
-            tableOutput("ph_variable")
+            uiOutput("ph_variable")
           )
         ),
         column(
@@ -1753,7 +1935,7 @@ server <- function(input, output, session) {
               ),
               tags$details(
                 tags$summary("Show EC contributions"),
-                tableOutput("ec_contrib")
+                uiOutput("ec_contrib")
               )
             )
           }
@@ -1772,16 +1954,16 @@ server <- function(input, output, session) {
     if (is.null(res)) return(tags$p("No result yet."))
 
     # --- working solution volume ---
-    vol <- input$vol %||% 1
-    if (!is.numeric(vol) || is.na(vol) || vol <= 0) vol <- 1
+    vol <- input$vol %||% CONSTANTS$defaults$volume_l
+    if (!is.numeric(vol) || is.na(vol) || vol <= 0) vol <- CONSTANTS$defaults$volume_l
 
     # --- stock parameters (Option A) ---
-    stock_factor <- input$stock_factor %||% 1
+    stock_factor <- input$stock_factor %||% CONSTANTS$defaults$stock_factor
     if (!is.numeric(stock_factor) || is.na(stock_factor) || stock_factor <= 0) {
       stock_factor <- NA_real_
     }
 
-    stock_vol <- input$stock_vol %||% NA_real_
+    stock_vol <- input$stock_vol %||% CONSTANTS$defaults$stock_volume_l
     if (!is.numeric(stock_vol) || is.na(stock_vol) || stock_vol <= 0) {
       stock_vol <- NA_real_
     }
