@@ -1214,9 +1214,9 @@ server <- function(input, output, session) {
     df <- data.frame(
       Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
       `Tissue %` = round(perc, 3),
-      `mg l\u207b\u00b9` = round(mgL, 3),
       check.names = FALSE
     )
+    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
     render_html_table(df, html_cols = "Nutrient")
   })
 
