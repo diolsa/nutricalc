@@ -492,10 +492,12 @@ ui <- fluidPage(
                   column(6, strong("Water"))
                 ),
                 div(
-                                          radioButtons("input_unit", label = NULL,
-                                                       choices = c("mmol/L", "\u00b5mol/L", "mg/L"),
-                                                       selected = "mmol/L", inline = TRUE),
-                                        )
+                  radioButtons(
+                    "input_unit", label = NULL,
+                    choices = c("mmol/L", "\u00b5mol/L", "mg/L"),
+                    selected = "mmol/L", inline = TRUE
+                  )
+                )
                                  ),
           column(6,
                 div(strong("Priority"),
