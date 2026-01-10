@@ -213,8 +213,16 @@ run_self_checks <- function() {
         strrep(")", CONSTANTS$numeric_expr$max_paren_depth + 5)),
       expected = 0
     ),
-    list(name = "unbalanced_open", input = "((1", expected = 0),
-    list(name = "unbalanced_close", input = ")1+1(", expected = 0)
+    list(
+      name = "unbalanced_open",
+      input = "((1",
+      expected = 0
+    ),
+    list(
+      name = "unbalanced_close",
+      input = ")1+1(",
+      expected = 0
+    )
   )
 
   results <- vapply(cases, function(case) {
@@ -342,7 +350,7 @@ water_key_label <- function(key) {
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
   tags$head(
-    tags$style(HTML(sprintf("
+    tags$style(HTML(paste0("
   body { font-size: 13px; }
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
@@ -379,7 +387,7 @@ ui <- fluidPage(
 
 
 
-  #selected_salts { max-height: %dpx; overflow-y: auto; padding: 6px 1px 1px; }
+  #selected_salts { max-height: ", CONSTANTS$ui_heights$selected_salts, "px; overflow-y: auto; padding: 6px 1px 1px; }
   #input_unit label { color: #6c757d !important; font-size: 0.9em !important; font-weight: normal !important; margin-right: 6px !important; }
   #input_unit .radio-inline { margin-right: 6px !important; }
   #select_all_visible, #deselect_all_salts, #clear_search { width: 30px !important; height: 30px !important; padding: 0 !important; display: inline-flex; align-items: center; justify-content: center; background-color: #e9ecef !important; border: 1px solid rgba(0,0,0,0.25) !important; border-radius: 4px !important; box-shadow: inset 0 1px 1px rgba(0,0,0,0.075); margin: 3px; }
@@ -415,7 +423,7 @@ ui <- fluidPage(
 
 
 
-"), CONSTANTS$ui_heights$selected_salts)),
+")),
     tags$script(HTML("
       (function(){
         if (window.__saltPickerInit) return;
