@@ -1384,31 +1384,24 @@ server <- function(input, output, session) {
   observeEvent(input$salt_check_values, {
     vis <- filtered_salts()
     old <- selected_salts()
-    # User's current selection of visible checkboxes
-    visible_checked <- input$salt_check_values %||% character(0)
-
-    # Preserve selection state of hidden (filtered) salts
-    hidden_salts <- setdiff(all_salts(), vis)
-    hidden_selected <- intersect(old, hidden_salts)
-
-    # Merge: unchanged hidden + user's visible selection
-    new_sel <- union(hidden_selected, visible_checked)
+    visible_sel <- input$salt_check_values %||% character(0)
+    new_sel <- union(  setdiff(old, vis), visible_sel)
     selected_salts(new_sel)
-  }, ignoreNULL = FALSE)
+  })
 
 
   observeEvent(input$deselect_all_salts, {
-    # Deselect ALL salts, not just visible
-    selected_salts(character(0))
+    vis <- filtered_salts()
+    old <- selected_salts()
+    new_sel <- setdiff(old, vis)
+    selected_salts(new_sel)
 
   })
 
   observeEvent(input$select_all_visible, {
     vis <- filtered_salts()
     old <- selected_salts()
-    hidden_salts <- setdiff(all_salts(), vis)
-    hidden_selected <- intersect(old, hidden_salts)
-    new_sel <- union(hidden_selected, vis)
+    new_sel <- union(old, vis)
     selected_salts(new_sel)
 
   })
