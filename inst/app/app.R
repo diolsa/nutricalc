@@ -425,50 +425,70 @@ ui <- fluidPage(
 
 ")),
     tags$script(HTML("
-      (function(){
-        if (window.__saltPickerInit) return;
-        window.__saltPickerInit = true;
-        if (!window.Shiny || !window.jQuery) return;
+(function(){
+  if (window.__saltPickerInit) return;
+  window.__saltPickerInit = true;
 
-        var scrollKey = 'saltPickerScrollTop';
-        var observer = null;
+  var scrollKey = 'saltPickerScrollTop';
+  var observer = null;
 
-        function restoreScroll() {
-          var el = document.getElementById('selected_salts');
-          if (!el) return;
-          var stored = sessionStorage.getItem(scrollKey);
-          if (stored !== null) {
-            el.scrollTop = parseInt(stored, 10) || 0;
-          }
-          if (!el.dataset.scrollInit) {
-            el.addEventListener('scroll', function(){
-              sessionStorage.setItem(scrollKey, String(this.scrollTop));
-            });
-            el.dataset.scrollInit = '1';
-          }
-        }
+  function restoreScroll() {
+    var el = document.getElementById('selected_salts');
+    if (!el) return;
+    var stored = sessionStorage.getItem(scrollKey);
+    if (stored !== null) el.scrollTop = parseInt(stored, 10) || 0;
 
-        function attachObserver() {
-          var target = document.getElementById('salt_picker');
-          if (!target || observer) return;
-          observer = new MutationObserver(function() {
-            restoreScroll();
-          });
-          observer.observe(target, { childList: true, subtree: true });
-        }
+    if (!el.dataset.scrollInit) {
+      el.addEventListener('scroll', function(){
+        sessionStorage.setItem(scrollKey, String(this.scrollTop));
+      });
+      el.dataset.scrollInit = '1';
+    }
+  }
 
-        document.addEventListener('shiny:connected', function() {
-          restoreScroll();
-          attachObserver();
-        });
+  function collectChecked() {
+    var boxes = document.querySelectorAll('.salt_check:checked');
+    var vals = [];
+    for (var i=0; i<boxes.length; i++) vals.push(boxes[i].value);
+    return vals;
+  }
 
-        window.jQuery(document).on('change', '.salt_check', function() {
-          var vals = [];
-          window.jQuery('.salt_check:checked').each(function(){ vals.push(window.jQuery(this).val()); });
-          window.Shiny.setInputValue('salt_check_values', vals, {priority: 'event'});
-        });
-      })();
-    "))
+  function pushToShiny() {
+    if (!window.Shiny) return;
+    window.Shiny.setInputValue('salt_check_values', collectChecked(), {priority: 'event'});
+  }
+
+  function attachObserver() {
+    var target = document.getElementById('salt_picker');
+    if (!target || observer) return;
+
+    observer = new MutationObserver(function() {
+      restoreScroll();
+      // important: after rerender, re-sync checked list to server
+      pushToShiny();
+    });
+
+    observer.observe(target, { childList: true, subtree: true });
+  }
+
+  // Any checkbox change -> push immediately
+  document.addEventListener('change', function(e){
+    if (e.target && e.target.classList && e.target.classList.contains('salt_check')) {
+      pushToShiny();
+    }
+  });
+
+  // On connect + DOM ready: restore scroll, attach observer, and push initial state
+  function init() {
+    restoreScroll();
+    attachObserver();
+    pushToShiny();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('shiny:connected', init);
+})();
+"))
 
 
 
@@ -582,7 +602,7 @@ ui <- fluidPage(
                                    actionButton("deselect_all_salts", label = NULL, icon = icon("square"), class = "btn btn-light btn-sm", title = "Deselect all")
                                ),
                                tags$div(style = "margin:13px 0;"),
-                               uiOutput("salt_picker"),
+                               div(id = "salt_picker", uiOutput("salt_picker")),
                                uiOutput("sel_status")
                       ),
                       tabPanel("\U0001f4da Recipes",
