@@ -138,7 +138,7 @@ ec_from_ph <- function(
     fe_state = c("Fe2+", "Fe3+"),
     t_C = 25,
     gamma = NULL,
-    gamma_model = "debye_huckel_25C",
+    gamma_model = "auto",
     A_DH_25 = 0.5085
 ) {
   fe_state <- match.arg(fe_state)
@@ -185,45 +185,37 @@ ec_from_ph <- function(
     sqrt(I_mol_L) / abs_z
   )
 
-  # Debye\u2013Huckel (limiting law) gamma at 25 C
-  gamma_dh <- function(z, I_mol_L, A) {
-    10^(-A * z^2 * sqrt(I_mol_L))
-  }
+  # helper: DH gamma for fallback
+  gamma_dh <- function(z, I_mol_L, A) 10^(-A * z^2 * sqrt(I_mol_L))
 
   # Choose gamma values
   if (gamma_model == "auto") {
-    if (!is.null(gamma)) {
-      gamma_vals <- gamma[df$ion]
-      gamma_vals[is.na(gamma_vals)] <- 1
-    } else if (!is.null(ph_res$gamma_ions)) {
-      gamma_vals <- ph_res$gamma_ions[df$ion]
-      gamma_vals[is.na(gamma_vals)] <- 1
-    } else {
-      gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
+
+    # start with DH for all ions (safe baseline)
+    gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
+
+    # overwrite with provided gamma vector (if any)
+    if (!is.null(gamma) && !is.null(names(gamma))) {
+      idx <- match(df$ion, names(gamma))
+      ok  <- !is.na(idx) & is.finite(gamma[idx]) & gamma[idx] > 0
+      gamma_vals[ok] <- gamma[idx[ok]]
+    } else if (!is.null(ph_res$gamma_ions) && !is.null(names(ph_res$gamma_ions))) {
+      idx <- match(df$ion, names(ph_res$gamma_ions))
+      gi  <- ph_res$gamma_ions[idx]
+      ok  <- !is.na(idx) & is.finite(gi) & gi > 0
+      gamma_vals[ok] <- gi[ok]
     }
+
   } else if (gamma_model == "provided") {
-    if (is.null(gamma) || is.null(names(gamma))) {
-      stop("gamma_model = \"provided\" requires a named numeric gamma vector.", call. = FALSE)
-    }
-    gamma_vals <- gamma[df$ion]
-    missing_gamma <- df$ion[is.na(gamma_vals)]
-    if (length(missing_gamma) > 0) {
-      stop(
-        sprintf("gamma is missing values for ions: %s", paste(unique(missing_gamma), collapse = ", ")),
-        call. = FALSE
-      )
-    }
+    ...
   } else if (gamma_model == "unity") {
-    gamma_vals <- rep(1, nrow(df))
+    ...
   } else {
-    # debye_huckel_25C
     gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
   }
 
-  if (any(!is.finite(gamma_vals) | gamma_vals <= 0)) {
-    stop("gamma must be finite and > 0 for all ions used in EC.", call. = FALSE)
-  }
   df$gamma <- as.numeric(gamma_vals)
+
 
   # Conductivity sum
   F_const <- 9.6485e4

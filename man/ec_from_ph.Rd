@@ -10,7 +10,7 @@ ec_from_ph(
   fe_state = c("Fe2+", "Fe3+"),
   t_C = 25,
   gamma = NULL,
-  gamma_model = "debye_huckel_25C",
+  gamma_model = "auto",
   A_DH_25 = 0.5085
 )
 }

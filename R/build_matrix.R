@@ -135,7 +135,7 @@ salt_info$category[salt_info$salt == "ZnCl2"]                  <- "Zinc chloride
 salt_info$category[salt_info$salt == "MnCl2\u00b74H2O"]             <- "Manganese(II) chloride tetrahydrate"
 salt_info$category[salt_info$salt == "NH4Cl"]                  <- "Ammonium chloride"
 salt_info$category[salt_info$salt == "NaNO3"]                  <- "Sodium nitrate"
-salt_info$category[salt_info$salt == "5Ca(NO3)2\u00b7NH4NO3\u00b710H2O"] <- "Calcium nitrate\u2013ammonium nitrate double salt decahydrate (5:1)"
+salt_info$category[salt_info$salt == "5Ca(NO3)2\u00b7NH4NO3\u00b710H2O"] <- "Calcium nitrate\u2013ammonium nitrate decahydrate (5:1)"
 salt_info$category[salt_info$salt == "HNO3"]                   <- "Nitric acid"
 salt_info$category[salt_info$salt == "KOH"]                    <- "Potassium hydroxide"
 salt_info$category[salt_info$salt == "H2SO4"]                  <- "Sulfuric acid"
@@ -149,3 +149,4 @@ salt_info$category[salt_info$salt == "Ca(OH)2"]                <- "Calcium hydro
 acid_base_compounds <- c("HNO3", "H2SO4", "KOH", "HCl", "H3PO4", "NaOH", "NH4OH", "Ca(OH)2")
 
 salt_info$is_acid_base <- salt_info$salt %in% acid_base_compounds
+

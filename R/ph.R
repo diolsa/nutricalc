@@ -39,7 +39,7 @@ ph_from_achieved <- function(
   if (temp_C != 25) stop("This simple implementation currently assumes 25C")
 
   # --- constants (25 C) ---
-  A_davies <- 0.509
+  A_davies <- 0.5085
   Kw <- 1e-14
 
   # acid constants (thermodynamic, for activities)
@@ -560,12 +560,38 @@ ph_from_achieved <- function(
     )
   )
 
+  gamma_ions <- c(
+    "H+" = out$gam$z1,
+    "OH-" = out$gam$z1,
+    "K+" = out$gam$z1,
+    "Na+" = out$gam$z1,
+    "NH4+" = out$gam$z1,
+    "Ca2+" = out$gam$z2,
+    "Mg2+" = out$gam$z2,
+    "Fe2+" = out$gam$z2,   # EC default Fe2+
+    "Fe3+" = out$gam$z3,   # if switch in ec_from_ph()
+    "Mn2+" = out$gam$z2,
+    "Zn2+" = out$gam$z2,
+    "Cu2+" = out$gam$z2,
+    "Cl-" = out$gam$z1,
+    "NO3-" = out$gam$z1,
+    "HCO3-" = out$gam$z1,
+    "CO3-2" = out$gam$z2,
+    "HSO4-" = out$gam$z1,
+    "SO4-2" = out$gam$z2,
+    "H2PO4-" = out$gam$z1,
+    "HPO4-2" = out$gam$z2,
+    "PO4-3" = out$gam$z3,
+    "MoO4-2" = out$gam$z2
+  )
+
   list(
     pH = as.numeric(pH),
     pHc = as.numeric(phc),
     H = as.numeric(H),
     I = as.numeric(out$I),
     gammas = out$gam,
+    gamma_ions = gamma_ions,
     species_mM = species_mM,
     charge_meq = c(
       pos = as.numeric(pos_meq),
@@ -575,6 +601,9 @@ ph_from_achieved <- function(
     charge_breakdown = charge_breakdown
   )
 }
+
+
+
 
 # Example sanity check (CO2_aq lowers pH; CO2 is neutral):
 # achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, KS4_3 = 4.1)
