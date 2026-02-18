@@ -17,7 +17,6 @@
 #'     \item percent_error - 100 * abs_error / target (NA when target == 0)
 #'     \item squared_error - sum(abs_error^2)
 #'     \item rel_squared_error - sum((abs_error/target)^2, na.rm = TRUE)
-#'     \item weighted_rel_squared_error - sum(weights * (abs_error/target)^2, na.rm = TRUE)
 #'   }
 #' @export
 optimize_nutrients <- function(nutrient_matrix, target, importance) {
@@ -88,8 +87,7 @@ optimize_nutrients <- function(nutrient_matrix, target, importance) {
       abs_error = abs_error,             # mmol L^-1
       percent_error = percent_error,     # %
       squared_error = sum(abs_error^2),
-      rel_squared_error = sum(rel_error^2, na.rm = TRUE),
-      weighted_rel_squared_error = sum(weights[names(rel_error)] * rel_error^2, na.rm = TRUE)
+      rel_squared_error = sum(rel_error^2, na.rm = TRUE)
     ),
     class = "nutrient_optimization_result"
   )
@@ -169,10 +167,7 @@ print.nutrient_optimization_result <- function(x, vol = 1, ...) {
   print(nutrients_df, row.names = FALSE)
 
   cat("\n\U0001f9ee Total squared error:", round(x$squared_error, 6), "\n")
-  cat("\U0001f4ca Total squared error (relative, unweighted):", round(x$rel_squared_error, 6), "\n")
-  if (!is.null(x$weighted_rel_squared_error)) {
-    cat("\U0001f4c8 Total squared error (relative, weighted objective):", round(x$weighted_rel_squared_error, 6), "\n")
-  }
+  cat("\U0001f4ca Total squared error (relative):", round(x$rel_squared_error, 6), "\n")
   if (vol > 1) cat("\U0001f9f4 Volume used for totals:", vol, "L\n")
 }
 
@@ -238,8 +233,7 @@ two_stage_optimize_nutrients <- function(
       abs_error = abs_error,
       percent_error = percent_error,
       squared_error = sum(abs_error^2, na.rm = TRUE),
-      rel_squared_error = sum(rel_error^2, na.rm = TRUE),
-      weighted_rel_squared_error = NA_real_
+      rel_squared_error = sum(rel_error^2, na.rm = TRUE)
     )
     class(res) <- "nutrient_optimization_result"
     res

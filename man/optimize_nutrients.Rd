@@ -24,6 +24,7 @@ An object of class 'nutrient_optimization_result' with elements:
     \item percent_error - 100 * abs_error / target (NA when target == 0)
     \item squared_error - sum(abs_error^2)
     \item rel_squared_error - sum((abs_error/target)^2, na.rm = TRUE)
+    \item weighted_rel_squared_error - sum(weights * (abs_error/target)^2, na.rm = TRUE)
   }
 }
 \description{
