@@ -29,7 +29,7 @@ ion_diffusion_25C <- function() {
       -1, -2, -3,
       -2
     ),
-    # Diffusion coefficients at 25 C in 10^-5 cm^2/s (your corrected values)
+    # Diffusion coefficients at 25 C in 10^-5 cm^2/s
     D_1e5_cm2_s = c(
       9.310, 5.273,
       1.957, 1.334, 1.957,
@@ -51,15 +51,15 @@ make_ec_ions <- function(achieved, ph_res) {
   get0 <- function(x, nm) if (!is.null(x[[nm]])) x[[nm]] else 0
 
   # Fixed strong electrolytes from totals (mmol/L)
-  K  <- get0(achieved, "K")
-  Na <- get0(achieved, "Na")
-  Ca <- get0(achieved, "Ca")
-  Mg <- get0(achieved, "Mg")
-  Fe <- get0(achieved, "Fe")
-  Mn <- get0(achieved, "Mn")
-  Zn <- get0(achieved, "Zn")
-  Cu <- get0(achieved, "Cu")
-  Cl <- get0(achieved, "Cl")
+  K   <- get0(achieved, "K")
+  Na  <- get0(achieved, "Na")
+  Ca  <- get0(achieved, "Ca")
+  Mg  <- get0(achieved, "Mg")
+  Fe  <- get0(achieved, "Fe")
+  Mn  <- get0(achieved, "Mn")
+  Zn  <- get0(achieved, "Zn")
+  Cu  <- get0(achieved, "Cu")
+  Cl  <- get0(achieved, "Cl")
   NO3 <- get0(achieved, "NO3_N")  # NO3-N is 1:1 with NO3-
 
   # Mo: assume molybdate for EC purposes (mmol/L)
@@ -85,26 +85,26 @@ make_ec_ions <- function(achieved, ph_res) {
 
   # Build concentration vector (mmol/L) for ions in our lookup
   c(
-    "H+" = H,
-    "OH-" = OH,
-    "K+" = K,
-    "Na+" = Na,
-    "NH4+" = NH4,
-    "Ca2+" = Ca,
-    "Mg2+" = Mg,
-    "Fe2+" = Fe,
-    "Mn2+" = Mn,
-    "Zn2+" = Zn,
-    "Cu2+" = Cu,
-    "Cl-" = Cl,
-    "NO3-" = NO3,
-    "HCO3-" = HCO3,
-    "CO3-2" = CO3,
-    "HSO4-" = HSO4,
-    "SO4-2" = SO4,
+    "H+"     = H,
+    "OH-"    = OH,
+    "K+"     = K,
+    "Na+"    = Na,
+    "NH4+"   = NH4,
+    "Ca2+"   = Ca,
+    "Mg2+"   = Mg,
+    "Fe2+"   = Fe,   # total Fe mapped to Fe2+ unless fe_state forces Fe3+
+    "Mn2+"   = Mn,
+    "Zn2+"   = Zn,
+    "Cu2+"   = Cu,
+    "Cl-"    = Cl,
+    "NO3-"   = NO3,
+    "HCO3-"  = HCO3,
+    "CO3-2"  = CO3,
+    "HSO4-"  = HSO4,
+    "SO4-2"  = SO4,
     "H2PO4-" = H2PO4,
     "HPO4-2" = HPO4,
-    "PO4-3" = PO4,
+    "PO4-3"  = PO4,
     "MoO4-2" = Mo
   )
 }
@@ -119,6 +119,13 @@ make_ec_ions <- function(achieved, ph_res) {
 #' - D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
 #' - Output: EC in mS/cm and uS/cm.
 #'
+#' gamma_model:
+#'   1 = Davies (default)
+#'   2 = Debye-Hückel
+#'
+#' Override precedence:
+#'   model baseline -> ph_res$gamma_ions -> gamma argument (highest priority)
+#'
 #' @param achieved Named numeric vector (mmol/L) or data.frame with columns
 #'   Nutrient and Achieved.
 #' @param ph_res Result list from `ph_from_achieved()` containing `species_mM`.
@@ -126,9 +133,8 @@ make_ec_ions <- function(achieved, ph_res) {
 #'   as Fe3+ for EC purposes.
 #' @param t_C Temperature in degrees C.
 #' @param gamma Optional named numeric vector of activity coefficients (per ion).
-#' @param gamma_model One of "auto", "debye_huckel_25C", "unity", or "provided".
-#'   Default is "debye_huckel_25C".
-#' @param A_DH_25 Debye-Huckel A constant at 25 C.
+#' @param gamma_model Integer 1 (Davies) or 2 (Debye-Hückel). Default 1.
+#' @param A_DH_25 Debye-Huckel A constant at 25 C (also used as A in Davies).
 #'
 #' @return A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
 #' @export
@@ -138,15 +144,49 @@ ec_from_ph <- function(
     fe_state = c("Fe2+", "Fe3+"),
     t_C = 25,
     gamma = NULL,
-    gamma_model = "auto",
+    gamma_model = 1,
     A_DH_25 = 0.5085
 ) {
   fe_state <- match.arg(fe_state)
-  gamma_model <- match.arg(
-    gamma_model,
-    choices = c("debye_huckel_25C", "auto", "unity", "provided")
-  )
 
+  # ---- normalize gamma_model: allow 1/2 or helpful strings ----
+  if (is.character(gamma_model)) {
+    gm <- tolower(gamma_model[1])
+    if (gm %in% c("1", "davies", "davies_25c")) gamma_model <- 1L
+    if (gm %in% c("2", "dh", "debye", "debye_huckel", "debye-huckel", "debye_huckel_25c")) gamma_model <- 2L
+  }
+  gamma_model <- as.integer(gamma_model[1])
+  if (!gamma_model %in% c(1L, 2L)) {
+    stop("gamma_model must be 1 (Davies) or 2 (Debye-Hückel).", call. = FALSE)
+  }
+
+  # ---- helpers ----
+  gamma_dh_25C <- function(z, I_mol_L, A = 0.5085, tol = 1e-12) {
+    z <- as.numeric(z)
+    I <- as.numeric(I_mol_L)
+    if (!is.finite(I) || I <= tol) return(rep(1, length(z)))
+    10^(-A * z^2 * sqrt(I))
+  }
+
+  gamma_davies_25C <- function(z, I_mol_L, A = 0.5085, tol = 1e-12) {
+    z <- as.numeric(z)
+    I <- as.numeric(I_mol_L)
+    if (!is.finite(I) || I <= tol) return(rep(1, length(z)))
+    sI <- sqrt(I)
+    term <- (sI / (1 + sI)) - 0.3 * I
+    10^(-A * z^2 * term)
+  }
+
+  apply_named_gamma_override <- function(current, ions, gamma_named) {
+    if (is.null(gamma_named) || is.null(names(gamma_named))) return(current)
+    idx <- match(ions, names(gamma_named))
+    g   <- gamma_named[idx]
+    ok  <- !is.na(idx) & is.finite(g) & g > 0
+    current[ok] <- g[ok]
+    current
+  }
+
+  # ---- data ----
   tab <- ion_diffusion_25C()
 
   # Ion concentrations (mmol/L) from your existing pipeline
@@ -166,8 +206,7 @@ ec_from_ph <- function(
     data.frame(ion = names(c_mM), c_mM = as.numeric(c_mM), stringsAsFactors = FALSE),
     tab,
     by = "ion",
-    all.x = FALSE,
-    all.y = FALSE
+    all = FALSE
   )
   if (nrow(df) == 0) {
     stop("No overlapping ions between concentrations and diffusion lookup table.", call. = FALSE)
@@ -185,39 +224,26 @@ ec_from_ph <- function(
     sqrt(I_mol_L) / abs_z
   )
 
-  # helper: DH gamma for fallback
-  gamma_dh <- function(z, I_mol_L, A) 10^(-A * z^2 * sqrt(I_mol_L))
-
-  # Choose gamma values
-  if (gamma_model == "auto") {
-
-    # start with DH for all ions (safe baseline)
-    gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
-
-    # overwrite with provided gamma vector (if any)
-    if (!is.null(gamma) && !is.null(names(gamma))) {
-      idx <- match(df$ion, names(gamma))
-      ok  <- !is.na(idx) & is.finite(gamma[idx]) & gamma[idx] > 0
-      gamma_vals[ok] <- gamma[idx[ok]]
-    } else if (!is.null(ph_res$gamma_ions) && !is.null(names(ph_res$gamma_ions))) {
-      idx <- match(df$ion, names(ph_res$gamma_ions))
-      gi  <- ph_res$gamma_ions[idx]
-      ok  <- !is.na(idx) & is.finite(gi) & gi > 0
-      gamma_vals[ok] <- gi[ok]
-    }
-
-  } else if (gamma_model == "provided") {
-    ...
-  } else if (gamma_model == "unity") {
-    ...
+  # ---- baseline gamma from selected model ----
+  gamma_vals <- if (gamma_model == 1L) {
+    gamma_davies_25C(df$z, I_mol_L, A = A_DH_25)
   } else {
-    gamma_vals <- gamma_dh(df$z, I_mol_L, A_DH_25)
+    gamma_dh_25C(df$z, I_mol_L, A = A_DH_25)
   }
 
+  # Overrides: first ph_res (lower priority), then explicit gamma (highest)
+  if (!is.null(ph_res$gamma_ions)) {
+    gamma_vals <- apply_named_gamma_override(gamma_vals, df$ion, ph_res$gamma_ions)
+  }
+  if (!is.null(gamma)) {
+    gamma_vals <- apply_named_gamma_override(gamma_vals, df$ion, gamma)
+  }
+
+  # Clamp
+  gamma_vals[!is.finite(gamma_vals) | gamma_vals <= 0] <- .Machine$double.xmin
   df$gamma <- as.numeric(gamma_vals)
 
-
-  # Conductivity sum
+  # ---- conductivity sum ----
   F_const <- 9.6485e4
   R_const <- 8.31446
   T_K <- t_C + 273.15
@@ -248,7 +274,8 @@ ec_from_ph <- function(
       t_C = t_C,
       T_K = T_K,
       I_mol_L = I_mol_L,
-      gamma_model = gamma_model,
+      gamma_model = gamma_model, # 1 or 2
+      gamma_model_name = if (gamma_model == 1L) "davies_25C" else "debye_huckel_25C",
       A_DH_25 = A_DH_25
     )
   )

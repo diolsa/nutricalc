@@ -1,8 +1,12 @@
 #' Compute pH of a nutrient solution from achieved composition
 #'
-#' Uses charge balance with acid/base speciation and Davies activity corrections
+#' Uses charge balance with acid/base speciation and activity corrections
 #' to estimate pH at 25 C. Assumes no carbonate alkalinity, no complexation, and
 #' no precipitation.
+#'
+#' gamma_model:
+#'   1 = Davies (default)
+#'   2 = Debye–Hückel limiting law (DH)
 #'
 #' @param achieved Named numeric vector of mmol/L (e.g., solver result `x$achieved`).
 #'   If present, `CO2_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
@@ -15,19 +19,21 @@
 #' @param debug Logical; when TRUE prints basic bracket diagnostics.
 #' @param chelate_z Named numeric vector of chelate charges to include as fixed
 #'   anions. Values are net charges (negative) for ligand totals in mmol/L.
+#' @param gamma_model Integer 1 (Davies) or 2 (Debye–Hückel). Default 1.
 #'
 #' @return A list with pH, ionic strength, activity coefficients, species
 #'   distribution, and charge balance diagnostics.
 #' @export
 ph_from_achieved <- function(
-  achieved,
-  temp_C = 25,
-  phc_bracket = c(3, 9),
-  tol = 1e-9,
-  max_iter = 200,
-  inner_max_iter = 50,
-  debug = FALSE,
-  chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4)
+    achieved,
+    temp_C = 25,
+    phc_bracket = c(3, 9),
+    tol = 1e-9,
+    max_iter = 200,
+    inner_max_iter = 50,
+    debug = FALSE,
+    chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4),
+    gamma_model = 1
 ) {
   if (!is.numeric(inner_max_iter) || length(inner_max_iter) != 1 || is.na(inner_max_iter) ||
       inner_max_iter < 1 || inner_max_iter %% 1 != 0) {
@@ -38,12 +44,23 @@ ph_from_achieved <- function(
   stopifnot(is.numeric(achieved), !is.null(names(achieved)))
   if (temp_C != 25) stop("This simple implementation currently assumes 25C")
 
+  # ---- normalize gamma_model: allow 1/2 or helpful strings ----
+  if (is.character(gamma_model)) {
+    gm <- tolower(gamma_model[1])
+    if (gm %in% c("1", "davies", "davies_25c")) gamma_model <- 1L
+    if (gm %in% c("2", "dh", "debye", "debye_huckel", "debye-huckel", "debye_huckel_25c")) gamma_model <- 2L
+  }
+  gamma_model <- as.integer(gamma_model[1])
+  if (!gamma_model %in% c(1L, 2L)) {
+    stop("gamma_model must be 1 (Davies) or 2 (Debye–Hückel).", call. = FALSE)
+  }
+
   # --- constants (25 C) ---
-  A_davies <- 0.5085
+  A_25 <- 0.5085
   Kw <- 1e-14
 
   # acid constants (thermodynamic, for activities)
-  Ka_NH4 <- 10^(-9.25)
+  Ka_NH4  <- 10^(-9.25)
   Ka_HSO4 <- 10^(-1.99)
 
   Ka1_P <- 10^(-2.16)
@@ -51,16 +68,27 @@ ph_from_achieved <- function(
   Ka3_P <- 10^(-12.32)
   Ka1_C <- 10^(-6.35)
   Ka2_C <- 10^(-10.33)
-  Ka_B <- 10^(-9.27)
+  Ka_B  <- 10^(-9.27)
   Ka_Si1 <- 10^(-9.90)
 
-  # --- helpers ---
-  davies_gamma <- function(I, z) {
+  # --- helpers: activity coefficient models ---
+  gamma_davies_25C <- function(I, z, A = A_25) {
     if (!is.finite(I) || I <= 0) return(1.0)
     term <- (sqrt(I) / (1 + sqrt(I)) - 0.3 * I)
-    val <- 10^(-A_davies * z^2 * term)
+    val <- 10^(-A * z^2 * term)
     if (!is.finite(val) || val <= 0) return(.Machine$double.xmin)
     val
+  }
+
+  gamma_dh_25C <- function(I, z, A = A_25) {
+    if (!is.finite(I) || I <= 0) return(1.0)
+    val <- 10^(-A * z^2 * sqrt(I))
+    if (!is.finite(val) || val <= 0) return(.Machine$double.xmin)
+    val
+  }
+
+  gamma_z <- function(I, z) {
+    if (gamma_model == 1L) gamma_davies_25C(I, z) else gamma_dh_25C(I, z)
   }
 
   # pull inputs (mmol/L)
@@ -71,15 +99,16 @@ ph_from_achieved <- function(
     }
     0
   }
-  NO3 <- get0("NO3_N")        # mmol/L NO3- (NO3-N is 1:1)
-  NT <- get0("NH4_N")         # mmol/L total ammonia (NH4+/NH3)
-  PT <- get0("P")             # mmol/L total phosphate
-  KT <- get0("K")             # mmol/L K+
-  Ca <- get0("Ca")            # mmol/L Ca2+
-  Mg <- get0("Mg")            # mmol/L Mg2+
-  ST <- get0("S")             # mmol/L total sulfate (HSO4-/SO4^2-)
-  BT <- get0("B")             # mmol/L total boron
-  SiT <- get0("Si")           # mmol/L total silicon
+
+  NO3 <- get0("NO3_N")
+  NT  <- get0("NH4_N")
+  PT  <- get0("P")
+  KT  <- get0("K")
+  Ca  <- get0("Ca")
+  Mg  <- get0("Mg")
+  ST  <- get0("S")
+  BT  <- get0("B")
+  SiT <- get0("Si")
 
   Na <- get0("Na")
   Cl <- get0("Cl")
@@ -89,10 +118,12 @@ ph_from_achieved <- function(
   Zn <- get0("Zn")
   Cu <- get0("Cu")
   Mo <- get0("Mo")
-  EDTA <- get_any0(c("EDTA"))
-  DTPA <- get_any0(c("DTPA"))
+
+  EDTA  <- get_any0(c("EDTA"))
+  DTPA  <- get_any0(c("DTPA"))
   EDDHA <- get_any0(c("EDDHA"))
-  HBED <- get_any0(c("HBED"))
+  HBED  <- get_any0(c("HBED"))
+
   as_scalar_finite0 <- function(x) {
     if (is.null(x) || !length(x)) return(0)
     x <- suppressWarnings(as.numeric(x[1]))
@@ -111,7 +142,6 @@ ph_from_achieved <- function(
   }
   CT_mM <- max(0, as_scalar_finite0(CT_mM))
 
-  # BWB "Basenkapazit\u00e4t KB 8,2" (KS 8.2) is treated as free dissolved CO2(aq).
   CO2_aq_mM <- if ("CO2_aq" %in% names(achieved)) {
     achieved[["CO2_aq"]]
   } else if ("KB8_2" %in% names(achieved)) {
@@ -126,9 +156,9 @@ ph_from_achieved <- function(
   # convert mmol/L -> mol/L where needed
   mM_to_M <- function(x_mM) x_mM * 1e-3
 
-  # fixed ions list for ionic strength calc (we'll update variable ions each time)
+  # fixed ions for ionic strength
   fixed_c <- list(
-    K = c(c = mM_to_M(KT), z = 1),
+    K  = c(c = mM_to_M(KT), z = 1),
     Na = c(c = mM_to_M(Na), z = 1),
     Ca = c(c = mM_to_M(Ca), z = 2),
     Mg = c(c = mM_to_M(Mg), z = 2),
@@ -138,8 +168,8 @@ ph_from_achieved <- function(
     Cu = c(c = mM_to_M(Cu), z = 2),
 
     NO3 = c(c = mM_to_M(NO3), z = -1),
-    Cl = c(c = mM_to_M(Cl), z = -1),
-    MoO4 = c(c = mM_to_M(Mo), z = -2)  # Mo as molybdate
+    Cl  = c(c = mM_to_M(Cl), z = -1),
+    MoO4 = c(c = mM_to_M(Mo), z = -2)
   )
 
   chelate_conc <- c(EDTA = EDTA, DTPA = DTPA, EDDHA = EDDHA, HBED = HBED)
@@ -155,44 +185,44 @@ ph_from_achieved <- function(
   residual_meq <- function(phc) {
     H <- 10^(-phc) # mol/L
 
-    # ---- inner loop: find I -> gammas -> species -> I (fixed point) ----
-    I <- 0.03 # initial guess
+    # inner fixed-point loop on ionic strength
+    I <- 0.03
     gam <- list()
     species <- list()
 
     for (k in seq_len(inner_max_iter)) {
-      # gammas by charge state (Davies)
-      gam$z1 <- davies_gamma(I, 1)
-      gam$z2 <- davies_gamma(I, 2)
-      gam$z3 <- davies_gamma(I, 3)
+      # gammas by charge state (selected model)
+      gam$z1 <- gamma_z(I, 1)
+      gam$z2 <- gamma_z(I, 2)
+      gam$z3 <- gamma_z(I, 3)
 
-      gam$H <- gam$z1
-      gam$OH <- gam$z1
-      gam$NH4 <- gam$z1
-      gam$HSO4 <- gam$z1
-      gam$SO4 <- gam$z2
-      gam$H2PO4 <- gam$z1
-      gam$HPO4 <- gam$z2
-      gam$PO4 <- gam$z3
-      gam$HCO3 <- gam$z1
-      gam$CO3 <- gam$z2
-      gam$BOH4 <- gam$z1
+      gam$H      <- gam$z1
+      gam$OH     <- gam$z1
+      gam$NH4    <- gam$z1
+      gam$HSO4   <- gam$z1
+      gam$SO4    <- gam$z2
+      gam$H2PO4  <- gam$z1
+      gam$HPO4   <- gam$z2
+      gam$PO4    <- gam$z3
+      gam$HCO3   <- gam$z1
+      gam$CO3    <- gam$z2
+      gam$BOH4   <- gam$z1
       gam$H3SiO4 <- gam$z1
 
       # OH- from water autoprotolysis with activities
-      OH <- Kw / (gam$H * gam$OH * H)  # mol/L
+      OH <- Kw / (gam$H * gam$OH * H)
 
-      # NH4/NH3 with activities (NH3 neutral => gamma=1)
+      # NH4/NH3 (NH3 neutral)
       rN <- Ka_NH4 * gam$NH4 / (gam$H * H)
       NH4 <- mM_to_M(NT) / (1 + rN)
       NH3 <- mM_to_M(NT) - NH4
 
-      # sulfate with activities
+      # sulfate
       rS <- Ka_HSO4 * gam$HSO4 / (gam$H * gam$SO4 * H)
       HSO4 <- mM_to_M(ST) / (1 + rS)
       SO4 <- mM_to_M(ST) - HSO4
 
-      # phosphate with "conditional" Ka including gammas
+      # phosphate with conditional Ka including gammas
       K1c <- Ka1_P / (gam$H * gam$H2PO4)
       K2c <- Ka2_P * gam$H2PO4 / (gam$H * gam$HPO4)
       K3c <- Ka3_P * gam$HPO4 / (gam$H * gam$PO4)
@@ -200,40 +230,37 @@ ph_from_achieved <- function(
       D <- H^3 + K1c * H^2 + K1c * K2c * H + K1c * K2c * K3c
       H3PO4 <- mM_to_M(PT) * (H^3 / D)
       H2PO4 <- mM_to_M(PT) * (K1c * H^2 / D)
-      HPO4 <- mM_to_M(PT) * (K1c * K2c * H / D)
-      PO4 <- mM_to_M(PT) * (K1c * K2c * K3c / D)
+      HPO4  <- mM_to_M(PT) * (K1c * K2c * H / D)
+      PO4   <- mM_to_M(PT) * (K1c * K2c * K3c / D)
 
-      # carbonate speciation from CT (total inorganic carbon) or fixed CO2(aq)
+      # carbonate
       K1c_C <- Ka1_C / (gam$H * gam$HCO3)
       K2c_C <- Ka2_C * gam$HCO3 / (gam$H * gam$CO3)
+
       if (isTRUE(CO2_aq_mM > 0)) {
         CO2 <- mM_to_M(CO2_aq_mM)
         HCO3 <- (K1c_C * CO2) / H
-        CO3 <- (K2c_C * HCO3) / H
+        CO3  <- (K2c_C * HCO3) / H
       } else if (isTRUE(CT_mM > 0)) {
         D_c <- H^2 + K1c_C * H + K1c_C * K2c_C
         a0 <- H^2 / D_c
         a1 <- (K1c_C * H) / D_c
         a2 <- (K1c_C * K2c_C) / D_c
-
         CT <- mM_to_M(CT_mM)
-
-        CO2 <- a0 * CT
+        CO2  <- a0 * CT
         HCO3 <- a1 * CT
-        CO3 <- a2 * CT
+        CO3  <- a2 * CT
       } else {
-        CO2 <- 0
-        HCO3 <- 0
-        CO3 <- 0
+        CO2 <- 0; HCO3 <- 0; CO3 <- 0
       }
 
-      # borate speciation (B(OH)3 / B(OH)4-)
+      # borate
       aH <- gam$H * H
       rB <- (Ka_B / aH) * (1 / gam$BOH4)
       BOH4 <- mM_to_M(BT) * (rB / (1 + rB))
       BOH3 <- mM_to_M(BT) - BOH4
 
-      # silicate speciation (H4SiO4 / H3SiO4-)
+      # silicate
       rSi <- (Ka_Si1 / aH) * (1 / gam$H3SiO4)
       H3SiO4 <- mM_to_M(SiT) * (rSi / (1 + rSi))
       H4SiO4 <- mM_to_M(SiT) - H3SiO4
@@ -258,7 +285,6 @@ ph_from_achieved <- function(
         H3SiO4 * 1^2
       I_new <- 0.5 * I_new
 
-      # converge inner loop
       species <- list(
         H = H, OH = OH,
         NH4 = NH4, NH3 = NH3,
@@ -268,6 +294,7 @@ ph_from_achieved <- function(
         BOH3 = BOH3, BOH4 = BOH4,
         H4SiO4 = H4SiO4, H3SiO4 = H3SiO4
       )
+
       if (isTRUE(abs(I_new - I) < 1e-10)) {
         I <- I_new
         break
@@ -290,6 +317,7 @@ ph_from_achieved <- function(
         call. = FALSE
       )
     }
+
     non_finite <- vapply(species, function(x) !is.finite(x), logical(1))
     if (any(non_finite)) {
       return(list(
@@ -306,7 +334,7 @@ ph_from_achieved <- function(
       ))
     }
 
-    # ---- charge balance in meq/L (use concentrations) ----
+    # ---- charge balance in meq/L ----
     pos_fix_meq <- KT + Na + 2 * Ca + 2 * Mg + 3 * Fe + 2 * Mn + 2 * Zn + 2 * Cu
     neg_fix_meq <- NO3 + Cl + 2 * Mo
     if (length(chelate_conc)) {
@@ -315,7 +343,6 @@ ph_from_achieved <- function(
       }
     }
 
-    # variable parts (convert mol/L -> mmol/L)
     H_mM <- species$H * 1e3
     OH_mM <- species$OH * 1e3
     NH4_mM <- species$NH4 * 1e3
@@ -386,19 +413,19 @@ ph_from_achieved <- function(
       r12 <- residual_meq(12)
       message(sprintf(
         paste(
-        "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
-        "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
-        "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
-        sep = "\n"
-      ),
-      r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, CT_mM, r2$species[["HCO3"]] * 1e3, r2$species[["CO3"]] * 1e3,
-      r2$species[["BOH4"]] * 1e3, r2$species[["H3SiO4"]] * 1e3,
-      r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
-      r7$species[["BOH4"]] * 1e3, r7$species[["H3SiO4"]] * 1e3,
-      r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, CT_mM, r12$species[["HCO3"]] * 1e3, r12$species[["CO3"]] * 1e3,
-      r12$species[["BOH4"]] * 1e3, r12$species[["H3SiO4"]] * 1e3
-    ))
-  }
+          "pH bracket debug phc=2: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+          "pH bracket debug phc=7: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+          "pH bracket debug phc=12: f=%.6g pos=%.6g neg=%.6g H=%.6g mM OH=%.6g mM CT_mM=%.6g HCO3_mM=%.6g CO3_mM=%.6g BOH4_mM=%.6g H3SiO4_mM=%.6g",
+          sep = "\n"
+        ),
+        r2$f, r2$pos, r2$neg, r2$H_mM, r2$OH_mM, CT_mM, r2$species[["HCO3"]] * 1e3, r2$species[["CO3"]] * 1e3,
+        r2$species[["BOH4"]] * 1e3, r2$species[["H3SiO4"]] * 1e3,
+        r7$f, r7$pos, r7$neg, r7$H_mM, r7$OH_mM, CT_mM, r7$species[["HCO3"]] * 1e3, r7$species[["CO3"]] * 1e3,
+        r7$species[["BOH4"]] * 1e3, r7$species[["H3SiO4"]] * 1e3,
+        r12$f, r12$pos, r12$neg, r12$H_mM, r12$OH_mM, CT_mM, r12$species[["HCO3"]] * 1e3, r12$species[["CO3"]] * 1e3,
+        r12$species[["BOH4"]] * 1e3, r12$species[["H3SiO4"]] * 1e3
+      ))
+    }
 
     stop(
       sprintf(
@@ -412,9 +439,12 @@ ph_from_achieved <- function(
 
   if (isTRUE(debug)) {
     chelate_meq_total <- 0
-    if (length(chelate_conc)) {
-      for (nm in names(chelate_conc)) {
-        chelate_meq_total <- chelate_meq_total + abs(chelate_z[[nm]]) * chelate_conc[[nm]]
+    chelate_conc_dbg <- c(EDTA = EDTA, DTPA = DTPA, EDDHA = EDDHA, HBED = HBED)
+    chelate_conc_dbg <- chelate_conc_dbg[names(chelate_conc_dbg) %in% names(chelate_z)]
+    chelate_conc_dbg <- chelate_conc_dbg[is.finite(chelate_conc_dbg) & chelate_conc_dbg > 0]
+    if (length(chelate_conc_dbg)) {
+      for (nm in names(chelate_conc_dbg)) {
+        chelate_meq_total <- chelate_meq_total + abs(chelate_z[[nm]]) * chelate_conc_dbg[[nm]]
       }
     }
     r0 <- residual_meq(0)
@@ -445,7 +475,7 @@ ph_from_achieved <- function(
   fa <- bracket$fa
   fb <- bracket$fb
 
-  mid <- NA
+  mid <- NA_real_
   out <- NULL
   for (it in seq_len(max_iter)) {
     mid <- 0.5 * (a + b)
@@ -568,8 +598,8 @@ ph_from_achieved <- function(
     "NH4+" = out$gam$z1,
     "Ca2+" = out$gam$z2,
     "Mg2+" = out$gam$z2,
-    "Fe2+" = out$gam$z2,   # EC default Fe2+
-    "Fe3+" = out$gam$z3,   # if switch in ec_from_ph()
+    "Fe2+" = out$gam$z2,
+    "Fe3+" = out$gam$z3,
     "Mn2+" = out$gam$z2,
     "Zn2+" = out$gam$z2,
     "Cu2+" = out$gam$z2,
@@ -592,6 +622,8 @@ ph_from_achieved <- function(
     I = as.numeric(out$I),
     gammas = out$gam,
     gamma_ions = gamma_ions,
+    gamma_model = gamma_model,
+    gamma_model_name = if (gamma_model == 1L) "davies_25C" else "debye_huckel_25C",
     species_mM = species_mM,
     charge_meq = c(
       pos = as.numeric(pos_meq),
@@ -601,13 +633,3 @@ ph_from_achieved <- function(
     charge_breakdown = charge_breakdown
   )
 }
-
-
-
-
-# Example sanity check (CO2_aq lowers pH; CO2 is neutral):
-# achieved <- c(NO3_N = 5, K = 3, Ca = 2, Mg = 1, KS4_3 = 4.1)
-# ph_no_co2 <- ph_from_achieved(achieved)$pH
-# achieved[["CO2_aq"]] <- 0.44
-# ph_with_co2 <- ph_from_achieved(achieved)$pH
-# stopifnot(ph_with_co2 < ph_no_co2)
