@@ -19,7 +19,7 @@
 #' @param debug Logical; when TRUE prints basic bracket diagnostics.
 #' @param chelate_z Named numeric vector of chelate charges to include as fixed
 #'   anions. Values are net charges (negative) for ligand totals in mmol/L.
-#' @param gamma_model Integer 1 (Davies) or 2 (Debye–Hückel). Default 1.
+#' @param gamma_model Activity model selector: 1/"davies_25C" (Davies) or 2/"debye_huckel_25C" (Debye–Hückel). Default 1.
 #'
 #' @return A list with pH, ionic strength, activity coefficients, species
 #'   distribution, and charge balance diagnostics.
@@ -45,15 +45,14 @@ ph_from_achieved <- function(
   if (temp_C != 25) stop("This simple implementation currently assumes 25C")
 
   # ---- normalize gamma_model: allow 1/2 or helpful strings ----
-  if (is.character(gamma_model)) {
-    gm <- tolower(gamma_model[1])
-    if (gm %in% c("1", "davies", "davies_25c")) gamma_model <- 1L
-    if (gm %in% c("2", "dh", "debye", "debye_huckel", "debye-huckel", "debye_huckel_25c")) gamma_model <- 2L
+  gm <- tolower(as.character(gamma_model[1]))
+  if (gm %in% c("1", "davies", "davies_25c")) gm <- "davies_25c"
+  if (gm %in% c("2", "dh", "debye", "debye_huckel", "debye-huckel", "debye_huckel_25c")) gm <- "debye_huckel_25c"
+  if (!gm %in% c("davies_25c", "debye_huckel_25c")) {
+    stop("gamma_model must be one of 1/'davies_25C' or 2/'debye_huckel_25C'.", call. = FALSE)
   }
-  gamma_model <- as.integer(gamma_model[1])
-  if (!gamma_model %in% c(1L, 2L)) {
-    stop("gamma_model must be 1 (Davies) or 2 (Debye–Hückel).", call. = FALSE)
-  }
+  gamma_model <- if (identical(gm, "davies_25c")) "davies_25C" else "debye_huckel_25C"
+  gamma_model_id <- if (identical(gamma_model, "davies_25C")) 1L else 2L
 
   # --- constants (25 C) ---
   A_25 <- 0.5085
@@ -87,8 +86,10 @@ ph_from_achieved <- function(
     val
   }
 
+  gamma_fun <- if (identical(gamma_model, "davies_25C")) gamma_davies_25C else gamma_dh_25C
+
   gamma_z <- function(I, z) {
-    if (gamma_model == 1L) gamma_davies_25C(I, z) else gamma_dh_25C(I, z)
+    gamma_fun(I, z)
   }
 
   # pull inputs (mmol/L)
@@ -623,7 +624,8 @@ ph_from_achieved <- function(
     gammas = out$gam,
     gamma_ions = gamma_ions,
     gamma_model = gamma_model,
-    gamma_model_name = if (gamma_model == 1L) "davies_25C" else "debye_huckel_25C",
+    gamma_model_id = gamma_model_id,
+    gamma_model_name = gamma_model,
     species_mM = species_mM,
     charge_meq = c(
       pos = as.numeric(pos_meq),
