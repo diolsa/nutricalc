@@ -10,7 +10,7 @@ ec_from_ph(
   fe_state = c("Fe2+", "Fe3+"),
   t_C = 25,
   gamma = NULL,
-  gamma_model = "auto",
+  gamma_model = 1,
   A_DH_25 = 0.5085
 )
 }
@@ -27,10 +27,9 @@ as Fe3+ for EC purposes.}
 
 \item{gamma}{Optional named numeric vector of activity coefficients (per ion).}
 
-\item{gamma_model}{One of "auto", "debye_huckel_25C", "unity", or "provided".
-Default is "debye_huckel_25C".}
+\item{gamma_model}{Integer 1 (Davies) or 2 (Debye-Hückel). Default 1.}
 
-\item{A_DH_25}{Debye-Huckel A constant at 25 C.}
+\item{A_DH_25}{Debye-Huckel A constant at 25 C (also used as A in Davies).}
 }
 \value{
 A list with EC_mS_cm, EC_uS_cm, and per-ion contributions.
@@ -44,4 +43,11 @@ Units:
 - c is in mmol/L (mM); numerically identical to mol/m^3, used directly as such.
 - D is in 10^-5 cm^2/s and converted to m^2/s by multiplying 1e-9.
 - Output: EC in mS/cm and uS/cm.
+
+gamma_model:
+  1 = Davies (default)
+  2 = Debye-Hückel
+
+Override precedence:
+  model baseline -> ph_res$gamma_ions -> gamma argument (highest priority)
 }

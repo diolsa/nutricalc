@@ -12,7 +12,8 @@ ph_from_achieved(
   max_iter = 200,
   inner_max_iter = 50,
   debug = FALSE,
-  chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4)
+  chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4),
+  gamma_model = 1
 )
 }
 \arguments{
@@ -34,13 +35,20 @@ from BWB "Basenkapazitaet KB 8,2" / KS 8.2 and used to fix carbonate speciation.
 
 \item{chelate_z}{Named numeric vector of chelate charges to include as fixed
 anions. Values are net charges (negative) for ligand totals in mmol/L.}
+
+\item{gamma_model}{Integer 1 (Davies) or 2 (Debye–Hückel). Default 1.}
 }
 \value{
 A list with pH, ionic strength, activity coefficients, species
   distribution, and charge balance diagnostics.
 }
 \description{
-Uses charge balance with acid/base speciation and Davies activity corrections
+Uses charge balance with acid/base speciation and activity corrections
 to estimate pH at 25 C. Assumes no carbonate alkalinity, no complexation, and
 no precipitation.
+}
+\details{
+gamma_model:
+  1 = Davies (default)
+  2 = Debye–Hückel limiting law (DH)
 }
