@@ -122,7 +122,55 @@ note: For MgSO4 Heptahydrate is selected here
     )
   ),
 
+  hoagland_1933 = list(
+    name  = "Hoagland and Snyder (1933)",
+    category = "Standard Formulations",
+    notes = "Historic formulation Hoagland and Snyder (1933)",
+    unit  = "mg/L",
+    salts =  TRUE,
+    targets = c(
+      NO3_N=210, NH4_N=0, P=31, K=234, Ca=200, Mg=48, S=64,
+      Na=0, Cl=0.14, Fe=1, Mn=0.11, Zn=0.023, B=0.11, Cu=0.014, Mo=0.018, Si=0
+    )
+  ),
+  hoagland_1938 = list(
+    name  = "Hoagland and Arnon (1938)",
+    category = "Standard Formulations",
+    notes = "Historic formulation Hoagland and Snyder (1933)",
+    unit  = "mg/L",
+    salts =  TRUE,
+    targets = c(
+      NO3_N=210, NH4_N=0, P=31, K=234, Ca=200, Mg=48, S=64,
+      Na=0, Cl=0.14, Fe=1, Mn=0.50, Zn=0.05, B=0.50, Cu=0.02, Mo=0.048, Si=0
+    )
+  ),
 
+ Hewitt_1952 = list(
+    name  = "Hewitt (1952)",
+    category = "Standard Formulations",
+    notes = "Historic formulation Hoagland and Snyder (1933)",
+    unit  = "mg/L",
+    salts =  TRUE,
+    targets = c(
+      NO3_N=168, NH4_N=0, P=41, K=156, Ca=160, Mg=36, S=48,
+      Na=31, Cl=0.14, Fe=2.8, Mn=0.55, Zn=0.065, B=0.54, Cu=0.064, Mo=0.048, Si=0
+    )
+  ),
+
+
+
+  resh_2015 = list(
+    name  = "Resh (2015)",
+    category = "Standard Formulations",
+    notes = "from: Resh, H. M. (2015). Hydroponics for the home grower. CRC press. S. 46-47",
+    unit  = "mg/L",
+    salts =  TRUE,
+    targets = c(
+      NO3_N=140, NH4_N=0, P=50, K=352, Ca=180, Mg=50, S=168,
+      Na=0, Cl=0, Fe=5, Mn=0.8, Zn=0.2,
+      B=0.3, Cu=0.07, Mo=0.03, Si=0
+    )
+  ),
 
   resh_2015 = list(
     name  = "Resh (2015)",
