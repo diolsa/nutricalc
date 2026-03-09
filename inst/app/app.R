@@ -1569,8 +1569,8 @@ server <- function(input, output, session) {
       Target            = vapply(target, format_delivery_value, character(1)),
       Achieved          = vapply(achieved, format_delivery_value, character(1)),
       Final             = vapply(final, format_delivery_value, character(1)),
-      "Absolute Error"  = abs_err,
-      "Percent Error"   = pct_err,
+      "Abs. Error"      = abs_err,
+      "Pct. Error"      = pct_err,
       stringsAsFactors  = FALSE,
       check.names       = FALSE
     )
