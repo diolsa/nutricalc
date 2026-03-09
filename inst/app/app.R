@@ -926,7 +926,7 @@ server <- function(input, output, session) {
     updateTabsetPanel(session, "input_tabs", selected = "\U0001f3af Nutrient Targets")
   })
 
-  eval_targets <- reactive({
+  adjusted_targets <- reactive({
     vals <- targets_mmol()
     water_vals <- water_mmol()
     multiplier_pct <- input$ph_ec_multiplier %||% 0
@@ -938,7 +938,11 @@ server <- function(input, output, session) {
       need(!is.null(water_vals), "Water not initialized yet.")
     )
 
-    pmax((vals * (1 + multiplier)) - water_vals, 0)
+    (vals * (1 + multiplier)) - water_vals
+  })
+
+  eval_targets <- reactive({
+    pmax(adjusted_targets(), 0)
   })
 
   importance_vec <- reactive({
@@ -1445,6 +1449,9 @@ server <- function(input, output, session) {
     req(length(sel_effective) > 0)
 
     nm_sub <- nutrient_matrix[sel_effective, , drop = FALSE]
+    solver_target <- eval_targets()
+    adjusted_target <- adjusted_targets()
+    water_vals <- water_mmol()
 
     used_dummy <- FALSE
     dummy_name <- ".DUMMY_ZERO_SALT"
@@ -1467,13 +1474,13 @@ server <- function(input, output, session) {
     if (use_acid) {
       out <- two_stage_optimize_nutrients(
         nutrient_matrix = nm_pad,
-        target          = eval_targets(),
+        target          = solver_target,
         importance      = importance_vec()
       )
     } else {
       out <- optimize_nutrients(
         nutrient_matrix = nm_pad,
-        target          = eval_targets(),
+        target          = solver_target,
         importance      = importance_vec()
       )
     }
@@ -1487,6 +1494,42 @@ server <- function(input, output, session) {
         out$amounts <- out$amounts[setdiff(names(out$amounts), dummy_name)]
       }
     }
+
+    achieved_from_salts <- out$achieved
+    if (!is.null(out$amounts) && !is.null(names(out$amounts))) {
+      salt_names <- intersect(names(out$amounts), rownames(nm_sub))
+      if (length(salt_names)) {
+        nm_calc <- nm_sub[salt_names, names(solver_target), drop = FALSE]
+        achieved_from_salts <- as.vector(t(nm_calc) %*% out$amounts[salt_names])
+        names(achieved_from_salts) <- names(solver_target)
+      }
+    }
+    if (is.null(names(achieved_from_salts))) {
+      names(achieved_from_salts) <- names(solver_target)
+    }
+    achieved_from_salts <- achieved_from_salts[names(solver_target)]
+
+    achieved_final <- achieved_from_salts + water_vals[names(solver_target)]
+    abs_error <- achieved_final - adjusted_target
+    percent_error <- abs_error / adjusted_target * 100
+    percent_error[is.nan(percent_error) | is.infinite(percent_error)] <- NA
+
+    tol <- 1e-12
+    zero_tgt <- adjusted_target == 0
+    percent_error[zero_tgt & abs(achieved_final) < tol] <- 0
+
+    rel_error <- abs_error / adjusted_target
+    rel_error[is.nan(rel_error) | is.infinite(rel_error)] <- NA
+    rel_error[zero_tgt & abs(achieved_final) < tol] <- 0
+
+    out$solver_target <- solver_target
+    out$target <- adjusted_target
+    out$achieved_from_salts <- drop_tiny(achieved_from_salts)
+    out$achieved <- drop_tiny(achieved_final)
+    out$abs_error <- drop_tiny(abs_error)
+    out$percent_error <- drop_tiny(percent_error)
+    out$squared_error <- sum(out$abs_error^2, na.rm = TRUE)
+    out$rel_squared_error <- sum(rel_error^2, na.rm = TRUE)
 
     out$salt_names <- rownames(nm_sub)
     out
@@ -1568,24 +1611,7 @@ server <- function(input, output, session) {
       return(tags$p("pH calculation not available."))
     }
 
-  final_for_ph <- water_mmol()
-  add <- NULL
-  if (!is.null(res$amounts) && !is.null(names(res$amounts))) {
-    salt_names <- intersect(names(res$amounts), rownames(nutrient_matrix))
-    if (length(salt_names)) {
-      nm_sub <- nutrient_matrix[salt_names, , drop = FALSE]
-      add <- as.vector(t(nm_sub) %*% res$amounts[salt_names])
-      names(add) <- colnames(nm_sub)
-    }
-  }
-  if (is.null(add)) {
-    add <- if (!is.null(res$achieved_full)) res$achieved_full else res$achieved
-  }
-  for (nm in names(add)) {
-    current <- final_for_ph[nm]
-    if (is.na(current)) current <- 0
-    final_for_ph[nm] <- current + as.numeric(add[[nm]])
-  }
+  final_for_ph <- res$achieved
   final_for_ph <- c(final_for_ph, KS4_3 = water_hco3(), CO2_aq = water_co2_aq())
   # Debug: grep("EDTA", names(final_for_ph)); final_for_ph[["EDTA"]]
 
