@@ -128,7 +128,7 @@ split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
   base_mgL[c("NO3_N", "NH4_N")] <- 0
 
   cation_eq <- c(K = 1, Ca = 2, Mg = 2, Na = 1, Fe = 3, Mn = 2, Zn = 2, Cu = 2)
-  anion_eq <- c(P = 1, S = 2, Cl = 1, Mo = 2, B = 1, Si = 1)
+  anion_eq <- c(P = 1, S = 2, Cl = 1, Mo = 2)
 
   out <- tryCatch({
     other_mmol <- to_canonical_from_unit(base_mgL, "mg/L")
@@ -140,20 +140,16 @@ split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
     pos_meq <- sum(other_mmol[names(cation_eq)] * cation_eq, na.rm = TRUE)
     neg_meq <- sum(other_mmol[names(anion_eq)] * anion_eq, na.rm = TRUE)
 
-    nh4_mmol <- min(max(neg_meq - pos_meq, 0), total_n_mmol)
-    no3_mmol <- max(total_n_mmol - nh4_mmol, 0)
+    nh4_mmol <- (neg_meq - pos_meq + total_n_mmol) / 2
+    nh4_mmol <- min(max(nh4_mmol, 0), total_n_mmol)
+    no3_mmol <- total_n_mmol - nh4_mmol
 
     split_mgL <- from_canonical_to_unit(c(NO3_N = no3_mmol, NH4_N = nh4_mmol), "mg/L")
     split_mgL <- c(NO3_N = split_mgL[["NO3_N"]] %||% 0, NH4_N = split_mgL[["NH4_N"]] %||% 0)
-    split_mgL[!is.finite(split_mgL)] <- 0
-    split_mgL <- pmax(split_mgL, 0)
-
-    split_sum <- sum(split_mgL)
-    if (!is.finite(split_sum) || split_sum <= 0) {
-      fallback
-    } else {
-      split_mgL * (total_n_mgL / split_sum)
-    }
+    c(
+      NO3_N = as.numeric(split_mgL[["NO3_N"]]),
+      NH4_N = as.numeric(split_mgL[["NH4_N"]])
+    )
   }, error = function(e) {
     fallback
   })
