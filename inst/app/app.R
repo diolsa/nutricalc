@@ -1064,23 +1064,22 @@ server <- function(input, output, session) {
   })
 
   output$tissue_table <- renderTable({
-    perc <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
+    perc_input <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
     for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      perc[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
+      perc_input[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
     }
 
     mgL_targets <- tissue_mgL()
 
-    mg_display <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
-    other_keys <- intersect(setdiff(tissue_nutrients, "N"), names(mgL_targets))
-    mg_display[other_keys] <- mgL_targets[other_keys]
-    mg_display[["N"]] <- sum(mgL_targets[c("NO3_N", "NH4_N")], na.rm = TRUE)
+    perc_display <- setNames(rep(NA_real_, length(nutrients)), nutrients)
+    other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
+    perc_display[other_keys] <- perc_input[other_keys]
 
     data.frame(
-      Nutrient = vapply(tissue_nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc[tissue_nutrients], 3),
-      `mg l⁻¹` = round(mg_display[tissue_nutrients], 3),
+      Nutrient = vapply(nutrients, pretty_nutrient_label_str, character(1)),
+      `Tissue %` = round(perc_display[nutrients], 3),
+      `mg l⁻¹` = round(mgL_targets[nutrients], 3),
       check.names = FALSE
     )
   }, sanitize.text.function = function(x) x)
