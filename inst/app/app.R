@@ -1022,18 +1022,17 @@ server <- function(input, output, session) {
 
   # ---- Tissue Analysis: WUE and mg/L calculation --------------------------
   tissue_wue <- reactive({
-    dm   <- input$tissue_dm   %||% NA_real_
-    wat  <- input$tissue_water %||% NA_real_
+    dm  <- input$tissue_dm %||% NA_real_
+    wat <- input$tissue_water %||% NA_real_
     if (is.na(dm) || is.na(wat) || wat <= 0) return(NA_real_)
-    dm / wat  # g dry mass per L water
+    dm / wat
   })
 
   output$tissue_wue_text <- renderText({
     w <- tissue_wue()
-    if (is.na(w)) return("WUE: \u2014")
+    if (is.na(w)) return("WUE: —")
     sprintf("WUE: %.2f g dry mass per L water", w)
   })
-
 
   tissue_mgL <- reactive({
     w <- tissue_wue()
@@ -1050,7 +1049,6 @@ server <- function(input, output, session) {
     tissue_mgL_raw <- tissue_perc * 10 * w
 
     out <- setNames(rep(0, length(nutrients)), nutrients)
-
     other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
     out[other_keys] <- tissue_mgL_raw[other_keys]
 
@@ -1086,10 +1084,6 @@ server <- function(input, output, session) {
       check.names = FALSE
     )
   }, sanitize.text.function = function(x) x)
-
-
-
-
 
   # ---- Salts --------------------------
   all_salts <- reactive(rownames(nutrient_matrix))
