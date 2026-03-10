@@ -478,14 +478,21 @@ ui <- fluidPage(
                                fluidRow(
                                  column(
                                    width = 4,
-                                   h5("Tissue (%)"),
+                                   h5("Tissue"),
+                                   radioButtons(
+                                     "tissue_input_unit",
+                                     label = NULL,
+                                     choices = c("%" = "%", "ppm" = "ppm"),
+                                     selected = "%",
+                                     inline = TRUE
+                                   ),
                                    tags$small(class = "text-muted",
                                               "Nutrient concentration in dry mass"),
                                    br(),
-                                   # --- header row: Nutrient | Tissue % -------------------------------
+                                   # --- header row: Nutrient | Tissue value -------------------------------
                                    fluidRow(
                                      column(6, strong("Nutrient")),
-                                     column(6, strong("Tissue %"))
+                                     column(6, textOutput("tissue_input_col_header", inline = TRUE))
                                    ),
                                    tags$hr(style = "margin:4px 0;"),
                                    tags$div(
@@ -526,7 +533,7 @@ ui <- fluidPage(
                                    width = 5,
                                    h5("Nutrient solution"),
                                    tags$small(class = "text-muted",
-                                              "Calculated mg L\u207b\u00b9 from tissue % \u00d7 WUE."),
+                                              "Calculated mg L⁻¹ from tissue concentration × WUE."),
                                    tableOutput("tissue_table"),
                                    br(),
                                    actionButton("tissue_apply", "Use as targets",
@@ -1034,6 +1041,11 @@ server <- function(input, output, session) {
     sprintf("WUE: %.2f g dry mass per L water", w)
   })
 
+  output$tissue_input_col_header <- renderText({
+    unit <- input$tissue_input_unit %||% "%"
+    if (identical(unit, "ppm")) "Tissue ppm" else "Tissue %"
+  })
+
   tissue_mgL <- reactive({
     w <- tissue_wue()
     if (is.na(w)) {
@@ -1046,7 +1058,13 @@ server <- function(input, output, session) {
       tissue_perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
     }
 
-    tissue_mgL_raw <- tissue_perc * 10 * w
+    tissue_unit <- input$tissue_input_unit %||% "%"
+    tissue_mg_per_g <- if (identical(tissue_unit, "ppm")) {
+      tissue_perc / 1000
+    } else {
+      tissue_perc * 10
+    }
+    tissue_mgL_raw <- tissue_mg_per_g * w
 
     out <- setNames(rep(0, length(nutrients)), nutrients)
     other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
@@ -1064,24 +1082,32 @@ server <- function(input, output, session) {
   })
 
   output$tissue_table <- renderTable({
-    perc_input <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
+    tissue_input_vals <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
     for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      perc_input[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
+      tissue_input_vals[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
     }
 
     mgL_targets <- tissue_mgL()
 
-    perc_display <- setNames(rep(NA_real_, length(nutrients)), nutrients)
+    input_display <- setNames(rep(NA_real_, length(nutrients)), nutrients)
     other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
-    perc_display[other_keys] <- perc_input[other_keys]
+    input_display[other_keys] <- tissue_input_vals[other_keys]
 
-    data.frame(
+    tissue_col_name <- if (identical(input$tissue_input_unit %||% "%", "ppm")) {
+      "Tissue ppm"
+    } else {
+      "Tissue %"
+    }
+
+    out <- data.frame(
       Nutrient = vapply(nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc_display[nutrients], 3),
+      value = round(input_display[nutrients], 3),
       `mg l⁻¹` = round(mgL_targets[nutrients], 3),
       check.names = FALSE
     )
+    names(out)[names(out) == "value"] <- tissue_col_name
+    out
   }, sanitize.text.function = function(x) x)
 
   # ---- Salts --------------------------
