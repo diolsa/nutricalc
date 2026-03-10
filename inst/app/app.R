@@ -1046,6 +1046,37 @@ server <- function(input, output, session) {
     if (identical(unit, "ppm")) "Tissue ppm" else "Tissue %"
   })
 
+  tissue_prev_unit <- reactiveVal(NULL)
+
+  observeEvent(input$tissue_input_unit, {
+    new_unit <- input$tissue_input_unit %||% "%"
+    old_unit <- tissue_prev_unit()
+    if (is.null(old_unit)) {
+      tissue_prev_unit(new_unit)
+      return(invisible(NULL))
+    }
+    if (identical(new_unit, old_unit)) return(invisible(NULL))
+
+    factor <- if (identical(old_unit, "%") && identical(new_unit, "ppm")) {
+      10000
+    } else if (identical(old_unit, "ppm") && identical(new_unit, "%")) {
+      1 / 10000
+    } else {
+      1
+    }
+
+    for (nm in tissue_nutrients) {
+      id <- paste0("tissue_", nm)
+      val <- input[[id]] %||% NA_real_
+      if (is.na(val)) next
+      num <- suppressWarnings(as.numeric(val))
+      if (!is.finite(num)) next
+      updateNumericInput(session, id, value = num * factor)
+    }
+
+    tissue_prev_unit(new_unit)
+  }, ignoreInit = TRUE)
+
   tissue_mgL <- reactive({
     w <- tissue_wue()
     if (is.na(w)) {
