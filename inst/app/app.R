@@ -1084,15 +1084,16 @@ server <- function(input, output, session) {
 
     mgL <- tissue_mgL()
 
-    table_nutrients <- tissue_nutrients
-    mg_lookup <- c(mgL, N = sum(mgL[c("NO3_N", "NH4_N")]))
+    table_nutrients <- nutrients
+    perc_display <- setNames(rep(NA_real_, length(table_nutrients)), table_nutrients)
+    perc_display[intersect(names(perc), table_nutrients)] <- perc[intersect(names(perc), table_nutrients)]
 
     df <- data.frame(
       Nutrient   = vapply(table_nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc[table_nutrients], 3),
+      `Tissue %` = round(perc_display[table_nutrients], 3),
       check.names = FALSE
     )
-    df[["mg l\u207b\u00b9"]] <- round(mg_lookup[table_nutrients], 3)
+    df[["mg l\u207b\u00b9"]] <- round(mgL[table_nutrients], 3)
     df
   }, sanitize.text.function = function(x) x)
 
