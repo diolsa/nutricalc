@@ -97,6 +97,70 @@ nutrients <- if (requireNamespace("nutricalc", quietly = TRUE) &&
     "Fe","Mn","Zn","B","Cu","Mo","Si")
 }
 
+tissue_nutrients <- {
+  out <- character(0)
+  for (nm in nutrients) {
+    if (nm == "NO3_N") {
+      out <- c(out, "N")
+    } else if (nm != "NH4_N") {
+      out <- c(out, nm)
+    }
+  }
+  out
+}
+
+split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
+  fallback <- c(NO3_N = max(total_n_mgL, 0), NH4_N = 0)
+
+  if (!is.finite(total_n_mgL) || total_n_mgL <= 0) {
+    return(c(NO3_N = 0, NH4_N = 0))
+  }
+
+  nm_targets <- names(targets_mgL)
+  targets_mgL <- suppressWarnings(as.numeric(targets_mgL))
+  names(targets_mgL) <- nm_targets
+  targets_mgL[is.na(targets_mgL)] <- 0
+
+  base_mgL <- setNames(rep(0, length(nutrients)), nutrients)
+  shared <- intersect(names(targets_mgL), nutrients)
+  base_mgL[shared] <- targets_mgL[shared]
+  base_mgL[c("NO3_N", "NH4_N")] <- 0
+
+  cation_eq <- c(K = 1, Ca = 2, Mg = 2, Na = 1, Fe = 3, Mn = 2, Zn = 2, Cu = 2)
+  anion_eq <- c(P = 1, S = 2, Cl = 1, Mo = 2, B = 1, Si = 1)
+
+  out <- tryCatch({
+    other_mmol <- to_canonical_from_unit(base_mgL, "mg/L")
+
+    n_mgL <- setNames(rep(0, length(nutrients)), nutrients)
+    n_mgL[["NO3_N"]] <- total_n_mgL
+    total_n_mmol <- to_canonical_from_unit(n_mgL, "mg/L")[["NO3_N"]]
+
+    pos_meq <- sum(other_mmol[names(cation_eq)] * cation_eq, na.rm = TRUE)
+    neg_meq <- sum(other_mmol[names(anion_eq)] * anion_eq, na.rm = TRUE)
+
+    nh4_mmol <- min(max(neg_meq - pos_meq, 0), total_n_mmol)
+    no3_mmol <- max(total_n_mmol - nh4_mmol, 0)
+
+    split_mgL <- from_canonical_to_unit(c(NO3_N = no3_mmol, NH4_N = nh4_mmol), "mg/L")
+    split_mgL[is.na(split_mgL) | !is.finite(split_mgL)] <- 0
+    split_mgL <- pmax(split_mgL, 0)
+
+    split_sum <- sum(split_mgL)
+    if (!is.finite(split_sum) || split_sum <= 0) {
+      fallback
+    } else {
+      split_mgL * (total_n_mgL / split_sum)
+    }
+  }, error = function(e) {
+    fallback
+  })
+
+  out <- pmax(out, 0)
+  out[["NO3_N"]] <- max(total_n_mgL - out[["NH4_N"]], 0)
+  out
+}
+
 default_expr <- c(
   "15","1.25","2.5","9","3","1.00","1.3","0","0",
   "0.015","0.01","0.005","0.015","0.00075","0.0005","0"
@@ -423,7 +487,7 @@ ui <- fluidPage(
                                    ),
                                    tags$hr(style = "margin:4px 0;"),
                                    tags$div(
-                                     lapply(nutrients, function(nm) {
+                                     lapply(tissue_nutrients, function(nm) {
                                        fluidRow(
                                          column(
                                            width = 6,
@@ -977,17 +1041,26 @@ server <- function(input, output, session) {
     }
 
     # % in tissue (g per 100 g dry mass)
-    perc <- sapply(nutrients, function(nm) {
+    perc <- setNames(rep(0, length(nutrients)), nutrients)
+    for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      ifelse(is.na(val), 0, as.numeric(val))
-    })
-    names(perc) <- nutrients
+      perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
+    }
 
     # convert % -> mg/g : 1% = 10 mg/g
     mg_per_g <- perc * 10
 
     # mg/L = (mg/g) * (g/L)
     mgL <- mg_per_g * w
+
+    n_split <- split_total_n_by_electroneutrality(
+      total_n_mgL = mgL[["N"]],
+      targets_mgL = mgL[nutrients[!nutrients %in% c("NO3_N", "NH4_N")]]
+    )
+    mgL[["NO3_N"]] <- n_split[["NO3_N"]]
+    mgL[["NH4_N"]] <- n_split[["NH4_N"]]
+    mgL[["N"]] <- NULL
+
     names(mgL) <- nutrients
     mgL
   })
@@ -996,20 +1069,23 @@ server <- function(input, output, session) {
     w <- tissue_wue()
 
 
-    perc <- sapply(nutrients, function(nm) {
+    perc <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
+    for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      ifelse(is.na(val), NA_real_, as.numeric(val))
-    })
-    names(perc) <- nutrients
+      perc[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
+    }
 
     mgL <- tissue_mgL()
 
+    table_nutrients <- tissue_nutrients
+    mg_lookup <- c(mgL, N = sum(mgL[c("NO3_N", "NH4_N")]))
+
     df <- data.frame(
-      Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc, 3),
+      Nutrient   = vapply(table_nutrients, pretty_nutrient_label_str, character(1)),
+      `Tissue %` = round(perc[table_nutrients], 3),
       check.names = FALSE
     )
-    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
+    df[["mg l\u207b\u00b9"]] <- round(mg_lookup[table_nutrients], 3)
     df
   }, sanitize.text.function = function(x) x)
 
