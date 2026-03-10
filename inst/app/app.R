@@ -110,11 +110,12 @@ tissue_nutrients <- {
 }
 
 split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
-  fallback <- c(NO3_N = max(total_n_mgL, 0), NH4_N = 0)
-
+  total_n_mgL <- suppressWarnings(as.numeric(total_n_mgL)[1])
   if (!is.finite(total_n_mgL) || total_n_mgL <= 0) {
     return(c(NO3_N = 0, NH4_N = 0))
   }
+
+  fallback <- c(NO3_N = total_n_mgL, NH4_N = 0)
 
   nm_targets <- names(targets_mgL)
   targets_mgL <- suppressWarnings(as.numeric(targets_mgL))
@@ -143,7 +144,8 @@ split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
     no3_mmol <- max(total_n_mmol - nh4_mmol, 0)
 
     split_mgL <- from_canonical_to_unit(c(NO3_N = no3_mmol, NH4_N = nh4_mmol), "mg/L")
-    split_mgL[is.na(split_mgL) | !is.finite(split_mgL)] <- 0
+    split_mgL <- c(NO3_N = split_mgL[["NO3_N"]] %||% 0, NH4_N = split_mgL[["NH4_N"]] %||% 0)
+    split_mgL[!is.finite(split_mgL)] <- 0
     split_mgL <- pmax(split_mgL, 0)
 
     split_sum <- sum(split_mgL)
@@ -156,7 +158,10 @@ split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
     fallback
   })
 
+  out <- c(NO3_N = out[["NO3_N"]] %||% 0, NH4_N = out[["NH4_N"]] %||% 0)
+  out[!is.finite(out)] <- 0
   out <- pmax(out, 0)
+  out[["NH4_N"]] <- min(out[["NH4_N"]], total_n_mgL)
   out[["NO3_N"]] <- max(total_n_mgL - out[["NH4_N"]], 0)
   out
 }
@@ -1041,27 +1046,29 @@ server <- function(input, output, session) {
     }
 
     # % in tissue (g per 100 g dry mass)
-    perc <- setNames(rep(0, length(nutrients)), nutrients)
+    tissue_perc <- setNames(rep(0, length(tissue_nutrients)), tissue_nutrients)
     for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
+      tissue_perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
     }
 
     # convert % -> mg/g : 1% = 10 mg/g
-    mg_per_g <- perc * 10
+    tissue_mg_per_g <- tissue_perc * 10
 
     # mg/L = (mg/g) * (g/L)
-    mgL <- mg_per_g * w
+    tissue_mgL <- tissue_mg_per_g * w
+
+    mgL <- setNames(rep(0, length(nutrients)), nutrients)
+    other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
+    mgL[other_keys] <- tissue_mgL[other_keys]
 
     n_split <- split_total_n_by_electroneutrality(
-      total_n_mgL = mgL[["N"]],
+      total_n_mgL = tissue_mgL[["N"]] %||% 0,
       targets_mgL = mgL[nutrients[!nutrients %in% c("NO3_N", "NH4_N")]]
     )
     mgL[["NO3_N"]] <- n_split[["NO3_N"]]
     mgL[["NH4_N"]] <- n_split[["NH4_N"]]
-    mgL[["N"]] <- NULL
 
-    names(mgL) <- nutrients
     mgL
   })
 
