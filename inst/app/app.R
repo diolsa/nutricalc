@@ -128,6 +128,7 @@ split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
   base_mgL[c("NO3_N", "NH4_N")] <- 0
 
   cation_eq <- c(K = 1, Ca = 2, Mg = 2, Na = 1, Fe = 3, Mn = 2, Zn = 2, Cu = 2)
+  # Simplified fixed-equivalent model (not full speciation chemistry).
   anion_eq <- c(P = 1, S = 2, Cl = 1, Mo = 2)
 
   out <- tryCatch({
@@ -1037,60 +1038,53 @@ server <- function(input, output, session) {
   tissue_mgL <- reactive({
     w <- tissue_wue()
     if (is.na(w)) {
-      out <- setNames(rep(0, length(nutrients)), nutrients)
-      return(out)
+      return(setNames(rep(0, length(nutrients)), nutrients))
     }
 
-    # % in tissue (g per 100 g dry mass)
     tissue_perc <- setNames(rep(0, length(tissue_nutrients)), tissue_nutrients)
     for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
       tissue_perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
     }
 
-    # convert % -> mg/g : 1% = 10 mg/g
-    tissue_mg_per_g <- tissue_perc * 10
+    tissue_mgL_raw <- tissue_perc * 10 * w
 
-    # mg/L = (mg/g) * (g/L)
-    tissue_mgL <- tissue_mg_per_g * w
+    out <- setNames(rep(0, length(nutrients)), nutrients)
 
-    mgL <- setNames(rep(0, length(nutrients)), nutrients)
     other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
-    mgL[other_keys] <- tissue_mgL[other_keys]
+    out[other_keys] <- tissue_mgL_raw[other_keys]
 
     n_split <- split_total_n_by_electroneutrality(
-      total_n_mgL = tissue_mgL[["N"]] %||% 0,
-      targets_mgL = mgL[nutrients[!nutrients %in% c("NO3_N", "NH4_N")]]
+      total_n_mgL = tissue_mgL_raw[["N"]] %||% 0,
+      targets_mgL = out[setdiff(names(out), c("NO3_N", "NH4_N"))]
     )
-    mgL[["NO3_N"]] <- n_split[["NO3_N"]]
-    mgL[["NH4_N"]] <- n_split[["NH4_N"]]
 
-    mgL
+    out[["NO3_N"]] <- n_split[["NO3_N"]] %||% 0
+    out[["NH4_N"]] <- n_split[["NH4_N"]] %||% 0
+
+    out
   })
 
   output$tissue_table <- renderTable({
-    w <- tissue_wue()
-
-
     perc <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
     for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
       perc[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
     }
 
-    mgL <- tissue_mgL()
+    mgL_targets <- tissue_mgL()
 
-    table_nutrients <- nutrients
-    perc_display <- setNames(rep(NA_real_, length(table_nutrients)), table_nutrients)
-    perc_display[intersect(names(perc), table_nutrients)] <- perc[intersect(names(perc), table_nutrients)]
+    mg_display <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
+    other_keys <- intersect(setdiff(tissue_nutrients, "N"), names(mgL_targets))
+    mg_display[other_keys] <- mgL_targets[other_keys]
+    mg_display[["N"]] <- sum(mgL_targets[c("NO3_N", "NH4_N")], na.rm = TRUE)
 
-    df <- data.frame(
-      Nutrient   = vapply(table_nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc_display[table_nutrients], 3),
+    data.frame(
+      Nutrient = vapply(tissue_nutrients, pretty_nutrient_label_str, character(1)),
+      `Tissue %` = round(perc[tissue_nutrients], 3),
+      `mg l⁻¹` = round(mg_display[tissue_nutrients], 3),
       check.names = FALSE
     )
-    df[["mg l\u207b\u00b9"]] <- round(mgL[table_nutrients], 3)
-    df
   }, sanitize.text.function = function(x) x)
 
 
