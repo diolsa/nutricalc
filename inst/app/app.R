@@ -97,6 +97,72 @@ nutrients <- if (requireNamespace("nutricalc", quietly = TRUE) &&
     "Fe","Mn","Zn","B","Cu","Mo","Si")
 }
 
+tissue_nutrients <- {
+  out <- character(0)
+  for (nm in nutrients) {
+    if (nm == "NO3_N") {
+      out <- c(out, "N")
+    } else if (nm != "NH4_N") {
+      out <- c(out, nm)
+    }
+  }
+  out
+}
+
+split_total_n_by_electroneutrality <- function(total_n_mgL, targets_mgL) {
+  total_n_mgL <- suppressWarnings(as.numeric(total_n_mgL)[1])
+  if (!is.finite(total_n_mgL) || total_n_mgL <= 0) {
+    return(c(NO3_N = 0, NH4_N = 0))
+  }
+
+  fallback <- c(NO3_N = total_n_mgL, NH4_N = 0)
+
+  nm_targets <- names(targets_mgL)
+  targets_mgL <- suppressWarnings(as.numeric(targets_mgL))
+  names(targets_mgL) <- nm_targets
+  targets_mgL[is.na(targets_mgL)] <- 0
+
+  base_mgL <- setNames(rep(0, length(nutrients)), nutrients)
+  shared <- intersect(names(targets_mgL), nutrients)
+  base_mgL[shared] <- targets_mgL[shared]
+  base_mgL[c("NO3_N", "NH4_N")] <- 0
+
+  cation_eq <- c(K = 1, Ca = 2, Mg = 2, Na = 1, Fe = 3, Mn = 2, Zn = 2, Cu = 2)
+  # Simplified fixed-equivalent model (not full speciation chemistry).
+  anion_eq <- c(P = 1, S = 2, Cl = 1, Mo = 2)
+
+  out <- tryCatch({
+    other_mmol <- to_canonical_from_unit(base_mgL, "mg/L")
+
+    n_mgL <- setNames(rep(0, length(nutrients)), nutrients)
+    n_mgL[["NO3_N"]] <- total_n_mgL
+    total_n_mmol <- to_canonical_from_unit(n_mgL, "mg/L")[["NO3_N"]]
+
+    pos_meq <- sum(other_mmol[names(cation_eq)] * cation_eq, na.rm = TRUE)
+    neg_meq <- sum(other_mmol[names(anion_eq)] * anion_eq, na.rm = TRUE)
+
+    nh4_mmol <- (neg_meq - pos_meq + total_n_mmol) / 2
+    nh4_mmol <- min(max(nh4_mmol, 0), total_n_mmol)
+    no3_mmol <- total_n_mmol - nh4_mmol
+
+    split_mgL <- from_canonical_to_unit(c(NO3_N = no3_mmol, NH4_N = nh4_mmol), "mg/L")
+    split_mgL <- c(NO3_N = split_mgL[["NO3_N"]] %||% 0, NH4_N = split_mgL[["NH4_N"]] %||% 0)
+    c(
+      NO3_N = as.numeric(split_mgL[["NO3_N"]]),
+      NH4_N = as.numeric(split_mgL[["NH4_N"]])
+    )
+  }, error = function(e) {
+    fallback
+  })
+
+  out <- c(NO3_N = out[["NO3_N"]] %||% 0, NH4_N = out[["NH4_N"]] %||% 0)
+  out[!is.finite(out)] <- 0
+  out <- pmax(out, 0)
+  out[["NH4_N"]] <- min(out[["NH4_N"]], total_n_mgL)
+  out[["NO3_N"]] <- max(total_n_mgL - out[["NH4_N"]], 0)
+  out
+}
+
 default_expr <- c(
   "15","1.25","2.5","9","3","1.00","1.3","0","0",
   "0.015","0.01","0.005","0.015","0.00075","0.0005","0"
@@ -412,18 +478,25 @@ ui <- fluidPage(
                                fluidRow(
                                  column(
                                    width = 4,
-                                   h5("Tissue (%)"),
+                                   h5("Tissue"),
+                                   radioButtons(
+                                     "tissue_input_unit",
+                                     label = NULL,
+                                     choices = c("%" = "%", "ppm" = "ppm"),
+                                     selected = "%",
+                                     inline = TRUE
+                                   ),
                                    tags$small(class = "text-muted",
                                               "Nutrient concentration in dry mass"),
                                    br(),
-                                   # --- header row: Nutrient | Tissue % -------------------------------
+                                   # --- header row: Nutrient | Tissue value -------------------------------
                                    fluidRow(
                                      column(6, strong("Nutrient")),
-                                     column(6, strong("Tissue %"))
+                                     column(6, textOutput("tissue_input_col_header", inline = TRUE))
                                    ),
                                    tags$hr(style = "margin:4px 0;"),
                                    tags$div(
-                                     lapply(nutrients, function(nm) {
+                                     lapply(tissue_nutrients, function(nm) {
                                        fluidRow(
                                          column(
                                            width = 6,
@@ -460,7 +533,7 @@ ui <- fluidPage(
                                    width = 5,
                                    h5("Nutrient solution"),
                                    tags$small(class = "text-muted",
-                                              "Calculated mg L\u207b\u00b9 from tissue % \u00d7 WUE."),
+                                              "Calculated mg L⁻¹ from tissue concentration × WUE."),
                                    tableOutput("tissue_table"),
                                    br(),
                                    actionButton("tissue_apply", "Use as targets",
@@ -956,66 +1029,117 @@ server <- function(input, output, session) {
 
   # ---- Tissue Analysis: WUE and mg/L calculation --------------------------
   tissue_wue <- reactive({
-    dm   <- input$tissue_dm   %||% NA_real_
-    wat  <- input$tissue_water %||% NA_real_
+    dm  <- input$tissue_dm %||% NA_real_
+    wat <- input$tissue_water %||% NA_real_
     if (is.na(dm) || is.na(wat) || wat <= 0) return(NA_real_)
-    dm / wat  # g dry mass per L water
+    dm / wat
   })
 
   output$tissue_wue_text <- renderText({
     w <- tissue_wue()
-    if (is.na(w)) return("WUE: \u2014")
+    if (is.na(w)) return("WUE: —")
     sprintf("WUE: %.2f g dry mass per L water", w)
   })
 
+  output$tissue_input_col_header <- renderText({
+    unit <- input$tissue_input_unit %||% "%"
+    if (identical(unit, "ppm")) "Tissue ppm" else "Tissue %"
+  })
+
+  tissue_prev_unit <- reactiveVal(NULL)
+
+  observeEvent(input$tissue_input_unit, {
+    new_unit <- input$tissue_input_unit %||% "%"
+    old_unit <- tissue_prev_unit()
+    if (is.null(old_unit)) {
+      tissue_prev_unit(new_unit)
+      return(invisible(NULL))
+    }
+    if (identical(new_unit, old_unit)) return(invisible(NULL))
+
+    factor <- if (identical(old_unit, "%") && identical(new_unit, "ppm")) {
+      10000
+    } else if (identical(old_unit, "ppm") && identical(new_unit, "%")) {
+      1 / 10000
+    } else {
+      1
+    }
+
+    for (nm in tissue_nutrients) {
+      id <- paste0("tissue_", nm)
+      val <- input[[id]] %||% NA_real_
+      if (is.na(val)) next
+      num <- suppressWarnings(as.numeric(val))
+      if (!is.finite(num)) next
+      updateNumericInput(session, id, value = num * factor)
+    }
+
+    tissue_prev_unit(new_unit)
+  }, ignoreInit = TRUE)
 
   tissue_mgL <- reactive({
     w <- tissue_wue()
     if (is.na(w)) {
-      out <- setNames(rep(0, length(nutrients)), nutrients)
-      return(out)
+      return(setNames(rep(0, length(nutrients)), nutrients))
     }
 
-    # % in tissue (g per 100 g dry mass)
-    perc <- sapply(nutrients, function(nm) {
+    tissue_perc <- setNames(rep(0, length(tissue_nutrients)), tissue_nutrients)
+    for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      ifelse(is.na(val), 0, as.numeric(val))
-    })
-    names(perc) <- nutrients
+      tissue_perc[[nm]] <- ifelse(is.na(val), 0, as.numeric(val))
+    }
 
-    # convert % -> mg/g : 1% = 10 mg/g
-    mg_per_g <- perc * 10
+    tissue_unit <- input$tissue_input_unit %||% "%"
+    tissue_mg_per_g <- if (identical(tissue_unit, "ppm")) {
+      tissue_perc / 1000
+    } else {
+      tissue_perc * 10
+    }
+    tissue_mgL_raw <- tissue_mg_per_g * w
 
-    # mg/L = (mg/g) * (g/L)
-    mgL <- mg_per_g * w
-    names(mgL) <- nutrients
-    mgL
+    out <- setNames(rep(0, length(nutrients)), nutrients)
+    other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
+    out[other_keys] <- tissue_mgL_raw[other_keys]
+
+    n_split <- split_total_n_by_electroneutrality(
+      total_n_mgL = tissue_mgL_raw[["N"]] %||% 0,
+      targets_mgL = out[setdiff(names(out), c("NO3_N", "NH4_N"))]
+    )
+
+    out[["NO3_N"]] <- n_split[["NO3_N"]] %||% 0
+    out[["NH4_N"]] <- n_split[["NH4_N"]] %||% 0
+
+    out
   })
 
   output$tissue_table <- renderTable({
-    w <- tissue_wue()
-
-
-    perc <- sapply(nutrients, function(nm) {
+    tissue_input_vals <- setNames(rep(NA_real_, length(tissue_nutrients)), tissue_nutrients)
+    for (nm in tissue_nutrients) {
       val <- input[[paste0("tissue_", nm)]] %||% NA_real_
-      ifelse(is.na(val), NA_real_, as.numeric(val))
-    })
-    names(perc) <- nutrients
+      tissue_input_vals[[nm]] <- ifelse(is.na(val), NA_real_, as.numeric(val))
+    }
 
-    mgL <- tissue_mgL()
+    mgL_targets <- tissue_mgL()
 
-    df <- data.frame(
-      Nutrient   = vapply(nutrients, pretty_nutrient_label_str, character(1)),
-      `Tissue %` = round(perc, 3),
+    input_display <- setNames(rep(NA_real_, length(nutrients)), nutrients)
+    other_keys <- intersect(setdiff(tissue_nutrients, "N"), nutrients)
+    input_display[other_keys] <- tissue_input_vals[other_keys]
+
+    tissue_col_name <- if (identical(input$tissue_input_unit %||% "%", "ppm")) {
+      "Tissue ppm"
+    } else {
+      "Tissue %"
+    }
+
+    out <- data.frame(
+      Nutrient = vapply(nutrients, pretty_nutrient_label_str, character(1)),
+      value = round(input_display[nutrients], 3),
+      `mg l⁻¹` = round(mgL_targets[nutrients], 3),
       check.names = FALSE
     )
-    df[["mg l\u207b\u00b9"]] <- round(mgL, 3)
-    df
+    names(out)[names(out) == "value"] <- tissue_col_name
+    out
   }, sanitize.text.function = function(x) x)
-
-
-
-
 
   # ---- Salts --------------------------
   all_salts <- reactive(rownames(nutrient_matrix))
