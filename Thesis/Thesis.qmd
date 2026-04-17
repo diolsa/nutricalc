@@ -36,7 +36,7 @@ library(kableExtra)
 
 # Abstract {.unnumbered}
 
-Efficient nutrient-solution formulation is fundamental to controlled horticultural production, yet in practice it is often based on fixed recipes or iterative manual adjustment. This thesis addresses that limitation through the developmet of a modular open-source computational framework in R for reproducible nutrient-solution design called NutriCalc.
+Efficient nutrient-solution formulation is fundamental to controlled horticultural production, yet in practice it is often based on fixed recipes or iterative manual adjustment. This thesis addresses that limitation through the development of a modular open-source computational framework in R for reproducible nutrient-solution design called NutriCalc.
 
 The central objective was to formalize nutrient formulation as a mathematically defined problem that can be solved transparently under agronomic and chemical constraints. To achieve this, the formulation task was expressed as a constrained linear optimization problem and solved using non-negative least squares, ensuring physically meaningful fertilizer quantities. The framework combines stoichiometric conversion, unit transformation, charge-balance-based evaluation and estimation of pH and electrical conductivity, thereby linking nutrient targets to key physicochemical properties of the final solution.
 
@@ -523,18 +523,13 @@ At present, no dedicated open-source R library is available for transparent, mod
 
 # Material and Methods
 
-## Development and evaluation workflow
+The development of the computational framework followed a structured development and validation pipeline. The R package was developed using the devtools package [@Wickham.2025].The first step involved designing the underlying data structures. A nutrient matrix was established in which the rows represented nutrients (such as N, P, K, and Ca) and the columns represented fertilizer salts. For readability, the input matrix was stored in transposed form and converted into the required orientation for calculation. Each fertilizer was parsed on the basis of its molecular formula into its elemental components using a database of molar masses and established stoichiometric rules.
 
-The development of the computational framework followed a structured development and validation pipeline. For the development of the R package devtools was used [@Wickham.2025].
+Building on this foundation, an R package was developed. The package includes core functions for parsing chemical formulas and computing molar masses, as well as for converting between different chemical representations such as oxides and elemental forms (e.g., P₂O₅ to P or SO₄ to S). It also includes tools for transforming concentration units (e.g., from mmol L⁻¹ to mg L⁻¹) using accurate molar-mass calculations. In addition, bidirectional transformations between compound-based and elemental quantities were integrated on the basis of stoichiometric relationships.
 
-The first step involved designing the underlying data structures. A nutrient matrix was established, in which the rows represent essential nutrients (such as N, P, K, Ca, etc.) and the columns represent fertilizer salts. For readability the input matrix was transposed and converted for the calculation. Each fertilizer was parsed based on its molecular formula into its elemental components, using a database of molar masses and established stoichiometric rules.
+The central component of the package was the implementation of the nutrient-solution formulation algorithm. This algorithm used nnls::nnls() to solve the system of equations under non-negativity constraints and to quantify deviations between the target and calculated solution in terms of absolute and relative error. The framework also allows users to assign weights to individual nutrients, thereby enabling the exploration of different formulation priorities and trade-offs.
 
-Building on this, an R package was be developed. This package includes core functions for parsing chemical formulas and computing molar masses, as well as for converting between different chemical representations such as oxides and elemental forms (e.g., P₂O₅ to P or SO₄ to S). It also include tools for transforming concentration units (e.g., from mmol/L to mg/L) using accurate molar mass calculations. Also bidirectional transformations between compound and elemental quantities, incorporating stoichiometric logic, was integrated.
-
-The central component of the package was be thr implementation of the nutrient solution formulation algorithm, using the nnls::nnls() function to solve the system of equations under non-negativity constraints and giving the difference between desired and obtained solution as absolute and relative error. The framework allows users to assign weights to individual nutrients, enabling exploration of different formulation priorities and trade-offs.
-
-The framework was be validated through a series of use cases. These included reproducing historical and crop-specific nutrient solutions, comparing the computed results with values from the literature and collecting some crop and author specific nutrient solutions in a base library. Nutrient distribution of anions and cations across different solutions is be visualized e.g. by ternary plot for cations (K+, Ca2+, Mg+) and anions (NO₃⁻, SO₄²⁻, PO₄3⁻) classify systematically different nutrient combinations as done by @Steiner.1961.
-
+The framework was validated through a series of use cases. These included reproducing historical and crop-specific nutrient solutions, comparing the computed results with values reported in the literature, and compiling crop- and author-specific nutrient solutions into a base library. The distribution of anions and cations across different solutions was visualized, for example, by ternary plots for cations (K⁺, Ca²⁺, Mg²⁺) and anions (NO₃⁻, SO₄²⁻, PO₄³⁻), in order to classify nutrient combinations systematically, as proposed by @Steiner.1961.
 ## Software Environment and Data Sources
 
 ### R version, packages
@@ -1894,7 +1889,7 @@ tbl <- knitr::kable(
   booktabs = TRUE,
   longtable = TRUE,
   align = c("l","l", rep("c", length(out_cols) - 2)),
-  caption = "Solver-derived pH, ionic strength, total charge equivalents (TCE), electrical conductivity (EC) and osmotic pressure for crop-specific formulations (salts-only; water = 0; KS 4.3 = 0; CO2(aq) = 0). EC sonneveld and reportet EC for comparison.",
+  caption = "Solver-derived pH, ionic strength, total charge equivalents (TCE), electrical conductivity (EC) and osmotic pressure for crop-specific formulations (salts-only; water = 0; KS 4.3 = 0; CO2(aq) = 0). EC Sonneveld and reported EC for comparison.",
   escape = TRUE
 ) |>
   kable_styling(latex_options = "repeat_header", font_size = 7) |>
@@ -2804,7 +2799,7 @@ kable(
 
 ## Case Study Results
 
-### Case study 1 — Experimental scientist: classical solution reconstruction under restricted salt availability (deionized water) under different EC.
+### Case study I — Experimental scientist: classical solution reconstruction under restricted salt availability (deionized water) under different EC.
 
 The macronutrient composition of Hoagland solution No. 2 consists of 14 mmol L⁻¹ NO₃–N, 1 mmol L⁻¹ NH₄–N, 1 mmol L⁻¹ P, 6 mmol L⁻¹ K, 4 mmol L⁻¹ Ca, 2 mmol L⁻¹ Mg and 2 mmol L⁻¹ S. In the absence of Ca(NO₃)₂ three exemplary alternative formulations using the technical salt CAN are shown in Table \ref{tab:tbl-hoagland-comparison}.
 
@@ -2962,13 +2957,13 @@ No deviation from the target composition of a Hoagland solution No. 2 was observ
 
 Hoagland solution No. 2
 
-### Case study 2 — Horticultural technician: tomato nutrient formulation using Berlin-Dahlem water with acid adjustment
+### Case study II — Horticultural technician: tomato nutrient formulation using Berlin-Dahlem water with acid adjustment
 
 #### Achieved composition
 
 For a nutrient solution formulated for tomatoes cultivated in rockwool [@Sonneveld.1994] and prepared with tap water from postal code 14195 [@BWB.2026], the two-stage solver with nitric acid addition was used. The calculated fertilizer salts are shown in @fig-tomato-salt-composition, including the amounts required for the preparation of 500 L nutrient solution and the corresponding amounts for 18 L of a 50-fold concentrated stock solution separated into A-BAK, B-BAK and micronutrients.
 
-![Screenshot of the fertilizer salt composition calculated in the NutriCalc Shiny app for a tomato nutrient solution in rockwool using tap water from Berlin postal code 14195. The formulation is shown separately for A-BAK, B-BAK, and micronutrients stock solutions. Fertilizer requirements are reported for the preparation of 500 L nutrient solution and the amounts for 18 L of a 50-fold concentrated stock solution.](Thesis_screenshots/tomato2final.png){#fig-tomato-salt-composition width="15cm"}
+![Fertilizer composition calculated in the NutriCalc Shiny app for a tomato nutrient solution in rockwool using tap water from Berlin postal code 14195. The formulation is separated into A-BAK, B-BAK, and micronutrient stock solution fractions. Fertilizer requirements are given for the preparation of 500 L nutrient solution and for 18 L of 50-fold concentrated stock solution.](Thesis_screenshots/tomato2final.png){#fig-tomato-salt-composition width="15cm"}
 
 #### Deviations from target
 
@@ -2982,13 +2977,13 @@ The calculated final nutrient solution had a pH of 5.82. Ionic strength amounted
 
 \newpage
 
-### Case study 3 — Research scientist: nutrient formulation for a novel halophyte (Salicornia) using mixed water sources
+### Case study III — Research scientist: nutrient formulation for a novel halophyte (Salicornia) using mixed water sources
 
 #### Achieved composition
 
 The calculated mixed water consists of 90 % tap water from Berlin postal code 10997 and 10 % demineralised water, thereby reducing the chloride concentration of the water source to 1.5 mmol L⁻¹. Based on this water composition and the reference recipe “Propagation vegetable plants in rockwool” reported by @Sonneveld.1994, chloride is set to 1.5 mmol L⁻¹, yielding a calculated sodium concentration of 5.5 mmol L⁻¹ to maintain electroneutrality. Since ammonium nitrate (NH₄NO₃) is excluded from the permissible fertilizer set, the target composition is achieved using an alternative fertilizer combination. The final fertilizer amounts are expressed for the preparation of 5 L stock solution.
 
-![Screenshot of the fertilizer salt composition calculated in the NutriCalc Shiny app for a tomato nutrient solution in rockwool using tap water from Berlin postal code 14195. The formulation is shown separately for A-BAK, B-BAK, and micronutrients stock solutions. Fertilizer requirements are reported for the preparation of 500 L nutrient solution and the amounts for 18 L of a 50-fold concentrated stock solution.](Thesis_screenshots/case3_salts.png){width="15cm"}
+![Screenshot of the fertilizer composition calculated in the NutriCalc Shiny app for a halophyte nutrient solution prepared from a mixture of tap water from Berlin postal code 10997 and deionized water. The formulation is shown separately for A-BAK, B-BAK, and the micronutrient stock solution. Fertilizer requirements are reported for the preparation of 5 L of 100-fold concentrated stock solution.](Thesis_screenshots/case3_salts.png){width="15cm"}
 
 #### Deviations from target
 
@@ -3006,7 +3001,7 @@ Salts used in the solver were selected on the basis of their solubility and thei
 
 The small SSE values reported for the crop set of @Sonneveld.1994 are mainly caused by the use of chelated Fe sources in the salt matrix. In the implemented representation, Fe chelates introduce Na as a counter ion. Accordingly, a non zero Na contribution can occur in the achieved solution even when Na is absent from the published target vector. This should not be interpreted as a substantive mismatch in the nutritionally relevant targets, but rather as a consequence of using chemically realistic Fe fertilizers. Consistent with this interpretation, SSE drops to zero when the Na target is set equal to the Fe associated Na contribution.
 
-A second recurring case involves recipes containing Si, commonly at around 0.75 mmol L^-1^. In the present matrix, Si is supplied via K~2~SiO~3~, which necessarily introduces additional K and also behaves as a strongly basic reagent. Consequently, exact matching depends on whether this coupled K contribution is represented in the target vector and or corrected by acid addition. When Si is omitted, or when the corresponding K contribution is accounted for explicitly, SSRE approaches zero.
+A second recurring case involves recipes containing Si, commonly at around 0.75 mmol L⁻¹. In the present matrix, Si is supplied via K~2~SiO~3~, which necessarily introduces additional K and also behaves as a strongly basic reagent. Consequently, exact matching depends on whether this coupled K contribution is represented in the target vector and or corrected by acid addition. When Si is omitted, or when the corresponding K contribution is accounted for explicitly, SSRE approaches zero.
 
 This indicates that the residual mismatch in Si containing recipes is not primarily caused by numerical instability of the optimiser, but by chemically coupled fertilizer behaviour. In other words, the difficulty lies less in the NNLS procedure itself than in the fact that silicon supply through potassium silicate cannot be treated independently of its accompanying alkalinity and counter ion contribution, because it behaves effectively as a base used in the role of a salt.
 
@@ -3146,7 +3141,17 @@ A fifth direction is the further development of reporting and user interaction. 
 
 Overall, future extensions of NutriCalc could strengthen the package in three broad areas: broader input flexibility, more advanced chemical and optimisation routines and improved reporting and user interaction. The most important future extension, however, is the integration of experimental data, particularly for the mass-balance approach, in order to derive more precisely balanced and crop-specific nutrient recipes for closed hydroponic systems.
 
-# Summary (possibly in German and English)
+# Summary
+
+This thesis addresses nutrient-solution formulation in horticulture, particularly in hydroponic and other soilless systems, where solution composition must be defined precisely under chemical and practical constraints. In practice, nutrient recipes are often derived from fixed formulations or manual trial-and-error adjustment. Such approaches are difficult to reproduce consistently across studies and prone to conversion errors, especially when water quality, fertilizer composition and different unit systems must be considered simultaneously.
+
+To address this problem, the thesis developed `NutriCalc`, an open-source computational framework in R for the formulation, evaluation and optimisation of nutrient solutions. The central methodological contribution was the development of a reproducible computational pipeline that replaces ad hoc recipe formulation with mathematical optimisation. Nutrient-solution design was formalised as a constrained linear optimisation problem and solved using non-negative least squares, allowing fertilizer combinations to be calculated transparently while ensuring physically meaningful, non-negative quantities.
+
+The framework integrated stoichiometric conversion of fertilizer compounds, mapping to canonical nutrient targets, transformation between molar and mass-based units, and correction for ions already present in the source water. In this way, NutriCalc established a consistent workflow linking fertilizer compounds, nutrient targets and practical concentration units. Beyond nutrient matching, it also incorporated chemically informed evaluation of electroneutrality, pH and electrical conductivity, connecting optimisation results to physicochemical properties relevant for experimental interpretation and practical nutrient management. A further contribution of the thesis was the implementation of the framework in two complementary forms: a programmable R package and a Shiny-based graphical user interface. This dual design supports both reproducible analytical workflows in research and interactive use in horticultural practice.
+
+The results showed that a broad range of published horticultural target solutions could be reconstructed exactly or with only small residual deviations. Where exact fits were not possible, these deviations were generally chemically interpretable and could often be traced to identifiable constraints such as limited fertilizer choice, stoichiometric ion coupling across salts or electroneutrality requirements. The case studies further demonstrated that the framework can be applied to more complex scenarios involving alternative fertilizer availability, local water composition and mixed water sources.
+
+Overall, the thesis showed that nutrient-solution design can be shifted from a recipe-based and partly opaque practice to a reproducible, optimisation-based and chemically explicit workflow, providing both a methodological framework for horticultural research and a practical basis for transparent nutrient management in soilless cultivation systems.
 
 # References
 
@@ -3193,4 +3198,4 @@ length(unused_keys)
 
 # Appendix {.unnumbered}
 
-# Declaration of Indepedence {.unnumbered}
+# Declaration of Independence {.unnumbered}
