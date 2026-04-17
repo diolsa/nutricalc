@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>thesis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="Thesis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Thesis_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Thesis_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Thesis_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Thesis_files/libs/quarto-html/popper.min.js"></script>
+<script src="Thesis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Thesis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Thesis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Thesis_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Thesis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Thesis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Thesis_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="Thesis_files/libs/kePrint-0.0.1/kePrint.js"></script>
+
+<link href="Thesis_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="abstract" class="level1 unnumbered">
+<h1 class="unnumbered">Abstract</h1>
+<p>This thesis describes the development of a modular, open-source computational framework in R for the formulation and optimization of nutrient solutions in horticulture. Addressing the complexity of combining fertilizer salts to meet specific nutrient solution targets, the project formalizes the formulation process as a constrained linear optimization problem solved through non-negative least squares. The framework integrates features for stoichiometric conversion, unit transformation, ion balance visualization pH and EC prediction. A Shiny-based GUI ensures usability for researchers and practitioners alike. The tool is intended to support sustainable, data-driven horticultural practices and reduce formulation errors in both research and applied settings.</p>
+<p>Concise summary of the research problem, objectives, methodological approach (software + chemical modeling), key results (accuracy, pH/EC plausibility, performance), and main implications. Explicitly highlights the software contribution and its relevance to nutrient solution formulation in horticulture.</p>
+</section>
+<section id="list-of-abbreviations" class="level1 unnumbered">
+<h1 class="unnumbered">List of Abbreviations</h1>
+<p>Definitions of technical abbreviations and units used throughout the thesis (e.g., EC, NNLS, ppm, mmol l⁻¹, meq l⁻¹).</p>
+<dl>
+<dt>pH</dt>
+<dd>
+<p>Power of Hydrogen (negative logarithm of the hydrogen ion activity)</p>
+</dd>
+<dt>NNLS</dt>
+<dd>
+<p>Non-Negative Least Squares</p>
+</dd>
+<dt>EC</dt>
+<dd>
+<p>Electrical Conductivity</p>
+</dd>
+<dt>SI</dt>
+<dd>
+<p>International System of Units [Système international d’unités]</p>
+</dd>
+<dt>WUE</dt>
+<dd>
+<p>Water Use Efficiency</p>
+</dd>
+<dt>BK</dt>
+<dd>
+<p>Base Capacity [Basen Kapazität]</p>
+</dd>
+<dt>SK</dt>
+<dd>
+<p>Acid Capacity [Säure Kapazität]</p>
+</dd>
+</dl>
+</section>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Conventionally, inquiries in the field of hydroponics begin by juxtaposing increasing global food demand with ongoing human population growth. This framing, often invoking Malthusian concerns, is typically followed by an outline of the advantages of hydroponic systems and a comparison with problems of soil-based cultivation.</p>
+<section id="scientific-and-practical-relevance-of-nutrient-solution-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-and-practical-relevance-of-nutrient-solution-formulation">Scientific and practical relevance of nutrient solution formulation</h2>
+<p>Introduces the role of nutrient solutions in hydroponic and soilless cultivation systems, and explains why accurate formulation affects plant performance, experimental validity, and sustainability.</p>
+</section>
+<section id="gap-lack-of-transparent-reproducible-flexible-formulation-tools" class="level2">
+<h2 class="anchored" data-anchor-id="gap-lack-of-transparent-reproducible-flexible-formulation-tools">Gap: lack of transparent, reproducible, flexible formulation tools</h2>
+<p>Identifies shortcomings of current practices and tools (manual calculations, spreadsheets, black-box software), focusing on lack of transparency, reproducibility, and extensibility.</p>
+<p>A reconstruction of nutrient calculations reported in the literature further illustrates the relevance of transparent conversion pipelines. For example, Jones et al.&nbsp;(2023) describe a control nutrient solution derived from defined molar concentrations of fertilizer salts (5.15 mM Ca(NO₃)₂; 8.79 mM KNO₃; 2.36 mM MgSO₄; 2.94 mM KH₂PO₄), subsequently scaled to a 10 % strength solution. Recalculating the resulting elemental concentrations reported in the paper reveals that the final values depend critically on how stoichiometric relationships, dilution factors and ion attribution are applied. In particular, deviations may arise when dilution factors are inconsistently propagated across elements, when molar masses of salts are used instead of elemental molar masses, or when contributions of shared ions are only partially accounted for. While K, P, and S match the reported control values, the largest discrepancies occur for Ca, Mg, and .Recomputing the resulting concentrations using stoichiometric attribution and elemental molar masses yields:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compute_molar_mass</span>(<span class="st">"Ca"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 40.078</code></pre>
+</div>
+</div>
+<p><span class="math display">\[
+c(\mathrm{Ca})
+= 5.15\,\si{mmol.L^{-1}}
+\times 40.08\,\si{mg.mmol^{-1}}
+\times 0.1
+= 20.64\,\si{mg.L^{-1}}.
+\]</span></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compute_molar_mass</span>(<span class="st">"Mg"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 24.305</code></pre>
+</div>
+</div>
+<p><span class="math display">\[
+c(\mathrm{Mg})
+= 2.36\,\si{mmol.L^{-1}}
+\times 24.31\,\si{mg.mmol^{-1}}
+\times 0.1
+= 5.74\,\si{mg.L^{-1}}.
+\]</span></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compute_molar_mass</span>(<span class="st">"NO3"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 62.004</code></pre>
+</div>
+</div>
+<p><span class="math display">\[
+c(\ce{NO3-})
+= \bigl(2\times 5.15 + 8.79\bigr)\,\si{mmol.L^{-1}}
+\times 62.01\,\si{mg.mmol^{-1}}
+\times 0.1
+= 118.38\,\si{mg.L^{-1}}.
+\]</span></p>
+<p>The reported Ca value (<span class="math inline">\(82.05\ \si{mg.L^{-1}}\)</span>) is consistent with using the molar mass of (and effectively <span class="math inline">\(5.0\ \si{mM}\)</span> instead of <span class="math inline">\(5.15\ \si{mM}\)</span>) rather than elemental Ca:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compute_molar_mass</span>(<span class="st">"Ca(NO3)2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 164.086</code></pre>
+</div>
+</div>
+<p><span class="math display">\[
+c(\mathrm{Ca})_{\text{reported}}
+= 5.0\,\si{mmol.L^{-1}}
+\times 164.09\,\si{mg.mmol^{-1}}
+\times 0.1
+= 82.05\,\si{mg.L^{-1}}.
+\]</span></p>
+<p>The reported Mg value (<span class="math inline">\(57.37\ \si{mg.L^{-1}}\)</span>) is consistent with the <span class="math inline">\(0.1\)</span> scaling factor not being applied:</p>
+<p><span class="math display">\[
+c(\mathrm{Mg})_{\text{reported}}
+= 2.36\,\si{mmol.L^{-1}}
+\times 24.31\,\si{mg.mmol^{-1}}
+= 57.37\,\si{mg.L^{-1}}.
+\]</span></p>
+<p>The reported nitrate value (<span class="math inline">\(63.87\ \si{mg.L^{-1}}\)</span>) is consistent with counting nitrate only from (omitting the contribution):</p>
+<p><span class="math display">\[
+c(\ce{NO3-})_{\text{reported}}
+= \bigl(2\times 5.15\bigr)\,\si{mmol.L^{-1}}
+\times 62.01\,\si{mg.mmol^{-1}}
+\times 0.1
+= 63.87\,\si{mg.L^{-1}}.
+\]</span></p>
+<p>While such differences do not necessarily affect the overall conclusions of the study, they demonstrate how small ambiguities in conversion logic can lead to substantial divergence in reported nutrient concentrations. These observations underline that even well-documented experimental studies can benefit from calculation frameworks in which all assumptions—unit conversions, stoichiometric coefficients and scaling factors are explicitly encoded and reproducible. This is particularly relevant for integrated production systems, where nutrient streams are reused across modules and quantitative consistency is essential.</p>
+</section>
+<section id="background-and-motivation" class="level2">
+<h2 class="anchored" data-anchor-id="background-and-motivation">Background and Motivation</h2>
+<p>Provides historical context of nutrient solution formulation, common workflows used by researchers and growers, and motivates the need for a reproducible, computational framework.</p>
+<p>Precise nutrient solution formulation is a cornerstone of modern horticultural production, particularly in hydroponic and soilless cultivation systems. This process involves selecting and combining soluble fertilizer salts to deliver specific concentrations of essential elements in desired chemical forms and ratios <span class="citation" data-cites="Jones.2014">(<a href="#ref-Jones.2014" role="doc-biblioref">Jones, 2014</a>)</span>. While standard formulations were published since the mid-19th century <span class="citation" data-cites="Hoagland.1920 Hoagland.1950 Knop.1860 Shive.1915">(<a href="#ref-Hoagland.1920" role="doc-biblioref">Hoagland, 1920</a>; <a href="#ref-Hoagland.1950" role="doc-biblioref">Hoagland &amp; Arnon, 1950</a>; <a href="#ref-Knop.1860" role="doc-biblioref">Knop, 1860</a>; <a href="#ref-Shive.1915" role="doc-biblioref">Shive, 1915</a>)</span>, practitioners frequently need to tailor them to local water quality, crop-specific requirements or available fertilizers, creating a complex and often error-prone challenge <span class="citation" data-cites="Resh.2013 Sonneveld.2009">(<a href="#ref-Resh.2013" role="doc-biblioref">Resh, 2013</a>; <a href="#ref-Sonneveld.2009" role="doc-biblioref">Sonneveld, 2009</a>)</span>.</p>
+<p>In plant nutrition experiments, treatments are typically designed to vary individual nutrients while holding others constant (ceteris paribus) to investigate the effect of a single nutrient element. However, due to the interdependencies among ions and their shared presence in various fertilizer salts, such isolation is rarely achievable in practice. Researchers must therefore account for the introduction of accompanying ions, which may affect plant responses and experimental validity.</p>
+<p>Creating accurate nutrient solutions under such constraints is time-consuming and sometimes mathematically infeasible, underscoring the need for computational tools that enable efficient, accurate, and reproducible formulation under realistic chemical and experimental conditions.</p>
+<p>The nutrient formulation problem is inherently mathematical. Many fertilizer salts contribute multiple nutrients (e.g., Ca(NO₃)₂ supplies both calcium and nitrate), leading to an interdependent system. This can be modeled as a system of linear equations:</p>
+<p><span class="math inline">\(A·x = b\)</span></p>
+<p>Where:</p>
+<ul>
+<li><p>A is the nutrient matrix (each row representing a nutrient, each column a fertilizer salt),</p></li>
+<li><p>x is the vector of unknown fertilizer quantities,</p></li>
+<li><p>b is the vector of target nutrient concentrations.</p></li>
+</ul>
+<p>Due to overlapping contributions and limited degrees of freedom, exact solutions may not exist. Thus, approximate solutions are needed, with the additional constraint that all fertilizer quantities must be non-negative. This motivates the use of non-negative least squares (NNLS) optimization, which minimizes the squared error between the achieved and target nutrient vectors under the constraint x ≥ 0.</p>
+<p>Moreover, real-world use requires support for various chemical notations such as conversions between elemental and oxide forms (e.g., P ↔︎ P₂O₅, S ↔︎ SO₄²⁻) and integration with commercially available fertilizers labeled in % w/w or expressed in units such as mmol/L or mg/L. Despite the existence of some basic Windows applications and Excel tools, there is currently no open-source, modular, and transparent software solution in R that offers this level of flexibility and chemical accuracy for horticultural applications.</p>
+</section>
+<section id="objectives-and-research-questions-software-focused-but-scientific" class="level2">
+<h2 class="anchored" data-anchor-id="objectives-and-research-questions-software-focused-but-scientific">Objectives and research questions (software-focused but scientific)</h2>
+<p>States the main objective of developing and evaluating a computational framework for nutrient solution formulation. Defines specific research questions related to algorithmic correctness, chemical consistency, usability, and horticultural relevance.</p>
+<p>The main objective of this thesis is to design and implement a computational framework in R that enables the formulation, analysis and optimization of nutrient solutions specifically for controlled-environment horticulture. This framework is intended to support accurate and efficient nutrient planning, and to facilitate reproducibility and transparency in both research and practical applications.</p>
+<p>More specifically, the thesis aims to develop tools that can construct nutrient matrices from molecular fertilizer formulas. These tools will allow for precise conversion between fertilizer compounds and their elemental forms using stoichiometric calculations. The formulation process will be modelled mathematically as a non-negative linear system and solved using Non-Negative Least Squares optimization methods <span class="citation" data-cites="Mullen.2024">(<a href="#ref-Mullen.2024" role="doc-biblioref">Mullen &amp; van Stokkum, 2024</a>)</span>.</p>
+<p>In addition to the computational backend, the framework will include features to visualize the distribution of nutrients across different fertilizer sources, and to assess the balance between cations and anions in the resulting solution. Furthermore, it will offer the ability to approximate the electrical conductivity (EC) of a nutrient solution in advance, based on the concentrations and molar conductivity of respective ions <span class="citation" data-cites="McCleskey.2012">(<a href="#ref-McCleskey.2012" role="doc-biblioref">McCleskey et al., 2012</a>)</span>.</p>
+<p>The tool will also be designed with extensibility in mind, laying the groundwork for the import of commercial fertilizer compositions. In the long term, the framework will be equipped to benchmark nutrient formulations based on either experimental or simulated crop yield data.</p>
+<p>Finally, to ensure accessibility and ease of use, the thesis will culminate in the development of a user-friendly graphical interface using the Shiny framework, enabling non-technical users to benefit from the computational functionalities <span class="citation" data-cites="Chang.2025">(<a href="#ref-Chang.2025" role="doc-biblioref">Chang et al., 2025</a>)</span>.</p>
+</section>
+</section>
+<section id="state-of-the-art-scientific-background" class="level1">
+<h1>State of the Art / Scientific Background</h1>
+<section id="nutrient-solution-formulation-principles-and-the-structure-of-experimental-design-in-plant-nutrition" class="level2">
+<h2 class="anchored" data-anchor-id="nutrient-solution-formulation-principles-and-the-structure-of-experimental-design-in-plant-nutrition">Nutrient solution formulation principles and the Structure of Experimental Design in Plant Nutrition</h2>
+<p>Experiments in plant nutrition seek to identify causal relationships between specific nutrients and plant responses such as growth, yield, vitality, and physiological performance. Despite the apparent simplicity of manipulating nutrient concentrations, such experiments are fundamentally constrained by chemical laws that limit causal identifiability. In particular, electroneutrality and the statistical requirement of ceteris paribus jointly restrict how nutrient solutions can be manipulated and how resulting effects may be interpreted. This chapter develops a formal framework, expressed in milliequivalent (meq) notation, that derives classical experimental designs in plant nutrition from first principles and clarifies the interpretational limits of nutrient experimentation.</p>
+<p>A nutrient solution may be represented as a vector of its ionic charge equivalents:</p>
+<span class="math display">\[\begin{align*}
+\mathbf{S}_{\mathrm{meq}} &amp;=
+\bigl(
+\mathrm{K^+},\ \mathrm{Ca^{2+}},\ \mathrm{Mg^{2+}},\ \dots
+\;\big|\;
+\mathrm{NO_3^-},\ \mathrm{Cl^-},\ \mathrm{SO_4^{2-}},\ \dots
+\bigr)
+\end{align*}\]</span>
+<p>where each component is expressed in milliequivalents per liter (meq L<span class="math inline">\(^{-1}\)</span>). For any ion <span class="math inline">\(i\)</span>,</p>
+<span class="math display">\[\begin{align*}
+\mathrm{meq}_i &amp;= |z_i|\, c_i ,
+\end{align*}\]</span>
+<p>with <span class="math inline">\(z_i\)</span> denoting ionic charge and <span class="math inline">\(c_i\)</span> the molar concentration. Expressing solution composition in meq makes ionic charge balance explicit and avoids ambiguity associated with heterovalent ions.</p>
+<p>Not all vectors in this space are chemically admissible. All aqueous nutrient solutions must satisfy electroneutrality, which in meq notation takes the form</p>
+<span class="math display">\[\begin{align*}
+\sum \mathrm{meq}_{\text{cat}} - \sum \mathrm{meq}_{\text{an}} &amp;= 0 .
+\end{align*}\]</span>
+<p>The sums include all charged species present, including <span class="math inline">\(\mathrm{H^+}\)</span> (formally <span class="math inline">\(\mathrm{H_3O^+}\)</span>) and <span class="math inline">\(\mathrm{OH^-}\)</span>. Electroneutrality implies that no ionic component can be altered independently of ions carrying opposite charge. Any experimental manipulation therefore induces compensatory changes elsewhere in the ionic system. In this chapter, meq values are treated as analytical charge equivalents used for experimental design; activity coefficients, complexation, and ion pairing may alter speciation but do not remove the electroneutrality constraint.</p>
+<p>In addition to charge balance, many nutritionally relevant components participate in acid–base equilibria and therefore exist as families of chemical species. For example, phosphate occurs as <span class="math inline">\(\mathrm{H_2PO_4^-}\)</span>, <span class="math inline">\(\mathrm{HPO_4^{2-}}\)</span>, and <span class="math inline">\(\mathrm{PO_4^{3-}}\)</span>, while carbonate occurs as <span class="math inline">\(\mathrm{CO_2}\)</span>, <span class="math inline">\(\mathrm{HCO_3^-}\)</span>, and <span class="math inline">\(\mathrm{CO_3^{2-}}\)</span>. Let <span class="math inline">\(c_i^{\mathrm{tot}}\)</span> denote the total analytical concentration of component <span class="math inline">\(i\)</span>. The total charge contribution of this component to the solution can be written as</p>
+<span class="math display">\[\begin{align*}
+\mathrm{meq}_i^{\mathrm{tot}}
+&amp;= \sum_j |z_{ij}|\, c_{ij} ,
+\end{align*}\]</span>
+<p>where <span class="math inline">\(c_{ij}\)</span> is the concentration of species <span class="math inline">\(j\)</span> belonging to component <span class="math inline">\(i\)</span>. Changes in pH redistribute charge among species with different valencies as shown for phosphate in <a href="#fig-phosphate-speciation-tight" class="quarto-xref">Figure&nbsp;1</a>, thereby altering the effective ionic composition of the solution even when total analytical concentrations are held constant. Although pH can be experimentally controlled using buffers or acid–base additions, such control necessarily introduces additional ionic components and therefore does not decouple pH from nutrient composition in a causal sense.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-phosphate-speciation-tight" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-phosphate-speciation-tight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Thesis_files/figure-html/fig-phosphate-speciation-tight-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-phosphate-speciation-tight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Phosphate speciation (percent) as a function of pH.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>From a causal-inference perspective, identification of an effect requires isolating variation in a target factor while holding other causally relevant factors fixed or blocked (ceteris paribus). In plant nutrition experiments, strict independent variation of a single ionic species is generally not possible, because electroneutrality and acid–base equilibria couple ionic charge, pH, ionic strength, and osmotic potential. As a result, strict ceteris paribus conditions for individual ions cannot be achieved in bulk nutrient solutions; they can only be approximated within constrained experimental frameworks. Within this framework, classical experimental designs in plant nutrition can be derived as three distinct classes of experiments, defined by the invariants they preserve in meq-space.</p>
+<p>Here, <span class="math inline">\(\Delta\)</span> denotes the change induced by the experimental manipulation, i.e.&nbsp;<span class="math inline">\(\Delta x := x_{\text{treatment}} - x_{\text{control}}\)</span> (or, more generally, the difference between two solution states). The first class consists of qualitative, or ion-substitution, experiments. In these experiments, one ionic species is replaced by another while total cation and total anion charge equivalents are kept constant:</p>
+<span class="math display">\[\begin{align*}
+\Delta \mathrm{meq}_i + \Delta \mathrm{meq}_j &amp;= 0 .
+\end{align*}\]</span>
+<p>When the substituted ions have the same charge, the substitution is isovalent (e.g.&nbsp;<span class="math inline">\(\mathrm{K^+} \leftrightarrow \mathrm{Na^+}\)</span> or <span class="math inline">\(\mathrm{Cl^-} \leftrightarrow \mathrm{NO_3^-}\)</span>). When the charges differ, the substitution is heterovalent, for example replacing <span class="math inline">\(2\)</span> meq of <span class="math inline">\(\mathrm{K^+}\)</span> (2 mmol) with <span class="math inline">\(2\)</span> meq of <span class="math inline">\(\mathrm{Ca^{2+}}\)</span> (1 mmol). Qualitative substitution experiments provide the highest degree of causal specificity achievable within whole-solution manipulations at fixed charge totals, although their interpretation remains conditional on buffering and counter-ion choice.</p>
+<p>The second class comprises quantitative, or salt addition (or removal), experiments. Here, the total amount of dissolved salt is changed, which necessarily alters both total cation and total anion charge equivalents by the same non-zero amount:</p>
+<span class="math display">\[\begin{align*}
+\Delta \sum \mathrm{meq}_{\text{cat}}
+&amp;= \Delta \sum \mathrm{meq}_{\text{an}}
+\neq 0 .
+\end{align*}\]</span>
+<p>Electroneutrality is preserved automatically, but ionic strength, electrical conductivity, and osmotic potential change and pH may shift depending on buffering. Because at least two ionic components vary simultaneously, plant responses in such experiments reflect composite effects of nutrient ions, counter-ions and general salinity.</p>
+<p>The third class treats quantity as an emergent quality through solution-strength series. In this case, all charge equivalents in the solution are scaled by a constant factor <span class="math inline">\(k\)</span>:</p>
+<span class="math display">\[\begin{align*}
+\mathbf{S}_{\mathrm{meq},k}
+&amp;= k\, \mathbf{S}_{\mathrm{meq},1} .
+\end{align*}\]</span>
+<p>This transformation preserves ion ratios expressed in meq while increasing or decreasing total charge density, ionic strength and osmotic potential. Although composition remains constant at the level of charge ratios, pH and ionic speciation may shift because acid–base equilibria are nonlinear. As a result, solution strength functions as an environmental condition rather than a simple quantitative variable.</p>
+<p>Across these three experiment types, causal specificity for individual ion identity typically decreases as the number of inseparable or uncontrolled variables increases. Qualitative substitution experiments offer the highest degree of causal specificity, whereas quantitative salt manipulations and solution-strength series progressively trade causal resolution for ecological or agronomic relevance. These experiment classes are therefore best understood as distinct projections of a chemically constrained ionic system, most transparently described in milliequivalent space.</p>
+</section>
+<section id="stoichiometry-and-saltion-relationships" class="level2">
+<h2 class="anchored" data-anchor-id="stoichiometry-and-saltion-relationships">Stoichiometry and salt–ion relationships</h2>
+<p>Explains the chemical basis of nutrient delivery via fertilizer salts, including molar mass concepts, stoichiometric coefficients, and the contribution of individual ions from multi-nutrient compounds.</p>
+</section>
+<section id="existing-tools" class="level2">
+<h2 class="anchored" data-anchor-id="existing-tools">Existing tools</h2>
+<p>A classical approach to calculate a nutriens solution sonnevel universla alghorithm</p>
+<p>Nutrient Solution Calculator is an Excel™-based tool developed by Luca Incrocci and supported by the EUPHOROS project <span class="citation" data-cites="Pardossi.2011">(<a href="#ref-Pardossi.2011" role="doc-biblioref">Pardossi et al., 2011</a>)</span>. It was previously available for download via Wageningen University and was still accessible in 2024, but was no longer publicly available there in 2026 <span class="citation" data-cites="Incrocci.2007">(<a href="#ref-Incrocci.2007" role="doc-biblioref">Incrocci, 2007</a>)</span>. A Spanish translation remains available online offered by the University of Almeria <span class="citation" data-cites="Incrocci.2020">(<a href="#ref-Incrocci.2020" role="doc-biblioref">Incrocci et al., 2020</a>)</span>. The spreadsheet is designed to calculate the composition and cost of fertigation stock solutions (A+B) from three principal inputs: the ionic composition of the irrigation water, the crop nutrient recipe, including target pH, EC, and nutrient concentrations, and the technical characteristics of the fertigation system, particularly stock tank volume and dilution ratio. Furthermore, it evaluates the potential risk of salt precipitation in concentrated stock solutions. The spreadsheet is password protected.</p>
+<p>Another Calculator is HydroBuddy, a free and open-source software application developed by Daniel Fernández Pinto for the formulation of hydroponic nutrient solutions <span class="citation" data-cites="FernandezPinto.2022">(<a href="#ref-FernandezPinto.2022" role="doc-biblioref">Fernández Pinto, 2022</a>)</span>. The program calculates the required quantities of fertilizers to achieve specified target nutrient concentrations. It includes a database of commonly used fertilizers whose compositions can be edited or extended by the user and allows the formulation of both direct nutrient solutions and concentrated stock solutions. The software determines the combination of fertilizer salts that best matches the desired nutrient composition through the solution of a system of linear equations and also provides an empirical estimation of the EC.</p>
+<p>No library dedicated to the calculation of Nutrient solutions developed in R is known so far.</p>
+</section>
+</section>
+<section id="material-and-methods" class="level1">
+<h1>Material and Methods</h1>
+<section id="development-and-evaluation-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="development-and-evaluation-workflow">Development and evaluation workflow</h2>
+<p>Describes the overall workflow of the thesis: requirement analysis, software design, implementation, testing, and evaluation. Clarifies how development and validation steps are iteratively connected.</p>
+<p>The development of the computational framework will follow a structured development and validation pipeline. For the development of the R package devtools was used <span class="citation" data-cites="Wickham.2025">(<a href="#ref-Wickham.2025" role="doc-biblioref">Wickham, 2025</a>)</span>.</p>
+<p>The first step involves designing the underlying data structures. A nutrient matrix will be established, in which the rows represent essential nutrients (such as N, P, K, Ca, etc.) and the columns represent fertilizer salts. For readability the input matrix will be transposed and converted for the calculation. Each fertilizer will be parsed based on its molecular formula into its elemental components, using a database of molar masses and established stoichiometric rules.</p>
+<p>Building on this, an R package will be developed. This package will include core functions for parsing chemical formulas and computing molar masses, as well as for converting between different chemical representations such as oxides and elemental forms (e.g., P₂O₅ to P or SO₄ to S). It will also include tools for transforming concentration units (e.g., from mmol/L to mg/L) using accurate molar mass calculations. Also bidirectional transformations between compound and elemental quantities, incorporating stoichiometric logic, will be integrated.</p>
+<p>The central component of the package will be an implementation of the nutrient solution formulation algorithm, using the nnls::nnls() function to solve the system of equations under non-negativity constraints and giving the difference between desired and obtained solution as absolute and relative error. The framework will allow users to assign weights to individual nutrients, enabling exploration of different formulation priorities and trade-offs.</p>
+<p>To support usability and maintainability, the R package will include comprehensive documentation and user guides.</p>
+<p>The framework will be validated through a series of use cases. These will include reproducing historical and crop-specific nutrient solutions comparing the computed results with values from the literature and collecting some crop and author specific nutrient solutions in a base library. Nutrient distribution of anions and cations across different solutions will be visualized e.g.&nbsp;by ternary plot for cations (K+, Ca2+, Mg+) and anions (NO₃⁻, SO₄²⁻, PO₄3⁻) classify systematically different nutrient combinations (Steiner, 1961). Additional validation steps may involve importing data on commercial fertilizer products and assessing the compatibility of the framework with industry formulations. Furthermore, a small user-oriented test with researchers and practitioners will be conducted to evaluate usability and practical applicability.</p>
+</section>
+<section id="software-environment-and-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="software-environment-and-data-sources">Software Environment and Data Sources</h2>
+<section id="r-version-packages" class="level3">
+<h3 class="anchored" data-anchor-id="r-version-packages">R version, packages</h3>
+<p>The package <code>nutricalc</code> was written in R 4.5.1 <span class="citation" data-cites="RCoreTeam.2025">(<a href="#ref-RCoreTeam.2025" role="doc-biblioref">R Core Team, 2025</a>)</span> using Posit RStudio 2025.09.2+418 “Cucumberleaf Sunflower” <span class="citation" data-cites="Positteam.2025">(<a href="#ref-Positteam.2025" role="doc-biblioref">Posit team, 2025</a>)</span>. Following packages were used: <code>stringr</code> <span class="citation" data-cites="Wickham.2025">(<a href="#ref-Wickham.2025" role="doc-biblioref">Wickham, 2025</a>)</span>, <code>nnls</code> <span class="citation" data-cites="Mullen.2024">(<a href="#ref-Mullen.2024" role="doc-biblioref">Mullen &amp; van Stokkum, 2024</a>)</span>, <code>shiny</code> <span class="citation" data-cites="Chang.2025">(<a href="#ref-Chang.2025" role="doc-biblioref">Chang et al., 2025</a>)</span>, <code>bslib</code> <span class="citation" data-cites="Sievert.2025">(<a href="#ref-Sievert.2025" role="doc-biblioref">Sievert et al., 2025</a>)</span>, <code>Ternary</code> <span class="citation" data-cites="Smith.2025">(<a href="#ref-Smith.2025" role="doc-biblioref">Smith &amp; Sanselme, 2025</a>)</span>, <code>xml2</code> <span class="citation" data-cites="Wickham.2026">(<a href="#ref-Wickham.2026" role="doc-biblioref">Wickham et al., 2026</a>)</span>. For the development in R <code>devtools</code> <span class="citation" data-cites="Wickham.2025b">(<a href="#ref-Wickham.2025b" role="doc-biblioref">Wickham et al., 2025</a>)</span> was used.</p>
+<p>Code of the package is provided on GitHub under <a href="https://github.com/diolsa/nutricalc" class="uri">https://github.com/diolsa/nutricalc</a> and the shiny-App is deployed under: <a href="https://nutricalc.shinyapps.io/nutricalc-app/" class="uri">https://nutricalc.shinyapps.io/nutricalc-app/</a></p>
+<p>Code development was supported by AI-assisted LLM for debugging and optimization to ensure code quality and computational reliability with OpenAI CODEX and ChatGPT 5.2.</p>
+</section>
+<section id="built-in-recipe-datasets" class="level3">
+<h3 class="anchored" data-anchor-id="built-in-recipe-datasets">Built-in recipe datasets</h3>
+<p><em>Describes the origin and selection of reference nutrient solution recipes, including normalization, unit harmonization, and consistency checks.</em></p>
+<div class="cell">
+<div id="tbl-crop-recipes-long-landscape_units" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-crop-recipes-long-landscape_units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Target compositions of crop-specific nutrient solutions (Olericulture, Floriculture, Fruticulture) from <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span>
+</figcaption>
+<div aria-describedby="tbl-crop-recipes-long-landscape_units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="canonical-nutrient-definitions" class="level3">
+<h3 class="anchored" data-anchor-id="canonical-nutrient-definitions">Canonical nutrient definitions</h3>
+<p><em>Defines the canonical nutrient set, naming conventions, chemical forms, and unit standards used consistently throughout the framework.</em></p>
+</section>
+</section>
+<section id="data-structures-and-chemical-representation" class="level2">
+<h2 class="anchored" data-anchor-id="data-structures-and-chemical-representation">Data Structures and Chemical Representation</h2>
+<div style="page-break-after: always;"></div>
+<section id="elementary-entities" class="level3">
+<h3 class="anchored" data-anchor-id="elementary-entities">Elementary Entities</h3>
+<p>After the 2019 revision of the International System of Units, the base units are defined by fixed numerical values of fundamental constants <span class="citation" data-cites="BIPM.2019">(<a href="#ref-BIPM.2019" role="doc-biblioref">BIPM, 2019</a>)</span>. The mole is the SI unit for the amount of a substance; its symbol is mol. The defining constant is the Avogadro constant, N<sub>A</sub> Thus:</p>
+<p><span class="math display">\[\begin{equation} 1\,\mathrm{mol} = \frac{6.02214076 \times 10^{23}}{N_\mathrm{A}} \end{equation}\]</span></p>
+<p>An elementary entity may be an atom, a molecule, or any other particle. In this work, the elementary entities are ions as listed in Table <span class="math inline">\(\ref{tab:element-molar-mass}\)</span>. The molar masses are taken from the CRC Handbook of Chemistry and Physics <span class="citation" data-cites="Haynes.2017">(<a href="#ref-Haynes.2017" role="doc-biblioref">Haynes, 2017</a>)</span> and rounded to three decimal places. - also a sentence why this elements (virtually part of the plant ionome)</p>
+
+</section>
+<section id="nutrient-set" class="level3">
+<h3 class="anchored" data-anchor-id="nutrient-set">Nutrient set</h3>
+<p>Defines the complete nutrient vector used by the solver, including macro- and micronutrients, units, and handling of missing or optional targets. <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span></p>
+
+
+
+</section>
+<section id="compound-by-nutrient-matrix" class="level3">
+<h3 class="anchored" data-anchor-id="compound-by-nutrient-matrix">Compound-by-nutrient matrix</h3>
+<p>Describes the stoichiometric matrix linking fertilizer compounds to nutrient ions, including how coefficients are derived from molecular formulas.</p>
+
+</section>
+<section id="salt-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="salt-metadata">Salt metadata</h3>
+<p>Documents fertilizer salt metadata used by the framework, including compound names, categories, acid/base flags, and handling assumptions relevant to the solver.</p>
+</section>
+</section>
+<section id="algorithmic-methods" class="level2">
+<h2 class="anchored" data-anchor-id="algorithmic-methods">Algorithmic Methods</h2>
+<section id="formula-parsing-and-molar-mass-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="formula-parsing-and-molar-mass-calculation">Formula parsing and molar mass calculation</h3>
+<p>Describes rules and algorithms for parsing chemical formulas and calculating molar masses, including validation and error handling.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nutricalc)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">compute_molar_mass</span>(<span class="st">"Ca(NO3)2·4H2O"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 236.146</code></pre>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="stoichiometric-conversions" class="level3">
+<h3 class="anchored" data-anchor-id="stoichiometric-conversions">Stoichiometric conversions</h3>
+<p>Numerically, the official SI unit for the substance concentration is mol m⁻³; however, this unit is equivalent to mmol l⁻¹. Therefore, the following relationships for conversion between mmol l⁻¹ and mg l⁻¹ were applied, following Appelo and Postma <span class="citation" data-cites="Appelo.2005">(<a href="#ref-Appelo.2005" role="doc-biblioref">Appelo, 2005</a>)</span>:</p>
+<p>Within the library, conversion between mmol l<sup>-1</sup> and mg l<sup>-1</sup> as elements can be accomplished with the convert_units() function. When the input is provided as a named numeric vector, the names are interpreted as nutrient identifiers (e.g., <code>Ca</code>, <code>P</code>, <code>NO3_N</code>) and are internally mapped to their corresponding element symbols to select the appropriate molar mass (from element_molar_mass_df) for conversion. For example, converting a complete set of recipe values from mg l⁻¹ to mmol l⁻¹:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">convert_units</span>(<span class="fu">c</span>(<span class="at">Ca =</span> <span class="dv">211</span>, <span class="at">P =</span> <span class="dv">46</span>), <span class="at">to =</span> <span class="st">"mmol/L"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Ca        P 
+5.264734 1.485117 </code></pre>
+</div>
+</div>
+<p>The conversion can also be applied to a single scalar concentration. In this case, the element must be specified explicitly, since a scalar input carries no nutrient name from which the element can be inferred. The element may be supplied either as a named argument or positionally in the order <code>(x, element, to)</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">convert_units</span>(<span class="at">x =</span> <span class="dv">15</span>, <span class="at">element =</span> <span class="st">"N"</span>, <span class="at">to =</span> <span class="st">"mg/L"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 210.105</code></pre>
+</div>
+</div>
+<p>For reporting and verification a recipe can be summarized with the recipe_summary() function:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">recipe_summary</span>(<span class="fu">c</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">NO3_N =</span> <span class="dv">15</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">NH4_N =</span> <span class="dv">1</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">P     =</span> <span class="fl">1.5</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">K     =</span> <span class="dv">6</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ca    =</span> <span class="dv">4</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Mg    =</span> <span class="dv">2</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">S     =</span> <span class="dv">2</span>),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">unit =</span> <span class="st">"mmol/L"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Nutrient Element mmol/L    mg/L
+1    NO3_N       N   15.0 210.105
+2    NH4_N       N    1.0  14.007
+3        P       P    1.5  46.461
+4        K       K    6.0 234.588
+5       Ca      Ca    4.0 160.312
+6       Mg      Mg    2.0  48.610
+7        S       S    2.0  64.130</code></pre>
+</div>
+</div>
+<p>When concentrations are declared in mg l⁻¹, masses are often reported in oxidized or compound forms (e.g.&nbsp;SO₄ or MgO). To convert between such compound-based representations and their elemental equivalents, the converte() function can be used:</p>
+<span class="math display">\[\begin{align*}
+\mathrm{x_{to}} &amp;= \mathrm{x_{from}} \times
+\frac{\mathrm{M_{to}}}{\mathrm{M_{from}}} \times
+\frac{\boldsymbol{\nu_{from,E}}}{\boldsymbol{\nu_{to,E}}}
+\end{align*}
+
+\noindent
+where
+\begin{align*}
+\mathrm{x_{from}} &amp;\text{ is the quantity expressed as the source formula (input value),} \\
+\mathrm{x_{to}}   &amp;\text{ is the equivalent quantity expressed as the target formula (output value),} \\
+\mathrm{M_{from}} &amp;\text{ is the molar mass of the source formula } [\mathrm{g\,mol^{-1}}], \\
+\mathrm{M_{to}}   &amp;\text{ is the molar mass of the target formula } [\mathrm{g\,mol^{-1}}], \\
+\boldsymbol{\nu_{from,E}} &amp;\text{ is the number of atoms of the anchor element } E \text{ in the source formula } [\text{dimensionless}], \\
+\boldsymbol{\nu_{to,E}}   &amp;\text{ is the number of atoms of the anchor element } E \text{ in the target formula } [\text{dimensionless}].
+\end{align*}\]</span>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">converte</span>(<span class="st">"SO4"</span>, <span class="st">"S"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.3337983</code></pre>
+</div>
+</div>
+<p>It is also possible to specify an explicit quantity to be converted, for example when converting a given mass concentration</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">converte</span>(<span class="st">"N"</span>, <span class="st">"NO3"</span>, <span class="dv">210</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 929.5952</code></pre>
+</div>
+</div>
+<p>If multiple elements are shared between the source and target formulas, the anchor element E must be specified to avoid ambiguity.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">converte</span>(<span class="st">"(NH4)2HPO4"</span>, <span class="st">"NH4H2PO4"</span>, <span class="at">element =</span> <span class="st">"P"</span>)  <span class="co"># P as the anchor</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.871032</code></pre>
+</div>
+</div>
+</section>
+<section id="nnls-optimization-with-weighting" class="level3">
+<h3 class="anchored" data-anchor-id="nnls-optimization-with-weighting">NNLS optimization with weighting</h3>
+<p>NNLS is a numerical optimization algorithm for solving linear least-squares problems under non-negativity constraints. It was written in 1973 in FORTRAN 77 by Lawson and Hanson at the Jet Propulsion Laboratory and published in their book <em>Solving Least Squares Problems</em> <span class="citation" data-cites="Lawson.1974 Lawson.1995">(<a href="#ref-Lawson.1974" role="doc-biblioref">Lawson &amp; Hanson, 1974</a>, <a href="#ref-Lawson.1995" role="doc-biblioref">1995</a>)</span>. In R, the Lawson–Hanson algorithm is implemented by the package <code>nnls</code> <span class="citation" data-cites="Mullen.2024">(<a href="#ref-Mullen.2024" role="doc-biblioref">Mullen &amp; van Stokkum, 2024</a>)</span>.</p>
+<p>For nutrient solution formulation, the objective is to determine the amounts of salts that fit a specified target nutrient composition as closely as possible. Each salt contributes fixed stoichiometric amounts of ions, so the relationship between the amount of each salt and the resulting nutrient concentration in solution is linear. Because salts can only be added and not removed, their amounts are constrained to be non-negative. Nutrient solution design can therefore be formulated as a linear mixture fitting problem subject to non-negativity constraints, which can be solved using the NNLS algorithm.</p>
+<p>Because many fertilizer salts supply multiple nutrients simultaneously exact matching of all nutrient targets is rarely possible. The optimization therefore identifies the best feasible compromise among competing nutrient constraints.</p>
+<p>Assume that <span class="math inline">\(n\)</span> fertilizer salts are available and <span class="math inline">\(m\)</span> nutrients are considered.</p>
+<p>In <code>NutriCalc</code>, fertilizer stoichiometry is stored in a matrix <span class="math display">\[
+S \in \mathbb{R}^{n \times m},
+\]</span> where rows correspond to salts (<span class="math inline">\(j = 1,\ldots,n\)</span>) and columns correspond to nutrients (<span class="math inline">\(i = 1,\ldots,m\)</span>). The entry <span class="math inline">\(S_{j i}\)</span> gives the amount of nutrient <span class="math inline">\(i\)</span> supplied by one unit of salt <span class="math inline">\(j\)</span> (mmol nutrient per mmol salt).</p>
+<p>Let</p>
+<ul>
+<li><span class="math inline">\(x \in \mathbb{R}_{\ge 0}^n\)</span> denote the vector of salt amounts (mmol <span class="math inline">\(L^{-1}\)</span>),</li>
+<li><span class="math inline">\(b \in \mathbb{R}^m\)</span> denote the vector of target nutrient concentrations (mmol <span class="math inline">\(L^{-1}\)</span>).</li>
+</ul>
+<p>For fitting, the solver uses the transposed stoichiometry matrix <span class="math display">\[
+A = S^\top \in \mathbb{R}^{m \times n},
+\]</span> so that rows correspond to nutrients and columns correspond to salts. The system therefore consists of <span class="math inline">\(m\)</span> nutrient equations and <span class="math inline">\(n\)</span> non-negative decision variables. Predicted (achieved) nutrient concentrations are <span class="math display">\[
+\hat b = A x .
+\]</span></p>
+<p>Thus, each row of <span class="math inline">\(A\)</span> represents the linear contribution of all salts to one nutrient, and each column represents the nutrient composition of one salt. The optimization therefore selects salt amounts so that the combined nutrient profile best approximates the desired composition.</p>
+<hr>
+</section>
+<section id="target-scaling-and-importance-weighting" class="level3">
+<h3 class="anchored" data-anchor-id="target-scaling-and-importance-weighting">Target scaling and importance weighting</h3>
+<p><code>NutriCalc</code> does not solve the unweighted least-squares problem <span class="math inline">\(\min_{x \ge 0}\lVert Ax - b\rVert_2\)</span>. Instead, residuals are rescaled relative to target magnitude and weighted according to user-defined nutrient importance.</p>
+<p>Conceptually, the solver minimizes the total weighted squared deviation between achieved and target nutrient concentrations. For nutrients with nonzero targets, deviations are measured relative to the target (i.e.&nbsp;proportional error). For nutrients with zero targets, deviations are measured in absolute concentration units.</p>
+<p>This relative scaling is necessary because nutrient concentrations often differ by several orders of magnitude (for example, macronutrients versus micronutrients). Without scaling, nutrients present at large absolute concentrations would dominate the optimization and prevent meaningful fitting of low-concentration nutrients.</p>
+<p>Scaling and importance weighting operate on residuals rather than on concentrations themselves. Optimization decisions therefore depend on deviations from targets rather than absolute concentration levels.</p>
+<hr>
+<section id="importance-weighting-of-nutrient-targets" class="level4">
+<h4 class="anchored" data-anchor-id="importance-weighting-of-nutrient-targets">Importance weighting of nutrient targets</h4>
+<p>In practical nutrient formulation, not all targets must be matched with the same precision. Some nutrients are critical for plant performance and must be maintained close to their target concentration, whereas others can vary within a broader range without adverse effects. The optimization therefore allows nutrient-specific importance levels that determine how strongly deviations from individual targets are penalized.</p>
+<p>User-defined importance values <span class="math inline">\(I_i\)</span> express the desired strictness of matching each nutrient. Higher importance means that deviations from the target are penalized more strongly, forcing the solver to prioritize matching that nutrient even if this leads to larger deviations in less important nutrients.</p>
+<p>Importance values are restricted to the interval <span class="math inline">\([-2,2]\)</span> and converted into positive numerical weights using an exponential mapping: <span class="math display">\[
+\tilde I_i = \min\!\bigl(2,\max(-2,I_i)\bigr),
+\]</span> <span class="math display">\[
+w_i = 0.1 \cdot 1000^{\tilde I_i}.
+\]</span></p>
+<p>Each unit increase in importance multiplies the penalty on deviations by a factor of 1000. This creates clear separation between importance levels and ensures that highly important nutrients strongly influence the optimization outcome. This mapping produces weights spanning approximately <span class="math inline">\(10^{-7}\)</span> to <span class="math inline">\(10^{5}\)</span>.</p>
+<p>The weights are incorporated into the least-squares objective using the diagonal matrix <span class="math display">\[
+W = \mathrm{diag}\!\left(\sqrt{w_1},\ldots,\sqrt{w_m}\right),
+\]</span> which scales the residuals before minimization. The optimization therefore minimizes a weighted sum of squared deviations, where each nutrient contributes proportionally to its assigned importance.</p>
+<hr>
+</section>
+<section id="target-based-scaling-of-residuals" class="level4">
+<h4 class="anchored" data-anchor-id="target-based-scaling-of-residuals">Target-based scaling of residuals</h4>
+<p>Nutrient targets differ substantially in magnitude, with macronutrients typically present at concentrations several orders of magnitude larger than micronutrients. If deviations were measured only in absolute units (mmol L<span class="math inline">\(^{-1}\)</span>), nutrients with large target concentrations would dominate the optimization, and small but biologically important deviations in low-concentration nutrients would have little influence on the solution.</p>
+<p>To avoid this imbalance, residuals are scaled relative to target magnitude. For each nutrient <span class="math inline">\(i\)</span>, define a scaling factor <span class="math display">\[
+s_i =
+\begin{cases}
+b_i, &amp; b_i \ne 0,\\
+1, &amp; b_i = 0.
+\end{cases}
+\]</span></p>
+<p>For nutrients with nonzero targets, deviations are therefore measured relative to the target value. For nutrients with zero targets, deviations are measured in absolute concentration units.</p>
+<p>To apply this scaling, each nutrient equation is divided by its corresponding factor <span class="math inline">\(s_i\)</span>. In matrix form, the target-scaled design matrix is <span class="math display">\[
+A_{\mathrm{sub}} = \operatorname{diag}(1/s)\, A,
+\]</span> and the scaled target vector is <span class="math inline">\(b/s\)</span>, where division is performed elementwise.</p>
+<p>The NNLS problem is then <span class="math display">\[
+\min_{x \ge 0}
+\left\|
+W \left( A_{\mathrm{sub}} x - b/s \right)
+\right\|_2^2 .
+\]</span></p>
+<p>This is equivalent to minimizing a weighted sum of squared scaled residuals. For nutrients with nonzero targets, the optimization minimizes weighted relative deviations; for nutrients with zero targets, it minimizes weighted absolute deviations. The scaling ensures that all nutrients contribute comparably to the optimization regardless of their concentration range, while importance weights control how strictly individual targets are enforced.</p>
+<p>Operationally, the solver predicts nutrient concentrations from candidate salt amounts, computes deviations from the targets, rescales and weights these deviations according to target magnitude and nutrient importance and determines the non-negative salt combination that minimizes the resulting weighted least-squares objective.</p>
+<hr>
+</section>
+</section>
+<section id="interpretation-of-the-solution" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation-of-the-solution">Interpretation of the solution</h3>
+<p>The NNLS solver returns the optimal non-negative salt amounts <span class="math inline">\(x\)</span>. Because the optimization is performed on scaled and weighted equations, achieved nutrient concentrations are recomputed using the original, unscaled stoichiometry: <span class="math display">\[
+\hat b = A x .
+\]</span></p>
+<p>The vector <span class="math inline">\(x\)</span> therefore represents the physically meaningful fertilizer composition and is interpreted directly as mmol L<span class="math inline">\(^{-1}\)</span> of each salt to add to the nutrient solution. These values can therefore be used directly to prepare the nutrient solution.</p>
+<hr>
+</section>
+<section id="error-quantities-reported-by-nutricalc" class="level3">
+<h3 class="anchored" data-anchor-id="error-quantities-reported-by-nutricalc">Error quantities reported by <code>NutriCalc</code></h3>
+<p>After computing achieved nutrient concentrations, deviations from the target composition are quantified using several complementary error measures. These metrics describe both absolute and relative discrepancies between predicted and desired nutrient levels.</p>
+<p>The absolute error for nutrient <span class="math inline">\(i\)</span> is</p>
+<p><span class="math display">\[
+e_i = \hat b_i - b_i ,
+\]</span></p>
+<p>expressed in mmol L<span class="math inline">\(^{-1}\)</span>. This measures the direct concentration difference between achieved and target values.</p>
+<p>Percent error expresses the deviation relative to the target concentration:</p>
+<p><span class="math display">\[
+p_i = 100 \cdot \frac{e_i}{b_i}.
+\]</span></p>
+<p>Percent error is computed elementwise. Non-finite values (e.g.&nbsp;division by zero) are recorded as missing. If <span class="math inline">\(b_i = 0\)</span> and <span class="math inline">\(|\hat b_i| &lt; 10^{-9}\)</span>, the percent error is set to <span class="math inline">\(0\)</span>.</p>
+<p>To summarize overall deviation across all nutrients, sum of squared error is computed as</p>
+<p><span class="math display">\[
+\mathrm{SSE} = \sum_{i=1}^{m} e_i^2 .
+\]</span></p>
+<p>This metric reflects the total magnitude of absolute concentration differences.</p>
+<p>Relative squared error evaluates deviations relative to target magnitude. Relative residuals are defined as</p>
+<p><span class="math display">\[
+r_i = \frac{e_i}{b_i},
+\]</span></p>
+<p>and non-finite values are omitted. The aggregate measure is reported as the sum of squared relative errors</p>
+<p><span class="math display">\[
+\mathrm{SSRE} = \sum_{i=1}^{m} r_i^2 .
+\]</span></p>
+<p>This metric summarizes proportional deviations across nutrients and provides a scale-independent measure of solution accuracy. Nutrients with zero target concentration where excluded from relative error metrics.</p>
+</section>
+<section id="two-stage-nnls-solver-separation-of-neutral-salts-and-acidbase-reagents" class="level3">
+<h3 class="anchored" data-anchor-id="two-stage-nnls-solver-separation-of-neutral-salts-and-acidbase-reagents">Two-stage NNLS solver: separation of neutral salts and acid–base reagents</h3>
+<p>In addition to the standard optimization, <code>NutriCalc</code> provides an optional two-stage solver that incorporates acid–base reagents. These compounds are included in the global stoichiometry matrix and distinguished from neutral fertilizer salts using the classification <code>salt_info$is_acid_base</code>. The purpose of this separation is to ensure that nutrient targets are satisfied using neutral salts first and whenever possible, while acids and bases are used only to correct remaining deficits that neutral salts cannot resolve. This prevents acid–base reagents from acting as unconstrained degrees of freedom in the primary optimization and yields chemically more interpretable fertilizer compositions.</p>
+<p>The two-stage procedure is activated only when the acid/base option is enabled. When this option is disabled, acid/base compounds are excluded from the selected compound set and nutrient optimization is performed using neutral salts only. Boric acid belongs to the neutral group in this classification, as it is treated as a micronutrient source rather than a pH-active reagent.</p>
+<p>In the first stage, NNLS optimization is performed using only compounds classified as neutral salts. This stage uses the same weighted and target-scaled objective as the standard solver and produces achieved nutrient concentrations</p>
+<p><span class="math display">\[
+\hat b^{(1)}.
+\]</span></p>
+<p>Residual nutrient deviations are then computed as</p>
+<p><span class="math display">\[
+r = b - \hat b^{(1)}.
+\]</span></p>
+<p>Residual entries are filtered before any second-stage correction. Deviations within the relative tolerance are treated as negligible and set to zero. Residuals are also set to zero for nutrients that cannot be supplied by any acid or base (non-fixable nutrients). Negative residuals (oversupply) are set to zero so that only undersupplied nutrients remain eligible for correction.</p>
+<p>If the two-stage mode is enabled and at least one fixable nutrient exceeds the tolerance criterion defined by</p>
+<p><span class="math display">\[
+r_i &gt; \max(\texttt{tol\_abs}, \texttt{tol\_rel}\, b_i),
+\]</span></p>
+<p>a second NNLS optimization is performed using only acid/base compounds. The target for this stage is the filtered residual vector from stage 1. Scaling and importance weighting are applied using the same rules as in the standard solver, but computed from the residual target rather than the original nutrient targets. Stage 2 therefore supplies only remaining nutrient deficits that neutral salts could not provide.</p>
+<p>Compound amounts from stage 1 and stage 2 are then inserted into their original compound indices to form the complete fertilizer vector (x). Final nutrient concentrations are recomputed from the full unscaled stoichiometry matrix,</p>
+<p><span class="math display">\[
+\hat b = A x,
+\]</span></p>
+<p>and all error metrics are evaluated from these final concentrations.</p>
+<p>Accordingly, the two-stage solver acts as a conditional refinement: neutral salts determine the primary nutrient composition, and acid–base reagents are introduced only when residual deficits exceeding the tolerance criterion remain after the neutral fit. Lowering the importance of a specific nutrient reduces the penalty for deviating from its target during stage 1, allowing a residual deficit to remain primarily in that nutrient while the remaining nutrients are matched more closely. Because stage-2 optimization operates only on residual undersupply, this deficit can then be supplied during the second stage by the corresponding acid–base compounds.</p>
+</section>
+</section>
+<section id="chemical-modeling" class="level2">
+<h2 class="anchored" data-anchor-id="chemical-modeling">Chemical Modeling</h2>
+<section id="water-quality-and-input-handling" class="level3">
+<h3 class="anchored" data-anchor-id="water-quality-and-input-handling">Water quality and input handling</h3>
+<p>Nutrient formulation was implemented using a target-based optimization workflow in NutriCalc. Users specify desired final nutrient concentrations as a nutrient target vector. The solver then computes the fertilizer salt additions needed to match this target. This approach is exact only when the initial water matrix is essentially deionized or demineralized water. In practical cultivation systems, however, source water already contains dissolved ions that contribute to the final solution and must therefore be accounted for before fertilizer optimization.</p>
+<p>To represent this baseline contribution, water chemistry is modeled as a water vector containing pre-existing ion concentrations. The formulation step uses an adjusted target vector obtained by subtracting the baseline water vector from the desired nutrient target vector. For each nutrient ion <span class="math inline">\(i\)</span>, the solver input is defined as:</p>
+<p><span class="math display">\[
+T_i^{adj} = \max\!\left(T_i^{target} - W_i,\; 0\right)
+\]</span></p>
+<p>where <span class="math inline">\(T_i^{target}\)</span> is the desired final concentration and <span class="math inline">\(W_i\)</span> is the concentration already present in the source water. Negative adjusted concentrations are not physically meaningful because fertilizer salts can only be added. Therefore, adjusted targets are bounded below by zero. The lower bound at zero reflects the additive-only fertilizer model used in the optimizer; excess baseline ions cannot be removed within this step. The resulting adjusted vector is then passed to the salt optimizer.</p>
+<p>In addition to ionic concentrations, two buffering descriptors are important for water characterization: acid capacity (Säurekapazität, KS 4.3) and base capacity (Basenkapazität, KB 8.2). These are not treated as primary fertilizer targets, but are retained as water properties because they influence downstream interpretation of pH behavior.</p>
+<p>Because users may operate with blended feed waters, NutriCalc supports mixing of multiple source waters prior to target subtraction. Each source is represented as a separate composition vector and the composite baseline is computed by mass balance. For two source waters with compositions <span class="math inline">\(W_1\)</span> and <span class="math inline">\(W_2\)</span> and volumes <span class="math inline">\(V_1\)</span> and <span class="math inline">\(V_2\)</span>, the mixed baseline composition is:</p>
+<p><span class="math display">\[
+W^{mix} = \frac{V_1 W_1 + V_2 W_2}{V_1 + V_2}.
+\]</span></p>
+<p>This expression is evaluated component-wise for all dissolved constituents of the water vector. The adjusted nutrient target is subsequently computed as:</p>
+<p><span class="math display">\[
+T^{adj} = \max\!\left(T^{target} - W^{mix},\; 0\right).
+\]</span></p>
+<p>This enables realistic handling of scenarios such as blending municipal water with deionized water, rainwater, or other process waters before nutrient dosing.</p>
+<p>Water quality inputs were derived from publicly available authority datasets where possible. For Berlin, NutriCalc retrieves supplier data and maps it to the internal water-vector representation. In practice, users can query location-specific baseline water data by postal code and optionally modify values to reflect local measurements or temporal variability.</p>
+<p>Overall, this method ensures that fertilizer optimization is performed against the true chemical starting point rather than an idealized zero-background assumption. By explicitly modeling baseline composition, optional source-water mixing and buffering-related capacities, the resulting formulations are more representative of real cultivation solutions and suitable for subsequent pH and EC evaluation.</p>
+</section>
+<section id="estimation-of-ph-via-charge-balance" class="level3">
+<h3 class="anchored" data-anchor-id="estimation-of-ph-via-charge-balance">Estimation of pH via charge balance</h3>
+<p>Solution pH is calculated using <code>ph_from_achieved()</code> based on the achieved nutrient composition returned by the solver (mmol L<span class="math inline">\(^{-1}\)</span>). The calculation is performed as a charge-balance problem in which pH is treated as an unknown variable. The hydrogen ion concentration is determined such that the aqueous solution satisfies electroneutrality, expressed in milliequivalents per litre (meq L<span class="math inline">\(^{-1}\)</span>), such that total positive and negative charge are equal <span class="citation" data-cites="Appelo.2005">(<a href="#ref-Appelo.2005" role="doc-biblioref">Appelo, 2005</a>)</span>.</p>
+<p>The calculation is formulated as a root-finding problem in which the charge-balance residual is expressed as a function of pH. The root variable is defined as</p>
+<p><span class="math display">\[
+\mathrm{pH}_c = -\log_{10}([\mathrm{H}^+]).
+\]</span></p>
+<p>For each trial value of <span class="math inline">\(\mathrm{pH}_c\)</span>, equilibrium speciation is computed and the resulting charge imbalance is evaluated. The solution pH corresponds to the value of <span class="math inline">\(\mathrm{pH}_c\)</span> for which the charge residual equals zero within numerical tolerance.</p>
+<p>Strong ions (e.g., <span class="math inline">\(\mathrm{K}^+\)</span>, <span class="math inline">\(\mathrm{Na}^+\)</span>, <span class="math inline">\(\mathrm{Ca}^{2+}\)</span>, <span class="math inline">\(\mathrm{Mg}^{2+}\)</span>, <span class="math inline">\(\mathrm{NO}_3^-\)</span>, <span class="math inline">\(\mathrm{Cl}^-\)</span>) contribute with fixed concentrations from the achieved nutrient composition, whereas variable ions (e.g., <span class="math inline">\(\mathrm{H}^+\)</span>, <span class="math inline">\(\mathrm{OH}^-\)</span>, <span class="math inline">\(\mathrm{NH}_4^+\)</span>) are determined from equilibrium speciation. Weak acid–base systems (e.g., sulfate, phosphate, carbonate, borate, silicate) are included in the speciation model and contribute to the charge balance according to their equilibrium distributions.</p>
+<p>Carbonate speciation is parameterized either from a carbonate-system input treated as total inorganic carbon when provided (e.g., <code>KS4_3</code>, interpreted approximately as <span class="math inline">\(\mathrm{HCO}_3^-\)</span>), or from fixed dissolved <span class="math inline">\(\mathrm{CO}_2(\mathrm{aq})\)</span> when provided (e.g., <code>KB8_2</code>, interpreted approximately as <span class="math inline">\(\mathrm{CO}_2\)</span>). Optional chelating ligands (e.g., for Fe) are included as fixed-charge anions when ligand totals are present (default net charges: EDTA, EDDHA, HBED <span class="math inline">\(z=-4\)</span> and DTPA <span class="math inline">\(z=-5\)</span>).</p>
+<p>Acid–base equilibria are evaluated using thermodynamic dissociation constants at 25 °C <span class="citation" data-cites="Haynes.2017">(<a href="#ref-Haynes.2017" role="doc-biblioref">Haynes, 2017</a>)</span>. The speciation model includes the following equilibrium systems:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>System</th>
+<th>Equilibrium species</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Water</td>
+<td><span class="math inline">\(\mathrm{H}^+\)</span>, <span class="math inline">\(\mathrm{OH}^-\)</span></td>
+</tr>
+<tr class="even">
+<td>Ammonia</td>
+<td><span class="math inline">\(\mathrm{NH}_4^+\)</span>, <span class="math inline">\(\mathrm{NH}_3\)</span></td>
+</tr>
+<tr class="odd">
+<td>Sulfate</td>
+<td><span class="math inline">\(\mathrm{HSO}_4^-\)</span>, <span class="math inline">\(\mathrm{SO}_4^{2-}\)</span></td>
+</tr>
+<tr class="even">
+<td>Phosphate</td>
+<td><span class="math inline">\(\mathrm{H}_3\mathrm{PO}_4\)</span>, <span class="math inline">\(\mathrm{H}_2\mathrm{PO}_4^-\)</span>, <span class="math inline">\(\mathrm{HPO}_4^{2-}\)</span>, <span class="math inline">\(\mathrm{PO}_4^{3-}\)</span></td>
+</tr>
+<tr class="odd">
+<td>Carbonate</td>
+<td><span class="math inline">\(\mathrm{CO}_2(\mathrm{aq})\)</span>, <span class="math inline">\(\mathrm{HCO}_3^-\)</span>, <span class="math inline">\(\mathrm{CO}_3^{2-}\)</span></td>
+</tr>
+<tr class="even">
+<td>Borate</td>
+<td><span class="math inline">\(\mathrm{B(OH)}_3\)</span>, <span class="math inline">\(\mathrm{B(OH)}_4^-\)</span></td>
+</tr>
+<tr class="odd">
+<td>Silicate</td>
+<td><span class="math inline">\(\mathrm{H}_4\mathrm{SiO}_4\)</span>, <span class="math inline">\(\mathrm{H}_3\mathrm{SiO}_4^-\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Non-ideal solution behavior is represented using Davies activity coefficients at 25 °C, using the Debye–Hückel parameter for water (<span class="math inline">\(A = 0.5085\)</span>). Ionic strength is computed as</p>
+<p><span class="math display">\[
+I = \tfrac{1}{2} \sum c_i z_i^2.
+\]</span></p>
+<p>For each trial <span class="math inline">\(\mathrm{pH}_c\)</span>, ionic strength and activity coefficients are determined iteratively because they depend on the speciation they influence. Ionic strength is computed from species concentrations, activity coefficients are updated from ionic strength and speciation is recalculated. This fixed-point iteration is repeated until successive estimates converge. The resulting activity coefficients are then applied to all equilibrium expressions.</p>
+<p>After convergence of the inner speciation loop, the charge residual is evaluated as total positive equivalents minus total negative equivalents. Positive charge includes fixed cations and variable <span class="math inline">\(\mathrm{H}^+\)</span> and <span class="math inline">\(\mathrm{NH}_4^+\)</span>. Negative charge includes fixed anions, <span class="math inline">\(\mathrm{OH}^-\)</span>, and the equivalent contributions of sulfate, phosphate, carbonate, borate, and silicate species, together with optional fixed chelate charge.</p>
+<p>The bisection search is initialized over a bounded pH interval (default 3–9), reflecting the typical range of horticultural nutrient solutions and improving numerical stability. If the charge-balance function is not bracketed within this interval, the search range is expanded automatically.</p>
+<p>The reported pH is activity-based,</p>
+<p><span class="math display">\[
+\mathrm{pH} = -\log_{10}\!\bigl(\gamma_H [\mathrm{H}^+]\bigr),
+\]</span></p>
+<p>and therefore may differ slightly from <span class="math inline">\(\mathrm{pH}_c\)</span>. All calculations assume 25 °C and exclude precipitation reactions and explicit metal–ligand complexation beyond optional fixed-charge chelate terms.</p>
+</section>
+<section id="ec-estimation-using-ionic-diffusion-coefficients" class="level3">
+<h3 class="anchored" data-anchor-id="ec-estimation-using-ionic-diffusion-coefficients">EC estimation using ionic diffusion coefficients</h3>
+</section>
+<section id="ec-estimation-using-ionic-diffusion-coefficients-1" class="level3">
+<h3 class="anchored" data-anchor-id="ec-estimation-using-ionic-diffusion-coefficients-1">EC estimation using ionic diffusion coefficients</h3>
+<p>Electrical conductivity (EC) quantifies the ability of an aqueous solution to transport electrical charge and is therefore determined by the concentration and mobility of dissolved ions. Several approaches exist for estimating EC from chemical composition, ranging from simple empirical relationships to ion-specific physicochemical models.</p>
+<p>In practical greenhouse fertilization, EC is often estimated from the total ionic charge concentration expressed in milliequivalents per liter (meq L<span class="math inline">\(^{-1}\)</span>). A widely used rule of thumb for greenhouse nutrient solutions is <span class="citation" data-cites="vanderLugt.2020">(<a href="#ref-vanderLugt.2020" role="doc-biblioref">van der Lugt et al., 2020</a>)</span>:</p>
+<p><span class="math display">\[
+\mathrm{EC}\;(\mathrm{mS\,cm^{-1}})
+=
+\frac{
+\sum \mathrm{meq\;cations}
++
+\sum \mathrm{meq\;anions}
+}{20}.
+\]</span></p>
+<p>Because aqueous solutions satisfy electroneutrality,</p>
+<p><span class="math display">\[
+\sum \mathrm{meq\;cations}
+\approx
+\sum \mathrm{meq\;anions},
+\]</span></p>
+<p>this relationship can also be interpreted as a proportionality between EC and total ionic charge concentration. A closely related approximation for dilute aqueous solutions is described by <span class="citation" data-cites="Appelo.2005">Appelo (<a href="#ref-Appelo.2005" role="doc-biblioref">2005</a>)</span>, where conductivity in µS cm<span class="math inline">\(^{-1}\)</span> is approximately proportional to total milliequivalents per liter (typically valid below about 1.5 mS cm<span class="math inline">\(^{-1}\)</span>):</p>
+<p><span class="math display">\[
+\sum \mathrm{meq\;ions}
+\;\approx\;
+\frac{\mathrm{EC}\;(\mu\mathrm{S\,cm^{-1}})}{100}.
+\]</span></p>
+<p>More refined empirical relationships have been proposed for greenhouse nutrient solutions with relatively constrained ionic composition. Based on experimental calibration, <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> proposed the following regression relating EC to total cation concentration:</p>
+<p><span class="math display">\[
+\mathrm{EC}
+=
+0.095
+\cdot
+\sum \mathrm{meq\;cations}
++
+0.19,
+\]</span></p>
+<p>where EC is expressed in mS cm<span class="math inline">\(^{-1}\)</span>.</p>
+<p>Although such empirical formulations may improve predictive accuracy within their calibration range, they do not explicitly account for differences in ionic mobility among individual species. Because the ionic species present in solution are known in <code>NutriCalc</code>, EC can be estimated mechanistically from their concentration, charge and mobility. The limiting molar ionic conductivity can be related to the diffusion coefficient through the Nernst–Einstein relation <span class="citation" data-cites="Kalka.2020">(<a href="#ref-Kalka.2020" role="doc-biblioref">Kalka, 2020</a>)</span>. In <code>NutriCalc</code>, this relation is extended by a mobility correction term accounting for non-ideal solution behavior. This method is used in hydrochemical programs such as PHREEQC (up to version 3.8) and AQION 8.7.15 <span class="citation" data-cites="Appelo.2010 Kalka.2020">(<a href="#ref-Appelo.2010" role="doc-biblioref">Appelo, 2010</a>; <a href="#ref-Kalka.2020" role="doc-biblioref">Kalka, 2020</a>)</span>.</p>
+<p><span class="math display">\[\begin{align}
+\label{eq:ec}
+\mathrm{EC}
+=
+\left(\frac{F^2}{R T}\right)
+\sum_{i} D_i z_i^{2}\, (\gamma_i)^{\alpha_i}\, c_i.
+\tag{6}
+\end{align}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\begin{align*}
+F &amp;\text{ is Faraday’s constant } [9.6485\times 10^{4}\ \mathrm{C\,mol^{-1}}],\\
+R &amp;\text{ is the gas constant } [8.31446\ \mathrm{J\,mol^{-1}\,K^{-1}}],\\
+T &amp;\text{ is absolute temperature } [T = t_{\mathrm{C}} + 273.15\ \mathrm{K}],\\
+D_i &amp;\text{ is the diffusion coefficient of ion } i\ [\mathrm{m^2\,s^{-1}}],\\
+z_i &amp;\text{ is the ionic charge number},\\
+\gamma_i &amp;\text{ is the activity coefficient of ion } i,\\
+\alpha_i &amp;\text{ is an empirical mobility scaling exponent},\\
+c_i &amp;\text{ is the molar concentration of ion } i.
+\end{align*}\]</span></p>
+<p>Concentrations used in the conductivity summation are expressed in mol m<span class="math inline">\(^{-3}\)</span>. Concentrations obtained in mmol L<span class="math inline">\(^{-1}\)</span> are numerically identical to mol m<span class="math inline">\(^{-3}\)</span> and are therefore used directly without conversion. For conductivity, concentrations are expressed in mol m<span class="math inline">\(^{-3}\)</span> whereas ionic strength for activity modeling is calculated from concentrations expressed in mol L<span class="math inline">\(^{-1}\)</span>. Diffusion coefficients in the internal data tables are stored in units of <span class="math inline">\(10^{-5}\,\mathrm{cm^2\,s^{-1}}\)</span> at 25 °C and converted to SI units prior to calculation:</p>
+<p><span class="math display">\[
+1\times10^{-5}\,\mathrm{cm^2\,s^{-1}}
+=
+1\times10^{-9}\,\mathrm{m^2\,s^{-1}}.
+\]</span></p>
+<p>The activity of a dissolved species depends not only on its concentration but also on the ionic strength of the solution <span class="citation" data-cites="Amelung.2018">(<a href="#ref-Amelung.2018" role="doc-biblioref">Amelung et al., 2018</a>)</span>. Ionic strength <span class="math inline">\((I)\)</span> is calculated for activity modeling from molar concentrations expressed in mol L<span class="math inline">\(^{-1}\)</span>:</p>
+<p><span class="math display">\[
+I
+=
+\frac{1}{2}\sum_i z_i^2 c_i.
+\]</span></p>
+<p>Because the classical Nernst–Einstein relation applies strictly at infinite dilution, a mobility scaling factor is introduced to account empirically for inter-ionic interactions at finite ionic strength as described by <span class="citation" data-cites="Appelo.2010">Appelo (<a href="#ref-Appelo.2010" role="doc-biblioref">2010</a>)</span>. The scaling exponent is defined as</p>
+<p><span class="math display">\[
+\alpha_i
+=
+\begin{cases}
+\frac{0.6}{\sqrt{|z_i|}}, &amp; I \le 0.36|z_i| \\
+\frac{\sqrt{I}}{|z_i|}, &amp; I &gt; 0.36|z_i|
+\end{cases}
+\]</span></p>
+<p>providing an ionic-strength-dependent attenuation of individual ionic contributions.</p>
+<p>Activity coefficients <span class="math inline">\((\gamma_i)\)</span> are obtained using the selected activity model implemented in <code>NutriCalc</code>. Two models are currently implemented: the limiting Debye–Hückel model and the Davies model. In the limiting Debye–Hückel model, the activity coefficient is given by</p>
+<p><span class="math display">\[
+-\log_{10}(\gamma_i)
+=
+A z_i^2 \sqrt{I},
+\]</span></p>
+<p>whereas in the Davies model it is given by</p>
+<p><span class="math display">\[
+-\log_{10}(\gamma_i)
+=
+A z_i^2 \left(\frac{\sqrt{I}}{1+\sqrt{I}} - 0.3I\right),
+\]</span></p>
+<p>where <span class="math inline">\(A = 0.5085\)</span> at 25 °C, <span class="math inline">\(z_i\)</span> is the ionic charge number and <span class="math inline">\(I\)</span> is the ionic strength in mol L<span class="math inline">\(^{-1}\)</span>.</p>
+<p>The limiting Debye–Hückel formula is typically applied at ionic strengths up to 0.1 mol L<span class="math inline">\(^{-1}\)</span> whereas the Davies formula is generally considered applicable up to about 0.5 mol L<span class="math inline">\(^{-1}\)</span>. Currently the Davies activity correction is used as the default in the <code>NutriCalc</code> Shiny app.</p>
+<p>The calculation is applied to the fully speciated aqueous ion composition obtained after nutrient formulation and equilibrium pH calculation. All dissolved charged species, including hydrogen and hydroxide ions, contribute to the conductivity sum according to their diffusion properties and concentrations.</p>
+<p>Diffusion coefficients of ionic species at 25 °C were retrieved from <span class="citation" data-cites="Haynes.2017">Haynes (<a href="#ref-Haynes.2017" role="doc-biblioref">2017</a>)</span>. The approach assumes fully dissociated strong electrolytes and does not account for neutral species or metal–ligand complexes. Consequently, the model provides a physically based estimate of conductivity that resolves species-specific contributions but may deviate from measured EC where complexation, ion pairing or strong ion association is significant.</p>
+</section>
+</section>
+<section id="shiny-application-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="shiny-application-workflow">Shiny Application Workflow</h2>
+<p>To install and run the application locally, users can use the package <code>remotes</code> to install package <code>nutricalc</code> from GitHub the following code:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"remotes"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"diolsa/nutricalc"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nutricalc)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">run_app</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Alternatively it is possible to run the deployed shiny application online without local installation at https://nutricalc.shinyapps.io/nutricalc-app/</p>
+<section id="user-inputs-targets-priorities-units" class="level3">
+<h3 class="anchored" data-anchor-id="user-inputs-targets-priorities-units">User inputs (targets, priorities, units)</h3>
+<p>+Documents accepted input formats, unit handling, and priority settings provided by the user.</p>
+</section>
+<section id="water-mixing-and-source-blending" class="level3">
+<h3 class="anchored" data-anchor-id="water-mixing-and-source-blending">Water mixing and source blending</h3>
+<p>On the target tab it is possible to input water values which will be subtracted from the target values. In the water tab users can fetch water data from berlin with the postal zip code (PLZ). This fetches the men data from bwb.de analyse na plz <span class="citation" data-cites="BWB.2026">BWB (<a href="#ref-BWB.2026" role="doc-biblioref">2026</a>)</span></p>
+</section>
+<section id="fertilizer-selection-and-recipes" class="level3">
+<h3 class="anchored" data-anchor-id="fertilizer-selection-and-recipes">Fertilizer selection and recipes</h3>
+<p>Describes fertilizer library management and the use of predefined or custom recipes.</p>
+</section>
+<section id="output-generation-and-visualization-tables-ternary-plots-stock-solutions" class="level3">
+<h3 class="anchored" data-anchor-id="output-generation-and-visualization-tables-ternary-plots-stock-solutions">Output generation and visualization (tables, ternary plots, stock solutions)</h3>
+<p>Summarizes generated outputs, including tables, ternary plots, nutrient distributions and stock solution calculations.</p>
+</section>
+</section>
+<section id="evaluation-and-validation-protocol" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-and-validation-protocol">Evaluation and validation protocol</h2>
+<section id="case-study-selection" class="level3">
+<h3 class="anchored" data-anchor-id="case-study-selection">Case study selection</h3>
+<p>Three case studies were selected to validate the performance of the application by covering a wide range of different use cases. For this three kind of users with different aims where imagined:</p>
+<p>1 Plant scientist that performs an experiment and needs a classical solution Hoagland solution?? in differtn sreghts, but is lacking some salts. Restricted Salts (classical salts missing?). is using deionized water.</p>
+<p>2 Horticultural Technician that needs a nutrient solution for a common crop. Technical salts. Cucumber. Use berlin dahlem water. I using deionized water with classical but wants to switch to local water to save costs. Second solver allowed acids/base (using nitric acid)</p>
+<p>3 Horticultural scientist that want to find a recipe for a novel crop. All salts. Crop: Halphyte Salicornia europea? is using WUE and fishwater mixed with deionized ?</p>
+<p>-Defines criteria for selecting representative crops, nutrient solutions, and formulation scenarios.</p>
+</section>
+<section id="accuracy-metrics-absoluterelative-error-weighting" class="level3">
+<h3 class="anchored" data-anchor-id="accuracy-metrics-absoluterelative-error-weighting">Accuracy metrics (absolute/relative error, weighting)</h3>
+<p>Defines absolute and relative error measures, nutrient weighting schemes, and acceptance thresholds.</p>
+</section>
+<section id="performance-profiling-runtime-vs-problem-size" class="level3">
+<h3 class="anchored" data-anchor-id="performance-profiling-runtime-vs-problem-size">Performance profiling (runtime vs problem size)</h3>
+<p>Describes benchmarking procedures used to assess runtime behavior and scalability with increasing problem size.</p>
+</section>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<p>The following result section is divided in two parts. The first part a general comparision</p>
+<section id="general-evaluation-across-crop-specific-recipes" class="level2">
+<h2 class="anchored" data-anchor-id="general-evaluation-across-crop-specific-recipes">General evaluation across crop specific recipes</h2>
+<p>To evaluate solver performance, a set of published crop specific nutrient targets from <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> were used as model input. These recipes specify target nutrient concentrations for various crops in mmol L⁻¹. The solver was only applied allowing salts to each recipe (no acids or bases) to compute the optimal fertilizer composition and achieved nutrient concentrations and were compared to the specified targets. The following sections summarize the results of this evaluation, including achieved nutrient profiles, error metrics, pH and EC. In addition, because <span class="citation" data-cites="Sonneveld.1999">Sonneveld et al. (<a href="#ref-Sonneveld.1999" role="doc-biblioref">1999</a>)</span> and <span class="citation" data-cites="Sonneveld.2009">Sonneveld (<a href="#ref-Sonneveld.2009" role="doc-biblioref">2009</a>)</span> used one reference formulation to demonstrate a universal nutrient solution algorithm, the NutriCalc solution for this formulation was compared in detail with the published results.</p>
+<section id="achieved-nutrient-solution-formulations" class="level3">
+<h3 class="anchored" data-anchor-id="achieved-nutrient-solution-formulations">Achieved Nutrient solution formulations</h3>
+<p>All reported recipes (list of recipes is found in <a href="#tbl-crop-recipes-long-landscape_units" class="quarto-xref">Table&nbsp;1</a> ) were solved and achieved results are summarized in <a href="#tbl-crop-recipes-long-landscape_result_units" class="quarto-xref">Table&nbsp;2</a>. Squared absolute and relative errors are reported for each recipe, quantifying the deviation between achieved and target nutrient concentrations across all nutrients. All achieved results matched the target nutrient profiles with SSE and SSRE values close to zero. Recipes including Si as a target nutrient exhibited comparatively higher relative error values. In formulations using Fe, achieved Na concentrations were non-zero although Na was not specified in the literature target vectors and Na contributed to the absolute error. When Na was added to the target vector at the achieved concentration (Na target set equal to Fe), the corresponding SSE values decreased to zero. For recipes containing Si, applying the second solver approach with reduced weighting for NO₃–N resulted in solutions with an SSRE of 0.</p>
+<div class="cell">
+<div id="tbl-crop-recipes-long-landscape_result_units" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-crop-recipes-long-landscape_result_units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Achieved Nutrient Solutions with SSE and SSRE. Asterisks denote two-stage optimization; parentheses indicate standard-solver errors.
+</figcaption>
+<div aria-describedby="tbl-crop-recipes-long-landscape_result_units-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="ph-and-ec-outputs" class="level2">
+<h2 class="anchored" data-anchor-id="ph-and-ec-outputs">pH and EC Outputs</h2>
+<div class="cell">
+<div id="tbl-crop-recipes-long-landscape_ph_ec" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-crop-recipes-long-landscape_ph_ec-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Solver-derived pH, ionic strength, total charge equivalents (TCE), electrical conductivity (EC) and osmotic pressure for crop-specific formulations (salts-only; water = 0; KS 4.3 = 0; CO2(aq) = 0). EC sonneveld and reportet EC for comparison.
+</figcaption>
+<div aria-describedby="tbl-crop-recipes-long-landscape_ph_ec-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+</div>
+<p>test row</p>
+<p>lala</p>
+<div class="cell">
+<div id="tbl-crop-recipes-long-landscape_ph_ec_models" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-crop-recipes-long-landscape_ph_ec_models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: pH and EC comparison across activity-coefficient models (salts-only; water = 0; KS 4.3 = 0; CO2(aq) = 0). EC Sonneveld is the linear estimate from TCE (meq/L).
+</figcaption>
+<div aria-describedby="tbl-crop-recipes-long-landscape_ph_ec_models-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+</div>
+<section id="performance-of-ph-calculation" class="level4">
+<h4 class="anchored" data-anchor-id="performance-of-ph-calculation">Performance of pH Calculation</h4>
+<p>Both γ activity correction models (Davies and Debye–Hückel) were evaluated for pH prediction against the phosphate buffer system (50 mL of 0.1 mol L⁻¹ KH₂PO₄ + x mL of 0.1 mol L⁻¹ NaOH), which spans pH 5.8–8.0 <span class="citation" data-cites="Haynes.2017 Bower.1955">(<a href="#ref-Bower.1955" role="doc-biblioref">Bower &amp; Bates, 1955</a>; <a href="#ref-Haynes.2017" role="doc-biblioref">Haynes, 2017</a>)</span>. In <a href="#fig-phosphate-buffer-calibration-two-salts" class="quarto-xref">Figure&nbsp;2</a>, predicted pH values are plotted against the reference pH for increasing NaOH additions at 25 °C. The Davies model closely matched the reference values (R<sup>2</sup> = 0.998), whereas the Debye–Hückel model showed weaker agreement (R<sup>2</sup> = 0.880).</p>
+<p>Diskussion: Consequently, γ Davies was selected as the default activity correction for pH prediction in NutriCalc.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-phosphate-buffer-calibration-two-salts" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-phosphate-buffer-calibration-two-salts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<embed src="Thesis_files/figure-html/fig-phosphate-buffer-calibration-two-salts-1.pdf" class="img-fluid" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-phosphate-buffer-calibration-two-salts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Comparison of 50 mL of 0.1 mol L⁻¹ KH₂PO₄ + x mL of 0.1 mol L⁻¹ NaOH (25 °C).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="performance-of-ec-calculation" class="level4">
+<h4 class="anchored" data-anchor-id="performance-of-ec-calculation">Performance of EC Calculation</h4>
+<p>To evaluate EC calculation performance, models were compared against reference calibration EC values for KCl solutions at 25 °C. Electrical conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from @Haynes.2017, which reports values based on primary conductivity standards originally published by @Pratt.2001. In @tbl-kcl-ec-comparison , reference values are compared with NutriCalc EC predictions using both γ activity-correction models (Davies and Debye–Hückel). For comparison, the empirical approach by @Sonneveld.1999 and geochemical computations with PHREEQC (@Parkhurst.2013) are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by @Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.</p>
+<div id="tbl-kcl-ec-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-kcl-ec-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Electrical conductivity of KCl solutions at 25 °C.
+</figcaption>
+<div aria-describedby="tbl-kcl-ec-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+</section>
+<section id="comparison-with-published-formulation" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-with-published-formulation">Comparison with published formulation</h3>
+<p>The nutrient solution algorithm described by <span class="citation" data-cites="Sonneveld.2009">Sonneveld (<a href="#ref-Sonneveld.2009" role="doc-biblioref">2009</a>)</span> uses the cucumber recipe with reuse of drainage water published in <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> as a demonstration of a universal nutrient-solution formulation method proposed in <span class="citation" data-cites="Sonneveld.1999">Sonneveld et al. (<a href="#ref-Sonneveld.1999" role="doc-biblioref">1999</a>)</span>. The target macronutrient concentrations for this demonstration are 11.75 mmol L⁻¹ NO₃–N, 1.00 mmol L⁻¹ NH₄–N, 1.25 mmol L⁻¹ P, 6.50 mmol L⁻¹ K, 2.75 mmol L⁻¹ Ca, 1.00 mmol L⁻¹ Mg, and 1.00 mmol L⁻¹ S. Micronutrients are not included because <span class="citation" data-cites="Sonneveld.2009">Sonneveld (<a href="#ref-Sonneveld.2009" role="doc-biblioref">2009</a>)</span> reports fertilizer additions only for macronutrients in this example. For a direct comparison, NutriCalc was constrained to the same set of salts reported by <span class="citation" data-cites="Sonneveld.2009">Sonneveld (<a href="#ref-Sonneveld.2009" role="doc-biblioref">2009</a>)</span>. The published Sonneveld formulation includes nitric acid. NutriCalc matched the targets exactly (SSE = 0; SSRE = 0) using the one-stage solver without requiring acid addition. The same error metrics (SSE and SSRE) were computed for both the published Sonneveld formulation and the NutriCalc solution and are shown in <a href="#tbl-sonneveld-vs-nutricalc" class="quarto-xref">Table&nbsp;6</a>. For the composition of nutrient salts used for the two formulations, see <a href="#tbl-fertilizer-comparison" class="quarto-xref">Table&nbsp;7</a>.</p>
+<div id="tbl-sonneveld-vs-nutricalc" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sonneveld-vs-nutricalc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Comparison of Sonneveld formulation and NutriCalc solution.
+</figcaption>
+<div aria-describedby="tbl-sonneveld-vs-nutricalc-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table cell caption-top table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Sonneveld solution
+</div></th>
+<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+NutriCalc solution
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nutrient</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Target</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Achieved</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SRE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Achieved</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SE</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">SRE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">NO₃–N</td>
+<td style="text-align: right;">11.75</td>
+<td style="text-align: right;">14.96</td>
+<td style="text-align: right;">10.3041</td>
+<td style="text-align: right;">0.0746</td>
+<td style="text-align: right;">11.75</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">NH₄–N</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.25</td>
+<td style="text-align: right;">0.0625</td>
+<td style="text-align: right;">0.0625</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P</td>
+<td style="text-align: right;">1.25</td>
+<td style="text-align: right;">1.50</td>
+<td style="text-align: right;">0.0625</td>
+<td style="text-align: right;">0.0400</td>
+<td style="text-align: right;">1.25</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">K</td>
+<td style="text-align: right;">6.50</td>
+<td style="text-align: right;">8.88</td>
+<td style="text-align: right;">5.6644</td>
+<td style="text-align: right;">0.1341</td>
+<td style="text-align: right;">6.50</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ca</td>
+<td style="text-align: right;">2.75</td>
+<td style="text-align: right;">2.47</td>
+<td style="text-align: right;">0.0784</td>
+<td style="text-align: right;">0.0104</td>
+<td style="text-align: right;">2.75</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mg</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">0.0049</td>
+<td style="text-align: right;">0.0049</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">0.0169</td>
+<td style="text-align: right;">0.0169</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">SSE = 16.1937</td>
+<td style="text-align: right;">SSRE = 0.3434</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">SSE = 0.0000</td>
+<td style="text-align: right;">SSRE = 0.0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="tbl-fertilizer-comparison" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fertilizer-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Comparison of fertilizer additions in the Sonneveld and NutriCalc formulations.
+</figcaption>
+<div aria-describedby="tbl-fertilizer-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="table cell caption-top table-sm table-striped small">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+mmol L⁻¹
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Name</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Formula</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Sonneveld</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">NutriCalc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Calcium nitrate–ammonium nitrate decahydrate (5:1)</td>
+<td style="text-align: left;">5 Ca(NO₃)₂·NH₄NO₃·10 H₂O</td>
+<td style="text-align: right;">0.49</td>
+<td style="text-align: right;">0.55</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ammonium nitrate</td>
+<td style="text-align: left;">NH₄NO₃</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">0.45</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Monopotassium phosphate</td>
+<td style="text-align: left;">KH₂PO₄</td>
+<td style="text-align: right;">1.50</td>
+<td style="text-align: right;">1.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Magnesium nitrate hexahydrate</td>
+<td style="text-align: left;">Mg(NO₃)₂·6 H₂O</td>
+<td style="text-align: right;">1.07</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Potassium sulfate</td>
+<td style="text-align: left;">K₂SO₄</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Nitric acid</td>
+<td style="text-align: left;">HNO₃</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Potassium nitrate</td>
+<td style="text-align: left;">KNO₃</td>
+<td style="text-align: right;">5.64</td>
+<td style="text-align: right;">3.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<hr>
+</section>
+</section>
+<section id="case-study-results" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-results">Case Study Results</h2>
+<section id="case-study-1-experimental-scientist-classical-solution-reconstruction-under-restricted-salt-availability-deionized-water" class="level3">
+<h3 class="anchored" data-anchor-id="case-study-1-experimental-scientist-classical-solution-reconstruction-under-restricted-salt-availability-deionized-water">Case study 1 — Experimental scientist: classical solution reconstruction under restricted salt availability (deionized water)</h3>
+<section id="achieved-composition" class="level4">
+<h4 class="anchored" data-anchor-id="achieved-composition">Achieved composition</h4>
+</section>
+<section id="deviations-from-target" class="level4">
+<h4 class="anchored" data-anchor-id="deviations-from-target">Deviations from target</h4>
+</section>
+<section id="ph-and-ec" class="level4">
+<h4 class="anchored" data-anchor-id="ph-and-ec">pH and EC</h4>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+<section id="case-study-2-horticultural-technician-tomato-nutrient-formulation-using-berlin-dahlem-water-with-acid-adjustment" class="level3">
+<h3 class="anchored" data-anchor-id="case-study-2-horticultural-technician-tomato-nutrient-formulation-using-berlin-dahlem-water-with-acid-adjustment">Case study 2 — Horticultural technician: tomato nutrient formulation using Berlin-Dahlem water with acid adjustment</h3>
+<section id="achieved-composition-1" class="level4">
+<h4 class="anchored" data-anchor-id="achieved-composition-1">Achieved composition</h4>
+<p>For a nutrient solution formulated for tomatoes cultivated in rockwool <span class="citation" data-cites="Sonneveld.1994">(<a href="#ref-Sonneveld.1994" role="doc-biblioref">Sonneveld &amp; Straver, 1994</a>)</span> and prepared with tap water from postal code 14195 <span class="citation" data-cites="BWB.2026">(<a href="#ref-BWB.2026" role="doc-biblioref">BWB, 2026</a>)</span>, the two-stage solver with nitric acid addition was used. The calculated fertilizer salts are shown in <a href="#fig-tomato-salt-composition" class="quarto-xref">Figure&nbsp;3</a>, including the amounts required for the preparation of 500 L nutrient solution and the corresponding amounts for 18 L of a 50-fold concentrated stock solution separated into A-BAK, B-BAK and micronutrients.</p>
+<div id="fig-tomato-salt-composition" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-tomato-salt-composition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Thesis_screenshots/tomato2final.png" class="img-fluid figure-img" style="width:15cm">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tomato-salt-composition-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Screenshot of the fertilizer salt composition calculated in the NutriCalc Shiny app for a tomato nutrient solution in rockwool using tap water from Berlin postal code 14195. The formulation is shown separately for A-BAK, B-BAK, and micronutrients stock solutions. Fertilizer requirements are reported for the preparation of 500 L nutrient solution and the amounts for 18 L of a 50-fold concentrated stock solution.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="deviations-from-target-1" class="level4">
+<h4 class="anchored" data-anchor-id="deviations-from-target-1">Deviations from target</h4>
+<p>The tomato recipe specifies a target composition without Na, Cl, or Si. In the calculated solution, these elements were present due to their contribution from the tap water. Although the target composition was matched with an SSRE of 0, absolute deviations remained for Na, Cl, and Si, resulting in an SSE of 7.69. The absolute errors were 2.03 mmol L⁻¹ for Na, 1.86 mmol L⁻¹ for Cl, and 0.30 mmol L⁻¹ for Si. Of the Na concentration, 0.015 mmol L⁻¹ originated from Fe-EDTA.</p>
+</section>
+<section id="ph-and-ec-1" class="level4">
+<h4 class="anchored" data-anchor-id="ph-and-ec-1">pH and EC</h4>
+<p>The tap water from postal code 14195 had a calculated pH of 7.44 and an EC of 0.86 mS cm⁻¹. Besides the ions considered in the target nutrient composition, it supplied 2.02 mmol L⁻¹ Na⁺ and 1.86 mmol L⁻¹ Cl⁻, contributing 0.09 and 0.13 mS cm⁻¹, respectively, to the total EC. The electroneutral 0.3 mmol L⁻¹ Si present in the tap water did not contribute to the overall EC.</p>
+<p>The calculated final nutrient solution had a pH of 5.82. Ionic strength amounted to 34.84 mmol L⁻¹, while the total concentration of charge equivalents was 24.61 meq L⁻¹. The calculated EC was 2.81 mS cm⁻¹, and the osmotic potential was −101.02 kPa. In the final solution, the largest ionic contribution to EC was from NO₃⁻ at 0.89 mS cm⁻¹, followed by K⁺ at 0.58 mS cm⁻¹ and SO₄²⁻ at 0.45 mS cm⁻¹</p>
+</section>
+</section>
+<section id="case-study-3-research-scientist-nutrient-formulation-for-a-novel-halophyte-salicornia-using-mixed-water-sources" class="level3">
+<h3 class="anchored" data-anchor-id="case-study-3-research-scientist-nutrient-formulation-for-a-novel-halophyte-salicornia-using-mixed-water-sources">Case study 3 — Research scientist: nutrient formulation for a novel halophyte (Salicornia) using mixed water sources</h3>
+<section id="achieved-composition-2" class="level4">
+<h4 class="anchored" data-anchor-id="achieved-composition-2">Achieved composition</h4>
+</section>
+<section id="deviations-from-target-2" class="level4">
+<h4 class="anchored" data-anchor-id="deviations-from-target-2">Deviations from target</h4>
+</section>
+<section id="ph-and-ec-2" class="level4">
+<h4 class="anchored" data-anchor-id="ph-and-ec-2">pH and EC</h4>
+</section>
+</section>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<section id="robustness-of-the-nnls-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="robustness-of-the-nnls-algorithm">Robustness of the NNLS algorithm</h2>
+<p>The NNLS algorithm used in NutriCalc is robust for solving nutrient formulation problems, as it effectively handles the constraints of non-negativity and can accommodate a wide range of target nutrient profiles.</p>
+<p>It is important to understand the implications that the optimization problem can be under- or overdeterminated. An overdeterminated problem is a perfectly balanced target in the meq space where the solver can find a solution that matches the target exactly only using salts. Overall if the SSR and SSRE are both zero, the solver has found a solution that matches the target perfectly in abolute and relative terms for all targets. But this does not mean that this is the only solution or that the solution is unique. In fact, there may be multiple solutions that achieve the same target profile, especially if the target is overdetermined. The solver will return one of these solutions, but there may be others that also match the target perfectly.</p>
+<p>In contrast, an underdetermined problem is one where the target profile is not electroneutral and thus not perfectly balanced in the meq space. Therefore the solver cannot find a solution that matches the target exactly, because every salt is inert and electroneutral. In this case, the solver will try to find a solution that minimizes the deviation from the target, but it will not be able to match all nutrients perfectly.</p>
+<p>unweighted vs weighted</p>
+<p>As weighting is optional, the solver can also be used in an unweighted manner, where, due to the normalization, all nutrients are treated equally in the optimization process. If a target is overdetermined, the solver will try to match every nutrient in relative terms, matching all targets as closely as possible and minimizing the SSRE for non-zero targets and the SSE for zero targets. The ability to weight certain nutrients allows prioritization of some nutrients over others, which can be useful when some nutrients are more critical for plant growth or when certain deviations are more tolerable. In mathematical terms, this corresponds to a weighted non-negative least-squares problem, in which deviations in highly weighted nutrients contribute more strongly (logarithm) to the objective function than deviations in nutrients with lower weights. Lowering the weight of one nutrient shifts more of the residual error to that nutrient and permits the achieved concentration to fall below its target. This allows the solver to find a solution matching the remaining nutrients more closely. Thus, one specific nutrient can be sacrificed to achieve a better overall match for the other nutrients. This can be particularly useful when the target profile is difficult to achieve with the available salts. By using the second solver and allowing bases and acids, it may be possible to compensate for the sacrificed nutrient by acid or base addition.</p>
+</section>
+<section id="interpretation-of-accuracy-and-deviations" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-of-accuracy-and-deviations">Interpretation of accuracy and deviations</h2>
+<p>Reported errors quantify the deviation between target and achieved nutrient concentrations. For each nutrient, the formulation output reports the absolute error and when the target is non-zero the relative error. Two aggregate metrics are derived: the sum of squared errors (SSE) and the sum of squared relative errors (SSRE). The per-nutrient errors indicate which nutrients deviate from the target, by how much and in which direction (under- or oversupply). The squared-error metrics summarize overall solution quality.</p>
+<p>The optimization itself is based on a row-normalized non-negative least squares (NNLS) formulation. Residuals are scaled by a nutrient-specific factor: for nutrients with non-zero targets, deviations are normalized by the corresponding target concentration. For nutrients with zero targets, a scaling factor of one is applied. As a result, all nutrients including those with targets set to zero, are actively included in the objective function. Any non-zero achieved concentration for a zero-target nutrient contributes a quadratic penalty and is therefore discouraged during optimization.</p>
+<p>SSE reflects the total squared deviation across all nutrients and therefore captures leakage into zero-target nutrients. SSRE, in contrast, summarizes squared relative deviations only for nutrients with non-zero targets and serves as the primary performance indicator for how closely specified targets were matched. However, both SSE and SSRE are post hoc reporting metrics. The solver’s decision is determined by the normalized and weighted NNLS objective. Consequently, a formulation with slightly lower relative deviation for non-zero targets may still be rejected if it introduces substantial unintended supply of zero-target nutrients, because this increases the overall objective value.</p>
+<p>Without normalization, an objective based solely on squared absolute errors would bias the optimization toward macronutrients, since deviations in the µmol L⁻¹ range would be numerically negligible compared with deviations in the mmol L⁻¹ range. Row-wise normalization ensures that proportional deviations are penalized on a comparable scale, preventing magnitude-driven bias and enabling balanced optimization for both macro- and micronutrients.</p>
+<p>For target inputs that satisfy electroneutrality, the solver will report an exact match between target and achieved concentration. If the target inputs satisfy electroneutrality, but the solver still returns a non-zero residual, the mismatch is attributable to the salt matrix rather than charge imbalance. In practice, this indicates that the specified targets are not representable with the implemented set of salts.</p>
+<section id="evaluation-of-errors-for-crop-set" class="level3">
+<h3 class="anchored" data-anchor-id="evaluation-of-errors-for-crop-set">Evaluation of errors for crop set</h3>
+<p>Salts used for the solver where selected based its solubility and reported usage in hydroponics. As there are salts that are not-water soluble, but used in soil based systems those where not introduced in the list of salts.</p>
+<p>The reported small SSE for the crop set of <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> is caused because in the salt matrix chelates are used for Fe. As the solver is stochimetrically sound the formula e.g.&nbsp;Fe-EDTA will provide one Na ion for every Fe ion. While in early hydroponic experiments other Fe salts like FeCl Fe sulfate citrate where used <span class="citation" data-cites="Hewitt.1966">(<a href="#ref-Hewitt.1966" role="doc-biblioref">Hewitt, 1966</a>)</span> today iron is commonly supplied with organic chelates, because thoaw arorganic salts ten dto build complexes and are not plant avaliable after some time. For this reason those salts where not included in the salt matrix.</p>
+<p>If the target input for Na equals Fe, then the SSE drops to 0. The recipe set of <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> follows electroneutrality. Only for recipes containing Si (commonly 0.75 mmol L⁻¹) it gets a bit complicate. If Si is removed, or if the counter ion of the salt used in the matrix (K₂SiO₃) is added in equivalent amounts (1.5 mmol K L⁻¹), SSRE drops to 0. So without Si the recipe is balanced, but this does not mean that by adding Si without accounting for K the recipe is out of balance. In nu</p>
+<p>Although Si is unusually high for a non-essential but beneficial element <span class="citation" data-cites="Rengel.2023">(<a href="#ref-Rengel.2023" role="doc-biblioref">Rengel et al., 2023</a>)</span> , <span class="citation" data-cites="Voogt.2001">Voogt &amp; Sonneveld (<a href="#ref-Voogt.2001" role="doc-biblioref">2001</a>)</span> reported that adding 0.75 mmol L⁻¹ Si was beneficial for certain crops, increasing yield and reducing powdery mildew.</p>
+<p>These recipes likely account for the alkaline nature of K₂SiO₃. A practical complication of potassium silicate is its strong basicity (effectively a mixture of KOH and silicic acid in a 2:1 ratio), which requires stoichiometric acid addition for neutralization. In the referenced formulation, this was addressed by adding HNO₃ while reducing KNO₃ by an equivalent amount to offset the additional K introduced with the silicate <span class="citation" data-cites="Voogt.2001">Voogt &amp; Sonneveld (<a href="#ref-Voogt.2001" role="doc-biblioref">2001</a>)</span> .</p>
+<p>To implement this kind of solution it is necessary to allow users to solve with acids and base which is described in the next section.</p>
+</section>
+</section>
+<section id="strengths-of-the-two-stage-solver" class="level2">
+<h2 class="anchored" data-anchor-id="strengths-of-the-two-stage-solver">Strengths of the two-stage solver</h2>
+<p>It was possible to achieve an exact match between target and achieved nutrient concentrations for the crop set of <span class="citation" data-cites="Sonneveld.1994">Sonneveld &amp; Straver (<a href="#ref-Sonneveld.1994" role="doc-biblioref">1994</a>)</span> mostly using the one-stage solver without requiring acid addition. This demonstrates that the implemented salt matrix is sufficiently comprehensive to represent the target nutrient profiles for this crop set. The two-stage solver provides an alternative two the only salt approach, when an exact solution is not achievable with the one-stage solver alone, by allowing for acid/base adjustments in a second optimization step. This flexibility enhances the robustness of the framework, enabling it to find optimal solutions. Alowwing acids and bases also for the first stage of the optimization would be possible, but could potentially lead to an overuse of acids and bases, if not penalized over salt usage.</p>
+<p>it would make the NNLS algohorithm The two stage approach allows to first find a solution with the salts and then adjust the pH with acids and bases if necessary.</p>
+<p>Discusses algorithmic robustness, interpretability, and practical advantages.</p>
+</section>
+<section id="limitations-of-chemical-simplifications" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-of-chemical-simplifications">Limitations of chemical simplifications</h2>
+<p>Discusses limitations arising from simplified chemistry (e.g., speciation, activity effects).</p>
+<p>The chemical Activity of dissolved Species are also influenced by the</p>
+</section>
+<section id="the-principle-of-electroneutrality" class="level2">
+<h2 class="anchored" data-anchor-id="the-principle-of-electroneutrality">The principle of electroneutrality</h2>
+<p>Electroneutrality is one the most fundamental principle in nutrient solution formulation. In any aqueous electrolyte solution, the sum of positive charges must equal the sum of negative charges. Thus, the total charge contributed by cations is balanced by the total charge contributed by anions <span class="citation" data-cites="Kalka.2024">(<a href="#ref-Kalka.2024" role="doc-biblioref">Kalka, 2024</a>)</span>. While many dissolved compounds dissociate into well-defined cations and anions and therefore contribute predictably to charge balance, some nutrients exist in different ionic species depending on pH. At the same time, pH should not be understood merely as a measure of hydrogen ion concentration, but more accurately as a measure of hydrogen ion activity. From this perspective, pH can be interpreted as a dependent variable constrained by the electroneutrality condition in aqueous solution. Accordingly, the activities of H₃O⁺ and OH⁻ adjust in conjunction with pH-dependent speciation systems such as phosphate, sulphate and carbonate to maintain charge balance, rather than being determined solely by the stoichiometric addition and neutralization of acid and base.</p>
+<p>Electroneutrality ultimately determines whether a target nutrient composition is physically realizable. In the optimization procedure, non-negativity of salt addition was implemented explicitly as a mathematical constraint, whereas electroneutrality was not imposed as an additional constraint. This is because fertilizer salts contribute ions in stoichiometrically balanced combinations. Acid or base addition changes pH and ionic speciation without violating the overall charge balance of the solution. Consequently, if a target nutrient profile is itself not electroneutral, no exact solution exists and the solver can only minimize the deviation from the specified targets.</p>
+</section>
+<section id="the-mass-balance-approach-in-nutrient-solution-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="the-mass-balance-approach-in-nutrient-solution-formulation">The mass balance approach in nutrient solution formulation</h2>
+<p>“Judging from their publications and statements, it would seem that many investigators have grown crops in a solution chosen largely at random, and that, where the results have been successful, they have recommended that solution as being specific for the particular crop concerned.” <span class="citation" data-cites="Steiner.1954">(<a href="#ref-Steiner.1954" role="doc-biblioref"><strong>Steiner.1954?</strong></a>)</span></p>
+<p>Optimal nutrient solutions can be formulated using the principle of mass balance <span class="citation" data-cites="Langenfeld.2022">(<a href="#ref-Langenfeld.2022" role="doc-biblioref">Langenfeld et al., 2022</a>)</span>. In contrast to empirically derived nutrient recipes, this approach seeks to relate nutrient supply directly to plant demand. Plant nutrient demand can be approximated from tissue nutrient composition in combination with plant water consumption, thereby linking absolute nutrient uptake to water uptake. On this basis, crop-specific target concentrations for the nutrient solution can be derived. Under ideal conditions, such a formulation would keep the residual or recirculating solution largely balanced over time, with only minimal accumulation or depletion of individual nutrients.</p>
+<p>In NutriCalc the th emass balance approach is implemented with an important nuance. I was combuned with th eprinciple of electronuetrality. Thus, the target nutrient profile</p>
+</section>
+<section id="comparison-to-existing-approaches" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-to-existing-approaches">Comparison to existing approaches</h2>
+<p>Compares the developed framework to existing tools and methods.</p>
+<p>BOH₃ and H₄SiO₄ matter for pH because they affect equilibria; they do not matter for EC because neutral species do not conduct and the remaining anions are excluded from the EC ion set.</p>
+</section>
+</section>
+<section id="conclusions-and-outlook" class="level1">
+<h1>Conclusions and Outlook</h1>
+<section id="scientific-contribution" class="level2">
+<h2 class="anchored" data-anchor-id="scientific-contribution">Scientific contribution</h2>
+<p>Summarizes methodological and conceptual contributions.</p>
+<p>Researchers will benefit from a tool for designing and analyzing nutrient experiments, while practitioners in horticulture will gain access to a user-friendly platform for formulating site- and crop-specific nutrient plans. The development of a Shiny-based interface will further enhance usability, making the tool accessible even to those without programming experience.</p>
+</section>
+<section id="practical-relevance-for-horticulture" class="level2">
+<h2 class="anchored" data-anchor-id="practical-relevance-for-horticulture">Practical relevance for horticulture</h2>
+<p>Highlights applicability for research and horticultural practice.</p>
+<p>In the long term, this framework may serve as a foundation for more comprehensive decision-support systems in horticulture. As such, the thesis offers both immediate practical value and a stepping stone for future innovations in sustainable d precision horticulture.</p>
+<p>The outcome of this thesis will be a modular, tensible R package that enables the accurate, reproducible, and chemically sound formulation of nutrient solutions for horticultural applications. By formalizing nutrient solution design as a constrained optimization problem and providing a transparent, open-source computational pipeline, this work will contribute to the intersection of digital horticulture, plant nutrition, and open-source software development.</p>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<p>Summarizes remaining constraints and assumptions.</p>
+<p>Out of scope for this thesis are precipitation modeling. These processes are more complex and beyond the linear framework considered here. They remain possible extensions for future work. Also some micronutrients co and ni. A good database of salts but users should be able to add salts and recipes</p>
+</section>
+<section id="future-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="future-extensions">Future extensions</h2>
+<p>Outlines potential extensions ichemistry, optimization, datasets, and user interface.</p>
+</section>
+</section>
+<section id="summary-possibly-in-german-and-english" class="level1">
+<h1>Summary (possibly in German and English)</h1>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Amelung.2018" class="csl-entry" role="listitem">
+Amelung, W., Blume, H.-P., Fleige, H., Horn, R., Kandeler, E., Kögel-Knabner, I., Kretzschmar, R., Stahr, K., Wilke, B.-M., Scheffer, F., &amp; Schachtschabel, P. (2018). <em>Scheffer/schachtschabel lehrbuch der bodenkunde</em> (17., <span>ü</span>berarbeitete und erg<span>ä</span>nzte Auflage). Berlin; Heidelberg: <span>Springer Spektrum</span>. <a href="https://doi.org/10.1007/978-3-662-55871-3">https://doi.org/10.1007/978-3-662-55871-3</a>
+</div>
+<div id="ref-Appelo.2005" class="csl-entry" role="listitem">
+Appelo, C. A. J. (2005). <em>Geochemistry, groundwater and pollution</em> (Second edition). Leiden: <span>A.A. Balkema Publishers</span>. <a href="https://doi.org/10.1201/9781439833544">https://doi.org/10.1201/9781439833544</a>
+</div>
+<div id="ref-Appelo.2010" class="csl-entry" role="listitem">
+Appelo, C. A. J. (2010). <em>SPECIFIC CONDUCTANCE: How to calculate, to use, and the pitfalls</em>. Retrieved from <a href="https://www.hydrochemistry.eu/exmpls/sc.html">https://www.hydrochemistry.eu/exmpls/sc.html</a>
+</div>
+<div id="ref-BIPM.2019" class="csl-entry" role="listitem">
+BIPM. (2019). <em>The international system of units (SI)</em>. <span>Bureau International des Poids et Mesures</span>. <a href="https://doi.org/10.59161/AUEZ1291">https://doi.org/10.59161/AUEZ1291</a>
+</div>
+<div id="ref-Bower.1955" class="csl-entry" role="listitem">
+Bower, V. E., &amp; Bates, R. G. (1955). pH values of the clark and lubs buffer solutions at 25 c. <em>Journal of Research of the National Bureau of Standards</em>, <em>55</em>, 197. Retrieved from <a href="https://api.semanticscholar.org/CorpusID:101259939">https://api.semanticscholar.org/CorpusID:101259939</a>
+</div>
+<div id="ref-BWB.2026" class="csl-entry" role="listitem">
+BWB. (2026). <em>Analysedaten nach postleitzahlen: Bitte geben sie ihre postleitzahl in das suchfenster ein, um die werte f<span>ü</span>r ihren wohnbezirk zu erhalten:</em> Retrieved from <a href="https://www.bwb.de/de/analysedaten-nach-postleitzahlen.php?PLZ=x">https://www.bwb.de/de/analysedaten-nach-postleitzahlen.php?PLZ=x</a>
+</div>
+<div id="ref-Chang.2025" class="csl-entry" role="listitem">
+Chang, W., Cheng, J., Allaire, J. J., Sievert, C., Schloerke, B., Xie, Y., Allen, J., McPherson, J., Dipert, A., &amp; Borges, B. (2025). <em>Shiny: Web application framework for r</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.shiny">https://doi.org/10.32614/CRAN.package.shiny</a>
+</div>
+<div id="ref-FernandezPinto.2022" class="csl-entry" role="listitem">
+Fernández Pinto, D. (2022). <em>HydroBuddy: An open source nutrient calculator for hydroponics and general agriculture</em>. Retrieved from <a href="https://github.com/danielfppps/hydrobuddy">https://github.com/danielfppps/hydrobuddy</a>
+</div>
+<div id="ref-Haynes.2017" class="csl-entry" role="listitem">
+Haynes, W. M. (Ed.). (2017). <em>CRC handbook of chemistry and physics</em> (97th edition). Boca Raton; London; New York: <span>CRC Press</span>.
+</div>
+<div id="ref-Hewitt.1966" class="csl-entry" role="listitem">
+Hewitt, E. J. (1966). <em>Sand and water culture methods used in the study of plant nutrition</em> (2. rev. edition). Farnham Royal: <span>Commonwealth Agricultural Bureaux</span>.
+</div>
+<div id="ref-Hoagland.1920" class="csl-entry" role="listitem">
+Hoagland, D. R. (1920). Optimum nutrient solutions for plants. <em>American Association for the Advancement of Science</em>. Retrieved from <a href="https://www.science.org/doi/10.1126/science.52.1354.562">https://www.science.org/doi/10.1126/science.52.1354.562</a>
+</div>
+<div id="ref-Hoagland.1950" class="csl-entry" role="listitem">
+Hoagland, D. R., &amp; Arnon, D. I. (1950). <em>The water-culture method for growing plants without soil</em>.
+</div>
+<div id="ref-Incrocci.2007" class="csl-entry" role="listitem">
+Incrocci, L. (2007). <em>Nutrient solution calculator: Retrieved from the internet archive (wayback machine)</em> (Dipartimento di Biologia delle Piante Agrarie, University of Pisa, Ed.). Retrieved from <a href="https://web.archive.org/web/20240813175407/https://www.wur.nl/en/research-results/projects-and-programmes/euphoros/calculation-tools/nutrient-solution-calculator.htm">https://web.archive.org/web/20240813175407/https://www.wur.nl/en/research-results/projects-and-programmes/euphoros/calculation-tools/nutrient-solution-calculator.htm</a>
+</div>
+<div id="ref-Incrocci.2020" class="csl-entry" role="listitem">
+Incrocci, L., M., Giménez Moolhuyzen, M., &amp; Guzmán Palomino, J. M. (2020). <em>Calculadora de soluciones nutritivas (SN)</em>. Retrieved from <a href="https://repositorio.ual.es/handle/10835/7670?show=full">https://repositorio.ual.es/handle/10835/7670?show=full</a>
+</div>
+<div id="ref-Jones.2014" class="csl-entry" role="listitem">
+Jones, J. B. (2014). <em>Complete guide for growing plants hydroponically</em>. Boca Raton: <span>CRC Press</span>.
+</div>
+<div id="ref-Kalka.2020" class="csl-entry" role="listitem">
+Kalka, H. (2020). <em>Electrical conductivity based on diffusion coefficients</em>. Retrieved from <a href="https://www.aqion.de/site/77">https://www.aqion.de/site/77</a>
+</div>
+<div id="ref-Kalka.2024" class="csl-entry" role="listitem">
+Kalka, H. (2024). <em>Charge-balance error (CBE)</em>. Retrieved from <a href="https://www.aqion.de/site/92">https://www.aqion.de/site/92</a>
+</div>
+<div id="ref-Knop.1860" class="csl-entry" role="listitem">
+Knop, W. (1860). Ueber die ern<span>ä</span>hrung der pflanzen durch w<span>ä</span>ssrige l<span>ö</span>sungen bei ausschlu<span>ß</span> des bodens. <em>Die Landwirthschaftlichen Versuchs-Stationen</em>, (2).
+</div>
+<div id="ref-Langenfeld.2022" class="csl-entry" role="listitem">
+Langenfeld, N. J., Pinto, D. F., Faust, J. E., Heins, R., &amp; Bugbee, B. (2022). Principles of nutrient and water management for indoor agriculture. <em>Sustainability</em>, <em>14</em>(16), 10204. <a href="https://doi.org/10.3390/su141610204">https://doi.org/10.3390/su141610204</a>
+</div>
+<div id="ref-Lawson.1974" class="csl-entry" role="listitem">
+Lawson, C. L., &amp; Hanson, R. J. (1974). <em>Solving least squares problems</em>. Englewood Cliffs, NJ: Prentice-Hall.
+</div>
+<div id="ref-Lawson.1995" class="csl-entry" role="listitem">
+Lawson, C. L., &amp; Hanson, R. J. (1995). <em>Solving least squares problems</em> ([10. Dr.]). Philadelphia: SIAM.
+</div>
+<div id="ref-McCleskey.2012" class="csl-entry" role="listitem">
+McCleskey, R. B., Nordstrom, D. K., &amp; Ryan, J. N. (2012). Comparison of electrical conductivity calculation methods for natural waters. <em>Limnology and Oceanography: Methods</em>, <em>10</em>(11), 952–967. <a href="https://doi.org/10.4319/lom.2012.10.952">https://doi.org/10.4319/lom.2012.10.952</a>
+</div>
+<div id="ref-Mullen.2024" class="csl-entry" role="listitem">
+Mullen, K. M., &amp; van Stokkum, I. H. M. (2024). <em>The lawson-hanson algorithm for non-negative least squares (NNLS): An r interface to the lawson-hanson implementation of an algorithm for non-negative least squares (NNLS). Also allows the combination of non-negative and non-positive constraints.</em> <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.nnls">https://doi.org/10.32614/CRAN.package.nnls</a>
+</div>
+<div id="ref-Pardossi.2011" class="csl-entry" role="listitem">
+Pardossi, Carmassi G., Diara C., I. L., Maggini R., &amp; Massa D. (2011). <em>Fertigation and substrate management in closed soilless culture</em>. <span>Dipartimento di Biologia delle Piante Agrarie, University of Pisa</span>.
+</div>
+<div id="ref-Positteam.2025" class="csl-entry" role="listitem">
+Posit team. (2025). <em>RStudio: Integrated development environment for r.</em> Posit Software, PBC. Retrieved from <a href="http://www.posit.co/">http://www.posit.co/</a>
+</div>
+<div id="ref-RCoreTeam.2025" class="csl-entry" role="listitem">
+R Core Team. (2025). <em>R: A language and environment for statistical computing</em>.
+</div>
+<div id="ref-Rengel.2023" class="csl-entry" role="listitem">
+Rengel, Z., Cakmak, I., White, P. J., Marschner, H., Prof. Dr. agr., Dres. h.c, Landwirtschaft, Agrarwissenschaftler, Zuckmantel, Stuttgart, Hohenheim, Marschner, P., 1929-1996, 30.10.1929-21.09.1996, &amp; University of Western Australia School of Agriculture. (2023). <em>Marschner’s mineral nutrition of plants</em> (4th ed.). London; San Diego, CA: <span>Academic Press, an imprint of Elsevier</span>.
+</div>
+<div id="ref-Resh.2013" class="csl-entry" role="listitem">
+Resh, H. M. (2013). <em>Hydroponic food production: A definitive guidebook for the advanced home gardener and the commercial hydroponic grower</em> (7th ed.). Boca Raton [u.a.]: <span>CRC Press</span>.
+</div>
+<div id="ref-Shive.1915" class="csl-entry" role="listitem">
+Shive, J. W. (1915). A three-salt nutrient solution for plants. <em>American Journal of Botany</em>, <em>2</em>(4), 157. <a href="https://doi.org/10.2307/2435048">https://doi.org/10.2307/2435048</a>
+</div>
+<div id="ref-Sievert.2025" class="csl-entry" role="listitem">
+Sievert, C., Cheng, J., Aden-Buie, G., Aguilar, J., &amp; Park, T. (2025). <em>Bslib: Custom ’bootstrap’ ’sass’ themes for ’shiny’ and ’rmarkdown’</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.bslib">https://doi.org/10.32614/CRAN.package.bslib</a>
+</div>
+<div id="ref-Smith.2025" class="csl-entry" role="listitem">
+Smith, M. R., &amp; Sanselme, L. (2025). <em>Ternary: Create ternary and holdridge plots</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.Ternary">https://doi.org/10.32614/CRAN.package.Ternary</a>
+</div>
+<div id="ref-Sonneveld.2009" class="csl-entry" role="listitem">
+Sonneveld, C. (2009). <em>Plant nutrition of greenhouse crops</em> (1st ed.). Dordrecht: Springer.
+</div>
+<div id="ref-Sonneveld.1994" class="csl-entry" role="listitem">
+Sonneveld, C., &amp; Straver, N. (1994). <em>Nutrient solutions for vegetables and flowers grown in water or substrates</em>. Retrieved from <a href="https://edepot.wur.nl/237302">https://edepot.wur.nl/237302</a>
+</div>
+<div id="ref-Sonneveld.1999" class="csl-entry" role="listitem">
+Sonneveld, C., Voogt, W., &amp; Spaans, L. (1999). A universal algorithm for calculation of nutrient solutions. <em>Acta Horticulturae</em>, (481), 331–340. <a href="https://doi.org/10.17660/actahortic.1999.481.38">https://doi.org/10.17660/actahortic.1999.481.38</a>
+</div>
+<div id="ref-vanderLugt.2020" class="csl-entry" role="listitem">
+van der Lugt, G., Holwerda, H. T., Hora, K., Bugter, M., Hardeman, J., &amp; Vries, P. de. (2020). <em>Nutrient solutions for greenhouse crops: Made available by: Eurofins agro, geerten, van der lugt, nouryon, SQM, yara</em> (4th ed.).
+</div>
+<div id="ref-Voogt.2001" class="csl-entry" role="listitem">
+Voogt, W., &amp; Sonneveld, C. (2001). Silicon in horticultural crops grown in soilless culture. In L. E. Datnoff, G. H. Snyder, &amp; G. H. Korndörfer (Eds.), <em>Silicon in agriculture</em> (pp. 115–131). Elsevier. <a href="https://doi.org/10.1016/S0928-3420(01)80010-0">https://doi.org/10.1016/S0928-3420(01)80010-0</a>
+</div>
+<div id="ref-Wickham.2025" class="csl-entry" role="listitem">
+Wickham, H. (2025). <em>Stringr: Simple, consistent wrappers for common string operations</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.stringr">https://doi.org/10.32614/CRAN.package.stringr</a>
+</div>
+<div id="ref-Wickham.2025b" class="csl-entry" role="listitem">
+Wickham, H., Hester, J., Chang, W., &amp; Bryan, J. (2025). <em>Devtools: Tools to make developing r packages easier</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.devtools">https://doi.org/10.32614/CRAN.package.devtools</a>
+</div>
+<div id="ref-Wickham.2026" class="csl-entry" role="listitem">
+Wickham, H., Hester, J., &amp; Ooms, J. (2026). <em>xml2: Parse XML</em>. <span>Comprehensive R Archive Network (CRAN)</span>. <a href="https://doi.org/10.32614/CRAN.package.xml2">https://doi.org/10.32614/CRAN.package.xml2</a>
+</div>
+</div>
+</section>
+<section id="appendix" class="level1 unnumbered">
+<h1 class="unnumbered">Appendix</h1>
+</section>
+<section id="declaration-of-indepedence" class="level1 unnumbered">
+<h1 class="unnumbered">Declaration of Indepedence</h1>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
