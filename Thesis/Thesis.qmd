@@ -503,7 +503,7 @@ From a plant nutrition perspective, comparisons between nutrient solutions of di
 
 ## Stoichiometry and salt–ion relationships
 
-In hydroponics, nutrients are supplied by dissolving fertilizer salts in water to prepare a nutrient solution \[\@Resh.2013\]. The formulation of such solutions is complicated by the declaration conventions used for commercial fertilizers. Nutrient contents are commonly expressed in oxide form rather than as elemental concentrations or ionic species. Thus, potassium is typically declared as K₂O rather than as K or ionic K⁺, while phosphorus is conventionally declared as P₂O₅ rather than as P or as the pH-dependent phosphate species H₂PO₄⁻, HPO₄²⁻, or PO₄³⁻. Although these conventions are historically established, they introduce an unnecessary level of abstraction and increase the susceptibility of nutrient calculations to error.
+In hydroponics, nutrients are supplied by dissolving fertilizer salts in water to prepare a nutrient solution [@Resh.2013]. The formulation of such solutions is complicated by the declaration conventions used for commercial fertilizers. Nutrient contents are commonly expressed in oxide form rather than as elemental concentrations or ionic species. Thus, potassium is typically declared as K₂O rather than as K or ionic K⁺, while phosphorus is conventionally declared as P₂O₅ rather than as P or as the pH-dependent phosphate species H₂PO₄⁻, HPO₄²⁻, or PO₄³⁻. Although these conventions are historically established, they introduce an unnecessary level of abstraction and increase the susceptibility of nutrient calculations to error.
 
 A more serious limitation is that fertilizer labels do not necessarily disclose all contained elements. As a result, attempts to recalculate complete fertilizer compositions in ionic form often fail to account for 100 % of the product mass. One reason is that elements such as chloride may be present without mandatory declaration. Under Regulation (EC) No 2003/2003, only specific nutrient categories are subject to declaration requirements, namely the primary nutrients nitrogen, phosphorus, and potassium; the secondary nutrients calcium, magnesium, sodium, and sulfur; and the micronutrients boron, cobalt, copper, iron, manganese, molybdenum, and zinc. In addition, secondary nutrients must only be declared above specified threshold concentrations. For sodium, for example, declaration is required only above 3 % Na₂O or 2.2 % Na.
 
@@ -547,11 +547,7 @@ Code development was supported by AI-assisted LLM for debugging and optimization
 
 ### Built-in recipe datasets
 
-*Describes the origin and selection of reference nutrient solution recipes, including normalization, unit harmonization, and consistency checks.*
-
-In his work @Hewitt.1966 collected a majority of the formulation used in the first half of the 20 Century.
-
-In this work a set of horticultural recipes form @Sonneveld.1994 where selected. Those xx recipes where divided into the three categories and "Olericulture", "Floriculture" and "Fruticulture". @Sonneveld.1994 divided the recipes in three Categories "A", "B" an "C", to reflect the of practical and experimental fitness of the reported formulation for the crop. in @tbl-crop-recipes-long-landscape_units the respective formulations are shown.
+@Hewitt.1966 compiled a large proportion of the nutrient-solution formulations used during the first half of the twentieth century. For the present work, selected standard recipes from this compilation were considered, particularly those that remain relevant in contemporary research and horticultural practice. In addition, 38 crop-specific horticultural recipes from @Sonneveld.1994 were included. These recipes were assigned to the three groups `Olericulture`, `Floriculture`, and `Fruticulture`. In the original source, @Sonneveld.1994 also classified the formulations into the categories `A`, `B`, and `C`, reflecting their practical and experimental suitability for the respective crop. The resulting set of formulations is shown in @tbl-crop-recipes-long-landscape_units.
 
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_units
@@ -1910,10 +1906,6 @@ print(tbl)
 cat("\\renewcommand{\\arraystretch}{1}\n")
 ```
 
-test row
-
-lala
-
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_ph_ec_models
 #| echo: false
@@ -2477,7 +2469,7 @@ ggplot(plot_df, aes(x = x_mL, y = pH, linetype = model)) +
 
 #### Performance of EC Calculation
 
-To evaluate EC calculation performance, models were compared against reference calibration EC values for KCl solutions at 25 °C. Electrical conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from \@Haynes.2017, which reports values based on primary conductivity standards originally published by \@Pratt.2001. In \@tbl-kcl-ec-comparison , reference values are compared with NutriCalc EC predictions using both γ activity-correction models (Davies and Debye–Hückel). For comparison, the empirical approach by \@Sonneveld.1999 and geochemical computations with PHREEQC (\@Parkhurst.2013) are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by \@Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.
+To evaluate EC calculation performance, models were compared against reference calibration EC values for KCl solutions at 25 °C. Electrical conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from @Haynes.2017, which reports values based on primary conductivity standards originally published by @Pratt.2001. In @tbl-kcl-ec-comparison , reference values are compared with NutriCalc EC predictions using both γ activity-correction models (Davies and Debye–Hückel). For comparison, the empirical approach by @Sonneveld.1999 and geochemical computations with PHREEQC [@Parkhurst.2013] are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by @Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.
 
 ```{r}
 #| label: tbl-kcl-ec-comparison
