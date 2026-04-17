@@ -123,37 +123,49 @@ note: For MgSO4 Heptahydrate is selected here
   ),
 
   hoagland_1933 = list(
-    name  = "Hoagland and Snyder (1933)",
+    name  = "Hoagland and Snyder (1933) I",
     category = "Standard Formulations",
-    notes = "Historic formulation Hoagland and Snyder (1933)",
+    notes = "Historic formulation Hoagland and Snyder (1933), Hoagland and Arnon (1938)",
     unit  = "mg/L",
     salts =  TRUE,
     targets = c(
       NO3_N=210, NH4_N=0, P=31, K=234, Ca=200, Mg=48, S=64,
-      Na=0, Cl=0.14, Fe=1, Mn=0.11, Zn=0.023, B=0.11, Cu=0.014, Mo=0.018, Si=0
+      Na=0, Cl=0.14, Fe=1, Mn=0.1, Zn=0.01, B=0.1, Cu=0.014, Mo=0.016, Si=0
     )
   ),
   hoagland_1938 = list(
-    name  = "Hoagland and Arnon (1938)",
+    name  = "Hoagland and Arnon (1938) II",
     category = "Standard Formulations",
-    notes = "Historic formulation Hoagland and Snyder (1933)",
+    notes = "Historic formulation Hoagland and Arnon (1938), Arnon (1938)",
     unit  = "mg/L",
     salts =  TRUE,
     targets = c(
-      NO3_N=210, NH4_N=0, P=31, K=234, Ca=200, Mg=48, S=64,
-      Na=0, Cl=0.14, Fe=1, Mn=0.50, Zn=0.05, B=0.50, Cu=0.02, Mo=0.048, Si=0
+      NO3_N=196, NH4_N=14, P=31, K=234, Ca=160, Mg=48, S=64,
+      Na=0, Cl=0.14, Fe=0.6*3, Mn=0.50, Zn=0.05, B=0.50, Cu=0.02, Mo=0.048, Si=0
+    )
+  ),
+
+  arnon_1938 = list(
+    name  = "Arnon and Hoagland (1940)",
+    category = "Standard Formulations",
+    notes = "Historic formulation Hoagland and Arnon (1940)",
+    unit  = "mg/L",
+    salts =  TRUE,
+    targets = c(
+      NO3_N=224, NH4_N=28, P=62, K=390, Ca=120, Mg=48, S=64,
+      Na=0, Cl=0.14, Fe=0.6*2, Mn=0.50, Zn=0.05, B=0.50, Cu=0.02, Mo=0.01, Si=0
     )
   ),
 
  Hewitt_1952 = list(
     name  = "Hewitt (1952)",
     category = "Standard Formulations",
-    notes = "Historic formulation Hoagland and Snyder (1933)",
+    notes = "Historic formulation Hewitt (1952) Long Ashton solution",
     unit  = "mg/L",
     salts =  TRUE,
     targets = c(
       NO3_N=168, NH4_N=0, P=41, K=156, Ca=160, Mg=36, S=48,
-      Na=31, Cl=0.14, Fe=2.8, Mn=0.55, Zn=0.065, B=0.54, Cu=0.064, Mo=0.048, Si=0
+      Na=31, Cl=0.14, Fe=2.8, Mn=0.55, Zn=0.065, B=0.5, Cu=0.064, Mo=0.055, Si=0
     )
   ),
 
