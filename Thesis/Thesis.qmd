@@ -523,13 +523,14 @@ At present, no dedicated open-source R library is available for transparent, mod
 
 # Material and Methods
 
-The development of the computational framework followed a structured development and validation pipeline. The R package was developed using the devtools package [@Wickham.2025].The first step involved designing the underlying data structures. A nutrient matrix was established in which the rows represented nutrients (such as N, P, K, and Ca) and the columns represented fertilizer salts. For readability, the input matrix was stored in transposed form and converted into the required orientation for calculation. Each fertilizer was parsed on the basis of its molecular formula into its elemental components using a database of molar masses and established stoichiometric rules.
+The development of the computational framework followed a structured development and validation pipeline. The R package was developed using the devtools package [@Wickham.2025]. The first step involved designing the underlying data structures. A compound-by-nutrient matrix was established in which rows represented fertilizer compounds (salts) and columns represented nutrients such as N, P, K, and Ca. For solving, this matrix was transposed internally so that nutrient equations formed the rows used by the NNLS routine. Each fertilizer was parsed on the basis of its molecular formula into its elemental components using a database of molar masses and established stoichiometric rules.
 
 Building on this foundation, an R package was developed. The package includes core functions for parsing chemical formulas and computing molar masses, as well as for converting between different chemical representations such as oxides and elemental forms (e.g., P₂O₅ to P or SO₄ to S). It also includes tools for transforming concentration units (e.g., from mmol L⁻¹ to mg L⁻¹) using accurate molar-mass calculations. In addition, bidirectional transformations between compound-based and elemental quantities were integrated on the basis of stoichiometric relationships.
 
 The central component of the package was the implementation of the nutrient-solution formulation algorithm. This algorithm used nnls::nnls() to solve the system of equations under non-negativity constraints and to quantify deviations between the target and calculated solution in terms of absolute and relative error. The framework also allows users to assign weights to individual nutrients, thereby enabling the exploration of different formulation priorities and trade-offs.
 
 The framework was validated through a series of use cases. These included reproducing historical and crop-specific nutrient solutions, comparing the computed results with values reported in the literature, and compiling crop- and author-specific nutrient solutions into a base library. The distribution of anions and cations across different solutions was visualized, for example, by ternary plots for cations (K⁺, Ca²⁺, Mg²⁺) and anions (NO₃⁻, SO₄²⁻, PO₄³⁻), in order to classify nutrient combinations systematically, as proposed by @Steiner.1961.
+
 ## Software Environment and Data Sources
 
 ### R version, packages
@@ -669,7 +670,7 @@ cat("\\renewcommand{\\arraystretch}{1}\n")
 
 After the 2019 revision of the International System of Units, the base units are defined by fixed numerical values of fundamental constants [@BIPM.2019]. The mole is the SI unit for the amount of a substance; its symbol is mol. The defining constant is the Avogadro constant, N~A~ Thus:
 
-\begin{equation} 1\,\mathrm{mol} = \frac{6.02214076 \times 10^{23}}{N_\mathrm{A}} \end{equation}
+\begin{equation} 1\,\mathrm{mol} = 6.02214076 \times 10^{23}\,\text{elementary entities} \end{equation}
 
 An elementary entity may be an atom, a molecule, or any other particle. In this work, the elementary entities are ions as listed in Table \ref{tab:element-molar-mass}. The molar masses are taken from the CRC Handbook of Chemistry and Physics [@Haynes.2017] and rounded to three decimal places. Not all elements reported are essential in plant nutrition. The list include also non-essential or even toxic elements, but elements that part of the plant ionome and potentially present in fertilizers or water even though not all elements reported here where integrated later.
 
@@ -859,14 +860,19 @@ cat(paste0(
 
 ### Formula parsing and molar mass calculation
 
-Describes rules and algorithms for parsing chemical formulas and calculating molar masses, including validation and error handling.
+Molecular formulas were treated as the primary formal representation of fertilizer compounds within the framework. Parsing therefore began by tokenizing each formula into element symbols, integer multipliers, bracketed groups, and optional hydrate components, for example the `·4H2O` term in hydrated salts. After structural validation, grouped expressions were expanded to absolute atom counts for each element. Molar mass was then calculated as the weighted sum of elemental contributions, such that for each element $i$, the stoichiometric coefficient $n_i$ was multiplied by its tabulated atomic molar mass $M_i$, giving:
+
+$$
+M = \sum_i n_i M_i
+$$
+
+This step is fundamental to the framework, because all downstream stoichiometric conversions between compound amounts and nutrient-element amounts depend directly on the resolved elemental composition and the corresponding molar masses. For example, the molar mass of calcium nitrate tetrahydrate was computed as follows:
 
 ```{r}
+#| echo: true
 library(nutricalc)
 compute_molar_mass("Ca(NO3)2·4H2O")
 ```
-
-\newpage
 
 ### Stoichiometric conversions
 
@@ -1409,15 +1415,15 @@ To evaluate the overall goodness of fit across all nutrients, deviations are add
 
 #### pH & EC
 
-The `pH & EC` tab summarizes the calculated pH and EC values based on the `Final` composition. Calculations are performed for `25\,^\circ\mathrm{C}` using Davies activity correction, while complex formation is not considered. On the left side of the tab, the calculated `pH`, ionic strength (`mmol\,L^{-1}`), and total charge equivalents (`meq\,L^{-1}`) are reported. By selecting `Show pH charge breakdown`, an expanded view of the pH charge balance can be displayed, showing the contributions of fixed cations, fixed anions, and variable components in `meq\,L^{-1}`.
+The `pH & EC` tab summarizes the calculated pH and EC values based on the `Final` composition. Calculations are performed for 25 °C using Davies activity correction, while complex formation is not considered. On the left side of the tab, the calculated `pH`, ionic strength mmol L⁻¹, and total charge equivalents meq L⁻¹ are reported. By selecting `Show pH charge breakdown`, an expanded view of the pH charge balance can be displayed, showing the contributions of fixed cations, fixed anions, and variable components in meq L⁻¹.
 
-On the right side of the tab, EC is reported in both `mS\,cm^{-1}` and `\mu S\,cm^{-1}`. From the calculated EC, osmotic potential is additionally derived and reported in `kPa`. By selecting `Show EC contributions`, the individual ionic contributions to the calculated EC can be displayed. For each ion, the table reports the concentration `c` (`mM`), charge number `z`, and the contribution to conductivity `\kappa` (`mS\,cm^{-1}`).
+On the right side of the tab, EC is reported in both mS cm⁻¹ and µS cm⁻¹. From the calculated EC, osmotic potential is additionally derived and reported in `kPa`. By selecting `Show EC contributions`, the individual ionic contributions to the calculated EC can be displayed. For each ion, the table reports the concentration `c` (`mM`), charge number `z`, and the contribution to conductivity mS cm⁻¹.
 
 Above the `pH` and `EC` output sections, an `Adjust concentration` slider is provided with a range from `-100%` to `+100%`. This control scales the concentration of the reported `Final` composition and thereby allows interactive assessment of the resulting changes in pH, EC, and related derived parameters.
 
 #### Solution
 
-The `Solution` tab reports the compounds used to obtain the `Achieved` composition. For each salt, acid, or base, the table reports the applied amount in $\mathrm{mmol\,L^{-1}}$, the calculated molar mass in $\mathrm{g\,mol^{-1}}$, and the corresponding concentration in $\mathrm{mg\,L^{-1}}$.
+The `Solution` tab reports the compounds used to obtain the `Achieved` composition. For each salt, acid, or base, the table reports the applied amount in mmol L⁻¹, the calculated molar mass in g mol⁻¹, and the corresponding concentration in mg L⁻¹.
 
 Above the `Fertilizer amounts` table, input fields are provided for working volume, stock factor, and stock volume. Based on these inputs, additional columns are computed for the required amount for the selected working-solution volume (`x L`) and, when valid stock parameters are provided, for the selected stock preparation (`y L` of `z`-fold stock).
 
@@ -1425,7 +1431,7 @@ Compounds are grouped according to the BAK assignment logic into `A-BAK`, `B-BAK
 
 #### Anions and Cations
 
-The `Anions` and `Cations` tabs report the relative proportions of selected anionic or cationic nutrient components on a $\mathrm{mmol\,L^{-1}}$ basis using ternary diagrams. In the `Anions` tab, the default components are `NO3-N`, `P`, and `S`, whereas in the `Cations` tab the default components are `K`, `Ca`, and `Mg`. Alternative ions can also be selected for comparison, including `Cl` for anions and `NH4-N` or `Na` for cations. The respective proportions of `Achieved` and `Target` are displayed directly in the ternary graph, and the corresponding percentage values are reported in the legend.
+The `Anions` and `Cations` tabs report the relative proportions of selected anionic or cationic nutrient components on a mmol L⁻¹ basis using ternary diagrams. In the `Anions` tab, the default components are `NO3-N`, `P`, and `S`, whereas in the `Cations` tab the default components are `K`, `Ca`, and `Mg`. Alternative ions can also be selected for comparison, including `Cl` for anions and `NH4-N` or `Na` for cations. The respective proportions of `Achieved` and `Target` are displayed directly in the ternary graph, and the corresponding percentage values are reported in the legend.
 
 ## Case study selection
 
@@ -1683,6 +1689,8 @@ cat("\\renewcommand{\\arraystretch}{1}\n")
 ```
 
 ## pH and EC Outputs
+
+
 
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_ph_ec
@@ -2224,8 +2232,6 @@ cat("\\renewcommand{\\arraystretch}{1}\n")
 
 Both γ activity correction models (Davies and Debye–Hückel) were evaluated for pH prediction against the phosphate buffer system (50 mL of 0.1 mol L⁻¹ KH₂PO₄ + x mL of 0.1 mol L⁻¹ NaOH), which spans pH 5.8–8.0 [@Haynes.2017; @Bower.1955]. In @fig-phosphate-buffer-calibration-two-salts, predicted pH values are plotted against the reference pH for increasing NaOH additions at 25 °C. The Davies model closely matched the reference values (R^2^ = 0.998), whereas the Debye–Hückel model showed weaker agreement (R^2^ = 0.880).
 
-Diskussion: Consequently, γ Davies was selected as the default activity correction for pH prediction in NutriCalc.
-
 ```{r}
 #| dev: cairo_pdf
 #| label: fig-phosphate-buffer-calibration-two-salts
@@ -2748,7 +2754,6 @@ kable(
   kable_styling(latex_options = "hold_position", full_width = FALSE, font_size = 9)
 ```
 
-tets testtest
 
 ```{r}
 #| label: tbl-fertilizer-comparison
@@ -2987,7 +2992,12 @@ The calculated mixed water consists of 90 % tap water from Berlin postal code 10
 
 #### Deviations from target
 
+Only negligible deviations from the target composition were observed in the achieved solution (SSE = 0.07; SSRE = 0). The calculated solution contained 5.5 mmol L⁻¹ Na and 1.5 mmol L⁻¹ Cl, consistent with the target composition and the mixed water source. The only remaining absolute deviation concerned Si contributed by the tap water, which was not specified as a target and therefore caused a small SSE.
+
+
 #### pH and EC
+
+The calculated final nutrient solution had a pH of 7.19. Ionic strength amounted to 39.47 mmol L⁻¹, while the total concentration of charge equivalents was 28.60 meq L⁻¹. The calculated EC was 3.09 mS cm⁻¹, and the osmotic potential was −111.29 kPa. The largest ionic contributions to EC were from NO₃⁻ (1.07 mS cm⁻¹), K⁺ (0.45 mS cm⁻¹), and Ca²⁺ (0.39 mS cm⁻¹). In addition, Na⁺ and Cl⁻ contributed 0.25 and 0.10 mS cm⁻¹, respectively.
 
 # Discussion
 
@@ -3064,6 +3074,8 @@ This is relevant because two solutions with similar nominal nutrient targets can
 The pH of a nutrient solution is a critical parameter that determines the speciation of elements across their various physicochemical forms (free ions, complexes, chelates, ion pairs, solid and gaseous phases and different oxidation levels) and is therefore critical for nutrient bioavailability (@Rijck.1998).
 
 The implemented pH estimation module provides a practical way to evaluate the expected pH of the formulated solution based on its composition and the applied acid or base correction. This allows users to anticipate whether the resulting pH will be within a desirable range for plant growth and to make informed decisions about formulation adjustments if necessary.
+
+While both γ activity correction models (Davies and Debye–Hückel) were evaluated, using the phosphate buffer system for pH prediction and KCl conductivity solutions at 25 °C for EC prediction, the Davies model showed closer agreement with the reference values in both cases. It was therefore selected as the default activity correction for pH and EC prediction in NutriCalc.
 
 Within the tested ranges, the implemented pH and EC models provided useful chemically informed approximations. The Davies activity correction showed better pH agreement than the limiting Debye Hückel model in phosphate buffer comparisons. Likewise, EC estimation based on diffusion coefficients together with Davies activity correction agreed closely with reference KCl values and with PHREEQC based comparisons, whereas simpler empirical approaches tended to underestimate conductivity at higher concentrations.
 
