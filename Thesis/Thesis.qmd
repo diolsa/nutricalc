@@ -252,7 +252,7 @@ c(\ce{NO3-})_{\text{reported}}
 = 63.87\,\si{mg.L^{-1}}.
 $$
 
-While such differences do not necessarily affect the overall conclusions of the study, they demonstrate how small ambiguities in conversion logic can lead to substantial divergence in reported nutrient concentrations. These observations underline that even potentionally well documented experimental studies can benefit from calculation frameworks in which unit conversions, stoichiometric coefficients and scaling factors are explicitly encoded and reproducible. This is particularly relevant for integrated production systems, where nutrient streams are reused across modules and quantitative consistency is essential.
+While such differences do not necessarily affect the overall conclusions of the study, they demonstrate how small ambiguities in conversion logic can lead to substantial divergence in reported nutrient concentrations. These observations underline that even well documented experimental studies can benefit from calculation frameworks in which unit conversions, stoichiometric coefficients and scaling factors are explicitly encoded and reproducible. This is particularly relevant for integrated production systems, where nutrient streams are reused across modules and quantitative consistency is essential.
 
 ## Background and Motivation
 
@@ -280,15 +280,15 @@ Moreover, real-world use requires support for various chemical notations such as
 
 ## Objectives and research questions
 
-The main objective of this thesis is to design and implement a computational framework in R that enables the formulation, analysis and optimization of nutrient solutions specifically for controlled-environment horticulture. This framework is intended to support accurate and efficient nutrient planning and to facilitate reproducibility and transparency in both research and practical applications.
+The main objective of this thesis was to develop and evaluate a computational framework in R for the formulation, analysis, and optimization of nutrient solutions in controlled-environment horticulture. The framework was intended to support accurate and efficient nutrient planning while improving reproducibility and transparency in both research and practical applications.
 
-More specifically, the thesis aims to develop tools that can construct nutrient matrices from molecular fertilizer formulas. These tools will allow for precise conversion between fertilizer compounds and their elemental forms using stoichiometric calculations. The formulation process will be modelled mathematically as a non-negative linear system and solved using Non-Negative Least Squares optimization methods [@Mullen.2024].
+More specifically, the thesis sought to establish tools for constructing nutrient matrices from molecular fertilizer formulas and for converting fertilizer compounds into their elemental equivalents by means of stoichiometric calculations. On this basis, nutrient formulation was formalized as a non-negative linear optimization problem and solved using Non-Negative Least Squares [@Mullen.2024].
 
-In addition to the computational backend, the framework will include features to visualize the distribution of nutrients across different fertilizer sources. Furthermore, it will offer the ability to approximate the and pH and EC of a nutrient solution in advance, based on the concentrations and molar conductivity of respective ions [@McCleskey.2012].
+Beyond nutrient matching, the framework was designed to visualize the distribution of nutrients across fertilizer sources and to estimate key physicochemical properties of the final solution, in particular pH and electrical conductivity, from ion concentrations and molar conductivity data [@McCleskey.2012].
 
-The tool will also be designed with extensibility in mind, laying the groundwork for the import of commercial fertilizer compositions. In the long term, the framework will be equipped to benchmark nutrient formulations based on either experimental or simulated crop yield data.
+The framework was further designed as an extensible system that can be expanded in the future to incorporate commercial fertilizer compositions and to benchmark nutrient formulations against experimental or simulated crop-yield data.
 
-Finally, to ensure accessibility and ease of use, the thesis will culminate in the development of a user-friendly graphical interface using the Shiny framework, enabling non-technical users to benefit from the computational functionalities [@Chang.2025].
+To ensure practical accessibility, the computational workflow was additionally implemented in a graphical user interface using the Shiny framework, enabling interactive use by non-technical users [@Chang.2025].
 
 # State of the Art / Scientific Background
 
@@ -672,7 +672,7 @@ After the 2019 revision of the International System of Units, the base units are
 
 \begin{equation} 1\,\mathrm{mol} = 6.02214076 \times 10^{23}\,\text{elementary entities} \end{equation}
 
-An elementary entity may be an atom, a molecule, or any other particle. In this work, the elementary entities are ions as listed in Table \ref{tab:element-molar-mass}. The molar masses are taken from the CRC Handbook of Chemistry and Physics [@Haynes.2017] and rounded to three decimal places. Not all elements reported are essential in plant nutrition. The list include also non-essential or even toxic elements, but elements that part of the plant ionome and potentially present in fertilizers or water even though not all elements reported here where integrated later.
+An elementary entity may be an atom, a molecule, or any other particle. In this work, the elementary entities are ions, as listed in Table \ref{tab:element-molar-mass}. The molar masses were taken from the CRC Handbook of Chemistry and Physics [@Haynes.2017] and rounded to three decimal places. Not all listed elements are essential for plant nutrition. The set also includes non-essential and potentially toxic elements that may occur in the plant ionome or in fertilizers and source water, although not all of these elements were incorporated into the final framework.
 
 ```{r}
 #| echo: false
@@ -733,7 +733,7 @@ cat(paste0(
 
 ### Nutrient set
 
-In Table \ref{tab:salt-molar-mass} all implemented 40 fertilizers accesible by the solver are listed with formula, name and respective molar mass. The molar mass is calculated from the chemical formula using the molar masses of the constituent elements and their stoichiometric coefficients reported in \ref{tab:element-molar-mass}.
+In Table \ref{tab:salt-molar-mass} all implemented 40 fertilizers available by the solver are listed with formula, name and respective molar mass. The molar mass is calculated from the chemical formula using the molar masses of the constituent elements and their stoichiometric coefficients reported in \ref{tab:element-molar-mass}.
 
 ```{r}
 #| echo: false
@@ -3210,4 +3210,9 @@ length(unused_keys)
 
 # Appendix {.unnumbered}
 
-# Declaration of Independence {.unnumbered}
+\includepdf[pages=-]{nutricalc_0.1.0.pdf}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Declaration of Independence}
+\includepdf[pages=-,pagecommand={}]{Declaration.pdf}

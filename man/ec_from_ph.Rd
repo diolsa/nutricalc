@@ -27,7 +27,7 @@ as Fe3+ for EC purposes.}
 
 \item{gamma}{Optional named numeric vector of activity coefficients (per ion).}
 
-\item{gamma_model}{Integer 1 (Davies) or 2 (Debye-Hückel). Default 1.}
+\item{gamma_model}{Activity model selector: 1/"davies_25C" (Davies) or 2/"debye_huckel_25C" (Debye-Huckel). Default 1.}
 
 \item{A_DH_25}{Debye-Huckel A constant at 25 C (also used as A in Davies).}
 }
