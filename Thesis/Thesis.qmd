@@ -438,6 +438,8 @@ This transformation preserves ion ratios expressed in meq while increasing or de
 
 Across these three experiment types, causal specificity for individual ion identity typically decreases as the number of inseparable or uncontrolled variables increases. Qualitative substitution experiments offer the highest degree of causal specificity, whereas quantitative salt manipulations and solution-strength series progressively trade causal resolution for ecological or agronomic relevance. These experiment classes are therefore best understood as distinct projections of a chemically constrained ionic system, most transparently described in milliequivalent space.
 
+From a plant nutrition perspective, comparisons between nutrient solutions of different provenance are only informative to the extent that differences in ionic composition are maintained or eliminated in a controlled manner. If two solutions of different origin, such as wastewater-derived (e.g. animal or human urine) and mineral solutions, are formulated to the same ionic composition, then the specifically nutritional dimension of the comparison is largely removed, reducing the question to a Ship of Theseus problem of identity. Under such conditions, any remaining differences are more appropriately interpreted in terms of economic factors associated with source, production, transport, cost and sustainability rather than nutrient composition itself.
+
 \begin{landscape}
 \begingroup
 \fontsize{11}{13}\selectfont
@@ -499,7 +501,6 @@ Environmental strength effect \\
 \endgroup
 \end{landscape}
 
-From a plant nutrition perspective, comparisons between nutrient solutions of different provenance are only informative to the extent that differences in ionic composition are maintained or eliminated in a controlled manner. If two solutions of different origin, such as wastewater-derived (e.g. animal or human urine) and mineral solutions, are formulated to the same ionic composition, then the specifically nutritional dimension of the comparison is largely removed, reducing the question to a Ship of Theseus problem of identity. Under such conditions, any remaining differences are more appropriately interpreted in terms of economic factors associated with source, production, transport, cost and sustainability rather than nutrient composition itself.
 
 ## Stoichiometry and salt–ion relationships
 
@@ -3135,7 +3136,7 @@ By combining an R package with a Shiny-based graphical user interface, the frame
 
 ## Limitations
 
-The scope of the present thesis is limited in several respects. Precipitation reactions and full metal-ligand complexation were not modeled explicitly, so the framework should not be interpreted as a complete geochemical simulation environment. Likewise, the pH and EC calculations remain approximations based on selected equilibrium and activity models. In addition, exact solvability always depends on the implemented fertilizer matrix, which is necessarily incomplete.
+The scope of the present thesis is limited in several respects. Precipitation reactions and full  complexation were not modeled explicitly, so the framework should not be interpreted as a complete geochemical simulation environment. Likewise, the pH and EC calculations remain approximations based on selected equilibrium and activity models. In addition, exact solvability always depends on the implemented fertilizer matrix, which is necessarily incomplete.
 
 The framework is therefore best understood as a transparent formulation and evaluation tool that captures major stoichiometric and physicochemical constraints, but not the full complexity of nutrient chemistry or crop response.
 
