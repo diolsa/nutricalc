@@ -1362,13 +1362,9 @@ Within the mixing interface, two separate source waters, `Water 1` and `Water 2`
 
 #### Fertilizers
 
-The `Fertilizers` tab is used to define the fertilizer salts, acids and bases available for optimization. Compounds are displayed in a list together with their chemical formulas and names.
+The `Fertilizers` tab is used to define the fertilizer salts, acids and bases available for optimization. Compounds are displayed in a list together with their chemical formulas and names. At the top of the tab, a `Salt search` text field is provided to filter the list. Both chemical formulas and compound names can be entered and the visibility of the listed compounds updates dynamically according to the search term. A `Clear search` button is located to the right of the search field and resets the search input, thereby restoring the full list.
 
-At the top of the tab, a `Salt search` text field is provided to filter the list. Both chemical formulas and compound names can be entered and the visibility of the listed compounds updates dynamically according to the search term. A `Clear search` button is located to the right of the search field and resets the search input, thereby restoring the full list.
-
-Compounds can be selected or deselected manually using the checkbox list. In addition, the `Select all visible` and `Deselect all visible` buttons allow batch selection or deselection of compounds currently shown in the filtered list. Thus, these controls operate on the subset of compounds visible under the active search term rather than on the complete compound list.
-
-Below the list, a status line provides summary information in the form `Using x selected of y visible (total z)`, where `x` denotes the number of currently selected compounds, `y` the number of currently visible compounds and `z` the total number of available compounds.
+Compounds can be selected or deselected manually using the checkbox list. In addition, the `Select all visible` and `Deselect all visible` buttons allow batch selection or deselection of compounds currently shown in the filtered list. Thus, these controls operate on the subset of compounds visible under the active search term rather than on the complete compound list. Below the list, a status line provides summary information in the form `Using x selected of y visible (total z)`, where `x` denotes the number of currently selected compounds, `y` the number of currently visible compounds and `z` the total number of available compounds.
 
 #### Recipes
 
@@ -1378,9 +1374,7 @@ Once a `Category` is selected, the corresponding `Recipe` list is displayed. By 
 
 #### Tissue
 
-The `Tissue` tab allows formulation of a nutrient solution based on the mass-balance approach described by @Langenfeld.2022.
-
-Tissue nutrient concentrations can be entered on a dry-mass basis and displayed in either `%` or `ppm`. In the central part of the tab, water-use efficiency (`WUE`) is calculated as dry mass divided by transpired water, with dry mass entered in `g` and transpired water in `L`. The resulting `WUE` value is displayed below the corresponding input fields.
+The `Tissue` tab allows formulation of a nutrient solution based on the mass-balance approach described by @Langenfeld.2022. Tissue nutrient concentrations can be entered on a dry-mass basis and displayed in either `%` or `ppm`. In the central part of the tab, water-use efficiency (`WUE`) is calculated as dry mass divided by transpired water, with dry mass entered in `g` and transpired water in `L`. The resulting `WUE` value is displayed below the corresponding input fields.
 
 Based on tissue nutrient concentration and `WUE`, nutrient demand per unit of transpired water is estimated and used to derive the corresponding nutrient-solution composition for analysis. In addition to the original approach of @Langenfeld.2022, total nitrogen is partitioned into nitrate and ammonium in accordance with the principle of electroneutrality. This extension is discussed in a later section.
 
@@ -2831,6 +2825,8 @@ This indicates that the residual mismatch in Si containing recipes is not primar
 Although Si is generally considered a beneficial rather than an essential element, positive effects on yield and disease suppression have been reported [@Rengel.2023; @Voogt.2001]. Practical use of potassium silicate often requires stoichiometric acid compensation. In the formulations discussed by @Voogt.2001, this was addressed by combining silicate addition with nitric acid and with corresponding adjustment of nitrate salts.
 
 The fact that Si containing cases improved when acid and base correction was allowed in NutriCalc therefore supports rather than undermines the chemical plausibility of the framework. Taken together, the results suggest that NutriCalc performs robustly within the tested horticultural domain and that the remaining deviations can usually be traced back to identifiable chemical causes.
+
+The three case studies illustrate distinct formulation constraints. The Hoagland case showed that exact reconstruction remained possible even when the original calcium nitrate source was unavailable and replaced by calcium ammonium nitrate. The tomato case demonstrated the effect of source-water correction, where Na, Cl, and Si from Berlin-Dahlem tap water remained present in the final solution. The halophyte case extended the workflow to mixed-water formulation, where sodium and chloride constraints were part of the experimental design. Together, these examples show that NutriCalc can be applied not only to recipe reconstruction, but also to constrained formulation scenarios involving fertilizer substitution, source-water chemistry, and experimental manipulation of specific ions.
 
 ## Exact solvability, electroneutrality and non uniqueness
 
