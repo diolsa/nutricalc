@@ -1,0 +1,828 @@
+\nonstopmode{}
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\makeatletter\@ifl@t@r\fmtversion{2018/04/01}{}{\usepackage[utf8]{inputenc}}\makeatother
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `nutricalc'}}
+\par\bigskip{\large \today}
+\end{center}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdftitle = {nutricalc: Nutrient Solution Formulation in Horticultural Sciences}}}{}
+\ifthenelse{\boolean{Rd@use@hyper}}{\hypersetup{pdfauthor = {Dilan Olmo Sakar}}}{}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Nutrient Solution Formulation in Horticultural Sciences}
+\item[Version]\AsIs{0.1.0}
+\item[Description]\AsIs{Provides tools for parsing chemical formulas, calculating molar masses,
+and optimizing fertilizer mixtures to meet specified nutrient targets using 
+non-negative least squares. Designed to help agronomists and researchers formulate 
+custom nutrient solutions efficiently.}
+\item[License]\AsIs{GPL-3}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{true}
+\item[Depends]\AsIs{R (>= 3.5)}
+\item[Imports]\AsIs{stringr,
+nnls,
+shiny,
+bslib,
+Ternary,
+xml2}
+\item[RoxygenNote]\AsIs{7.3.2}
+\end{description}
+\Rdcontents{Contents}
+\HeaderA{assign\_salts\_bak}{Assign salts to A, B, and Micro tanks based on composition and solver result}{assign.Rul.salts.Rul.bak}
+%
+\begin{Description}
+This helper takes the result from \code{optimize\_nutrients()} and the
+corresponding \code{nutrient\_matrix} (compounds x nutrients) and returns a
+BAK-style grouping:
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+assign_salts_bak(
+  res,
+  nutrient_matrix,
+  micro_nutrients = c("Fe", "Mn", "Zn", "B", "Cu", "Mo", "Si"),
+  calcium_nutrient = "Ca",
+  phosphorus_nutrient = "P",
+  sulfur_nutrient = "S",
+  balance_nutrients = c("NO3_N", "NH4_N", "P", "K", "Ca", "Mg", "S", "Na"),
+  drop_zero = TRUE,
+  tol = 0
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{res}] A \code{nutrient\_optimization\_result} as returned by
+\code{optimize\_nutrients()}.
+
+\item[\code{nutrient\_matrix}] Matrix [compound x nutrient] used in the optimization.
+Row names must match the salt names (formulas).
+
+\item[\code{micro\_nutrients}] Character vector of column names that count as
+micronutrients. Defaults to \code{c("Fe", "Mn", "Zn", "B", "Cu", "Mo")}.
+
+\item[\code{calcium\_nutrient}] Column name for calcium (default: \code{"Ca"}).
+
+\item[\code{phosphorus\_nutrient}] Column name for phosphorus (default: \code{"P"}).
+
+\item[\code{sulfur\_nutrient}] Column name for sulfur (default: \code{"S"}).
+
+\item[\code{balance\_nutrients}] Character vector of nutrient columns used to define
+the "load" when splitting AB salts between A and B. Defaults to
+\code{c("NO3\_N","NH4\_N","P","K","Ca","Mg","S","Na")}.
+
+\item[\code{drop\_zero}] Logical, if \code{TRUE} (default), remove salts with
+effectively zero mmol/L from the returned \code{table} and \code{by\_tank}.
+The \code{assignments} vector always includes all salts.
+
+\item[\code{tol}] Numeric tolerance for deciding what counts as "zero" mmol/L.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+- First, salts are classified purely by composition:
+* Micro  = any micro nutrient present (e.g. Fe, Mn, Zn, B, Cu, Mo)
+* A      = contains Ca (and no micro)
+* B      = contains P or S (and no micro / Ca)
+* AB     = none of the above (can go to A or B)
+
+- Then the AB salts are assigned to A or B so that A and B have a similar
+overall "load" (sum of delivered mmol of selected nutrients).
+\end{Details}
+%
+\begin{Value}
+A list with:
+\begin{ldescription}
+\item[\code{assignments}] Named character vector, salt -> tank ("A","B","Micro").
+\item[\code{table}] Data frame with columns \code{salt}, \code{tank}, \code{mmol\_l}
+(filtered to non-zero if \code{drop\_zero = TRUE}).
+\item[\code{by\_tank}] Named list of data frames (A, B, Micro, possibly others),
+each subset of \code{table}.
+\end{ldescription}
+\end{Value}
+\HeaderA{CANONICAL\_NUTRIENTS}{Canonical nutrient keys for targets and UI}{CANONICAL.Rul.NUTRIENTS}
+\keyword{datasets}{CANONICAL\_NUTRIENTS}
+%
+\begin{Description}
+Defines the stable nutrient order used across recipes, UI inputs, and target
+vectors. This is intentionally independent from the full `nutrient\_matrix`,
+which may include additional columns for chelate ligands or other species.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+CANONICAL_NUTRIENTS
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A character vector of nutrient keys.
+\end{Format}
+\HeaderA{compute\_molar\_mass}{Compute molar mass of a chemical formula}{compute.Rul.molar.Rul.mass}
+%
+\begin{Description}
+Supports formulas like "NaCl", "Ca(NO3)2", "CuSO4·5H2O", "MgN2O6·6H2O"
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compute_molar_mass(formula)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{formula}] Chemical formula string
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Molar mass in g/mol
+\end{Value}
+\HeaderA{compute\_percentage\_matrix}{Compute a matrix of mass percentages of nutrients in each fertilizer}{compute.Rul.percentage.Rul.matrix}
+%
+\begin{Description}
+Compute a matrix of mass percentages of nutrients in each fertilizer
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compute_percentage_matrix(nutrient_matrix)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{nutrient\_matrix}] A [fertilizer x nutrient] matrix in mmol/mol
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A matrix of nutrient mass percentages per fertilizer
+\end{Value}
+\HeaderA{converte}{Convert amount of one compound to another using molar mass and element counts}{converte}
+%
+\begin{Description}
+This function computes the conversion factor between two chemical formulas or elements
+based on their molar masses and the count of shared atoms. It adjusts for stoichiometry
+where applicable (e.g., converting from "SO4" to "S").
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+converte(from, to, value = 1, element = NULL)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{from}] A character string representing the source formula or element (e.g., "Ca", "NaCl", "SO4").
+
+\item[\code{to}] A character string representing the target formula or element.
+
+\item[\code{value}] A numeric value to convert (default is 1). Represents the quantity of `from`.
+
+\item[\code{element}] Optional element symbol to anchor the stoichiometric conversion when
+multiple elements are shared between `from` and `to`. If omitted and more than one
+element is shared, an error is raised to avoid ambiguous conversions.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A numeric value representing the equivalent amount of `to`, adjusted by molar mass and atom ratio.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+converte("SO4", "S")        # Convert sulfate to elemental sulfur
+converte("Na", "NaCl")      # Convert sodium to sodium chloride
+converte("P2O5", "P")       # Convert phosphorus pentoxide to elemental phosphorus
+converte("Ca", "CaCl2\u00b72H2O", 10)  # Convert 10 mmol of Ca to CaCl2\u00b72H2O
+converte("(NH4)2HPO4", "NH4H2PO4", element = "P")  # Disambiguate using P as the anchor
+
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{convert\_units}{Convert nutrient concentrations between mmol/L and mg/L}{convert.Rul.units}
+%
+\begin{Description}
+Converts numeric nutrient values (single element or named vector)
+between mmol/L and mg/L using molar masses in `element\_molar\_mass\_df`.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+convert_units(x, element = NULL, to = c("mg/L", "mmol/L"))
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] Numeric scalar or named numeric vector of nutrient values.
+If named, names should match those in `nutrient\_element\_map`.
+
+\item[\code{element}] Optional element symbol (e.g. "N", "P") when `x` is a scalar.
+
+\item[\code{to}] Target unit: "mg/L" or "mmol/L".
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Numeric vector (same length/names as `x`) in the target unit.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+convert_units(c(NO3_N = 15, P = 1.5), to = "mg/L")
+convert_units(c(NO3_N = 210, P = 46), to = "mmol/L")
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{drop\_tiny}{Zero-out tiny floating point values}{drop.Rul.tiny}
+%
+\begin{Description}
+Utility helper to clamp extremely small values to zero, avoiding noisy output.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+drop_tiny(x, tol = 1e-09)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] Numeric vector or matrix.
+
+\item[\code{tol}] Values with absolute magnitude below this tolerance are set to zero.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The input with near-zero entries replaced by zeros.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+drop_tiny(c(1, 1e-10, -1e-12))
+drop_tiny(matrix(c(0.5, 1e-12), nrow = 1))
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{ec\_from\_ph}{Compute EC from achieved composition and pH speciation}{ec.Rul.from.Rul.ph}
+%
+\begin{Description}
+Estimates conductivity using an ion-transport summation based on diffusion
+coefficients and activity coefficients.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ec_from_ph(
+  achieved,
+  ph_res,
+  fe_state = c("Fe2+", "Fe3+"),
+  t_C = 25,
+  gamma = NULL,
+  gamma_model = 1,
+  A_DH_25 = 0.5085
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{achieved}] Named numeric vector (mmol/L) or data.frame with columns
+Nutrient and Achieved.
+
+\item[\code{ph\_res}] Result list from `ph\_from\_achieved()` containing `species\_mM`.
+
+\item[\code{fe\_state}] One of "Fe2+" or "Fe3+". When "Fe3+", all Fe2+ is treated
+as Fe3+ for EC purposes.
+
+\item[\code{t\_C}] Temperature in degrees C.
+
+\item[\code{gamma}] Optional named numeric vector of activity coefficients (per ion).
+
+\item[\code{gamma\_model}] Activity model selector: 1/"davies\_25C" (Davies) or 2/"debye\_huckel\_25C" (Debye-Huckel). Default 1.
+
+\item[\code{A\_DH\_25}] Debye-Huckel A constant at 25 C (also used as A in Davies).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+Units:
+- c is in mmol/L (mM); numerically identical to mol/m\textasciicircum{}3, used directly as such.
+- D is in 10\textasciicircum{}-5 cm\textasciicircum{}2/s and converted to m\textasciicircum{}2/s by multiplying 1e-9.
+- Output: EC in mS/cm and uS/cm.
+
+gamma\_model:
+1 = Davies (default)
+2 = Debye-Hückel
+
+Override precedence:
+model baseline -> ph\_res\$gamma\_ions -> gamma argument (highest priority)
+\end{Details}
+%
+\begin{Value}
+A list with EC\_mS\_cm, EC\_uS\_cm, and per-ion contributions.
+\end{Value}
+\HeaderA{element\_molar\_mass\_df}{Atomic molar masses used for formula parsing}{element.Rul.molar.Rul.mass.Rul.df}
+\keyword{datasets}{element\_molar\_mass\_df}
+%
+\begin{Description}
+A lookup table of elemental (atomic) molar masses in grams per mole (g/mol).
+Used by molar-mass and unit-conversion helpers (e.g., when computing the molar
+mass of a chemical formula from its elemental composition).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(element_molar_mass_df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A data frame with 23 rows and 2 columns:
+\begin{description}
+
+\item[Element] Element symbol (character), e.g. \code{"C"}, \code{"O"}, \code{"Fe"}.
+\item[MolarMass\_g\_per\_mol] Atomic molar mass in g/mol (numeric).
+
+\end{description}
+
+\end{Format}
+\HeaderA{fetch\_bwb\_mittelwert}{Fetch BWB "In aller Tiefe" Mittelwerte by postal code}{fetch.Rul.bwb.Rul.mittelwert}
+%
+\begin{Description}
+Retrieves Berliner Wasserbetriebe (BWB) analysis data for a given Berlin
+postal code and returns the Mittelwert values (first available entry per
+parameter) for selected parameters as mmol/L.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+fetch_bwb_mittelwert(plz)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{plz}] Character or numeric vector of length one with a five digit
+German postal code.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A named numeric vector of length 18 in mmol/L with names
+`c("NO3\_N","NH4\_N","P","K","Ca","Mg","S","Na","Cl",
+"Fe","Mn","Zn","B","Cu","Mo","Si","KS4\_3","KB8\_2")`, limited to the decimal precision
+provided by the source values. `KS4\_3` is the acid capacity (alkalinity, KS 4.3);
+`KB8\_2` is the base capacity (acidity, KS 8.2) and is treated as dissolved CO2(aq).
+\end{Value}
+\HeaderA{ion\_diffusion\_25C}{Lookup table of ion diffusion coefficients at 25 C}{ion.Rul.diffusion.Rul.25C}
+%
+\begin{Description}
+Returns a data frame with ions, charge, and diffusion coefficients (D) at 25 C.
+Values are expressed as 10\textasciicircum{}-5 cm\textasciicircum{}2/s.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ion_diffusion_25C()
+\end{verbatim}
+\end{Usage}
+%
+\begin{Value}
+A data.frame with columns: ion, z, D\_1e5\_cm2\_s.
+\end{Value}
+\HeaderA{nutrient\_matrix}{Canonical fertilizer-to-nutrient stoichiometry matrix}{nutrient.Rul.matrix}
+\keyword{datasets}{nutrient\_matrix}
+%
+\begin{Description}
+A compound-by-nutrient matrix used by the nutrient solvers. Rows are fertilizer
+compounds (salts/acids/bases) and columns are nutrients. Each entry is the
+amount of nutrient delivered by 1 mmol of the compound (mmol nutrient per mmol
+compound).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(nutrient_matrix)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A numeric matrix with n rows (compounds) and 20 columns (nutrients).
+Row names are chemical formulas; column names are nutrient keys:
+`NO3\_N`, `NH4\_N`, `P`, `K`, `Ca`, `Mg`, `S`, `Na`, `Cl`, `Fe`, `Mn`, `Zn`,
+`B`, `Cu`, `Mo`, `Si`, `EDTA`, `DTPA`, `EDDHA`, `HBED`.
+\end{Format}
+%
+\begin{Details}
+The matrix entries are stoichiometric coefficients in mmol/mmol. For example,
+calcium nitrate (`Ca(NO3)2`) contributes 2 mmol `NO3\_N` and 1 mmol `Ca` per
+1 mmol of salt.
+\end{Details}
+\HeaderA{optimize\_nutrients}{Optimize Nutrient Solution Using NNLS}{optimize.Rul.nutrients}
+%
+\begin{Description}
+Solves for optimal fertilizer amounts to meet target nutrient concentrations.
+Expects a compound-by-nutrient matrix: rows = salts/compounds, columns = nutrients.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+optimize_nutrients(nutrient_matrix, target, importance)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{nutrient\_matrix}] Matrix [compound x nutrient] with entries in mol of nutrient per mmol of compound
+(i.e., how many mmol of nutrient you get from 1 mmol of the compound).
+
+\item[\code{target}] Named numeric vector of target concentrations (mmol/L).
+
+\item[\code{importance}] Named numeric vector (-2 to +2) specifying nutrient importance (weights).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+An object of class 'nutrient\_optimization\_result' with elements:
+\begin{itemize}
+
+\item{} amounts - named numeric (mmol/L) of each compound (same order as rownames of input)
+\item{} achieved - named numeric (mmol/L) delivered per nutrient
+\item{} target - named numeric (mmol/L) target per nutrient
+\item{} abs\_error - achieved - target (mmol/L)
+\item{} percent\_error - 100 * abs\_error / target (NA when target == 0)
+\item{} squared\_error - sum(abs\_error\textasciicircum{}2)
+\item{} rel\_squared\_error - sum((abs\_error/target)\textasciicircum{}2, na.rm = TRUE)
+
+\end{itemize}
+
+\end{Value}
+\HeaderA{percentage\_matrix}{Nutrient mass percentage matrix}{percentage.Rul.matrix}
+%
+\begin{Description}
+Mass percentages of nutrients in each fertilizer derived from `nutrient\_matrix`.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(percentage_matrix)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A numeric matrix with rows as fertilizer formulas and columns as nutrients
+(NO3\_N, NH4\_N, P, K, Ca, Mg, S, Na, Cl, Fe, Mn, Zn, B, Cu, Mo, Si). Each value
+is the mass percentage of the nutrient in the fertilizer.
+\end{Format}
+\HeaderA{ph\_from\_achieved}{Compute pH of a nutrient solution from achieved composition}{ph.Rul.from.Rul.achieved}
+%
+\begin{Description}
+Uses charge balance with acid/base speciation and activity corrections
+to estimate pH at 25 C. Assumes no carbonate alkalinity, no complexation, and
+no precipitation.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+ph_from_achieved(
+  achieved,
+  temp_C = 25,
+  phc_bracket = c(3, 9),
+  tol = 1e-09,
+  max_iter = 200,
+  inner_max_iter = 50,
+  debug = FALSE,
+  chelate_z = c(EDTA = -4, DTPA = -5, EDDHA = -4, HBED = -4),
+  gamma_model = 1
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{achieved}] Named numeric vector of mmol/L (e.g., solver result `x\$achieved`).
+If present, `CO2\_aq` is treated as dissolved free CO2(aq) (mmol/L), mapped
+from BWB "Basenkapazitaet KB 8,2" / KS 8.2 and used to fix carbonate speciation.
+
+\item[\code{temp\_C}] Temperature in Celsius (only 25 C supported in this version).
+
+\item[\code{phc\_bracket}] Numeric length-2 bracket for pHc = -log10([H+]) search.
+
+\item[\code{tol}] Root tolerance in meq/L.
+
+\item[\code{max\_iter}] Maximum iterations for the outer bisection.
+
+\item[\code{inner\_max\_iter}] Maximum iterations for the ionic strength fixed point.
+
+\item[\code{debug}] Logical; when TRUE prints basic bracket diagnostics.
+
+\item[\code{chelate\_z}] Named numeric vector of chelate charges to include as fixed
+anions. Values are net charges (negative) for ligand totals in mmol/L.
+
+\item[\code{gamma\_model}] Integer 1 (Davies) or 2 (Debye–Hückel). Default 1.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}
+gamma\_model:
+1 = Davies (default)
+2 = Debye–Hückel limiting law (DH)
+\end{Details}
+%
+\begin{Value}
+A list with pH, ionic strength, activity coefficients, species
+distribution, and charge balance diagnostics.
+\end{Value}
+\HeaderA{plot\_ternary}{Steiner-style ternary plot (Target vs Achieved) with constant-component drops}{plot.Rul.ternary}
+%
+\begin{Description}
+Steiner-style ternary plot (Target vs Achieved) with constant-component drops
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot_ternary(
+  result,
+  keys,
+  title = "Ternary (ratios)",
+  show_legend = TRUE,
+  step_percent = 10,
+  lab_cex = 0.95,
+  axis_cex = 0.85,
+  padding = 0.08,
+  col_target = "black",
+  col_achieved = "firebrick",
+  pch_target = 16,
+  pch_achieved = 17,
+  cex_points = 1.25,
+  show_link = FALSE,
+  lty_link = 2,
+  lwd_link = 1,
+  legend_pos = "topright",
+  show_axis_drops = TRUE,
+  drop_col = "grey35",
+  drop_lwd = 1,
+  drop_lty = 1,
+  show_ratio = TRUE,
+  ratio_format = "percent",
+  ratio_digits = 1
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{result}] List with numeric named vectors `target` and `achieved`.
+
+\item[\code{keys}] Character(3) giving axis order, e.g. c("K","Ca","Mg").
+
+\item[\code{title}] Plot title.
+
+\item[\code{show\_legend}] Logical, show legend (default TRUE).
+
+\item[\code{step\_percent}] Integer in [1, 50]; major grid step as percent. Default 10.
+
+\item[\code{lab\_cex}, \code{axis\_cex}, \code{padding}] Plot layout controls.
+
+\item[\code{col\_target}, \code{col\_achieved}] Colors.
+
+\item[\code{pch\_target}, \code{pch\_achieved}] Point symbols.
+
+\item[\code{cex\_points}] Point size.
+
+\item[\code{show\_link}] Logical, draw connector between Target and Achieved.
+
+\item[\code{lty\_link}, \code{lwd\_link}] Style for connector if shown.
+
+\item[\code{legend\_pos}] Legend position.
+
+\item[\code{show\_axis\_drops}] Logical, draw constant-component drops from Achieved to sides.
+
+\item[\code{drop\_col}, \code{drop\_lwd}, \code{drop\_lty}] Style for drop lines.
+
+\item[\code{show\_ratio}] Logical, include "(A, B; C)" values in legend (default TRUE).
+
+\item[\code{ratio\_format}] "percent" (default) or "proportion".
+
+\item[\code{ratio\_digits}] Digits for numeric formatting.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Invisibly returns NULL (draws the plot).
+\end{Value}
+\HeaderA{print.bwb\_mittelwert}{Pretty-print BWB Mittelwerte}{print.bwb.Rul.mittelwert}
+%
+\begin{Description}
+Pretty-print BWB Mittelwerte
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'bwb_mittelwert'
+print(x, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] A `bwb\_mittelwert` numeric vector.
+
+\item[\code{...}] Additional arguments passed to `print`.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+The input `bwb\_mittelwert` object, invisibly.
+\end{Value}
+\HeaderA{print.nutrient\_optimization\_result}{Pretty-print the optimization result}{print.nutrient.Rul.optimization.Rul.result}
+%
+\begin{Description}
+Shows per-liter amounts; if `vol > 1`, also shows a dynamic column "g for <vol> L".
+Uses `compute\_molar\_mass(formula)` (g/mol) when available; if not found, prints without mass columns.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+## S3 method for class 'nutrient_optimization_result'
+print(x, vol = 1, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] A 'nutrient\_optimization\_result' object.
+
+\item[\code{vol}] Total solution volume in liters (must be > 0). If > 1, a "g for <vol> L" column is added.
+
+\item[\code{...}] Unused.
+\end{ldescription}
+\end{Arguments}
+\HeaderA{recipes}{Nutrient solution recipes used by NutriCalc}{recipes}
+\keyword{datasets}{recipes}
+%
+\begin{Description}
+A named list of recipe definitions. Each element is a list with:
+\begin{description}
+
+\item[name] Display name
+\item[category] Category such as "Olericulture", "Fruticulture", ...
+\item[notes] Free text notes / citation
+\item[unit] Either "mmol/L" or "mg/L"
+\item[salts] TRUE (all salts) or a character vector of salt formulas
+\item[targets] Named numeric vector of nutrient targets
+
+\end{description}
+
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+recipes
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A named list of recipe lists.
+\end{Format}
+\HeaderA{recipe\_summary}{Create a summary table of nutrient concentrations in both units}{recipe.Rul.summary}
+%
+\begin{Description}
+Given a named vector of nutrient concentrations and its unit,
+returns a data frame showing each nutrient's value in mmol/L and mg/L.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+recipe_summary(recipe, unit = c("mmol/L", "mg/L"))
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{recipe}] Named numeric vector of nutrient concentrations (e.g., NO3\_N, P, K, ...).
+
+\item[\code{unit}] Current unit of the values: "mmol/L" or "mg/L".
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with columns `Nutrient`, `Element`, `mmol/L`, `mg/L`.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+recipe_summary(c(NO3_N = 15, P = 1.5), unit = "mmol/L")
+recipe_summary(c(NO3_N = 210, P = 46), unit = "mg/L")
+\end{ExampleCode}
+\end{Examples}
+\HeaderA{run\_app}{Launch the NutriCalc Shiny App}{run.Rul.app}
+%
+\begin{Description}
+Launch the NutriCalc Shiny App
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+run_app(...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{...}] Arguments passed to [shiny::runApp()].
+\end{ldescription}
+\end{Arguments}
+\HeaderA{salt\_info}{Metadata for fertilizer compounds}{salt.Rul.info}
+\keyword{datasets}{salt\_info}
+%
+\begin{Description}
+Descriptive metadata for each compound in \code{\LinkA{nutrient\_matrix}{nutrient.Rul.matrix}},
+including a human-readable category name and whether the compound is treated
+as an acid/base in the two-stage solver.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+data(salt_info)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A data frame with n rows and 3 columns:
+\begin{description}
+
+\item[salt] Chemical formula key matching \code{rownames(nutrient\_matrix)}.
+\item[category] Human-readable compound name/category.
+\item[is\_acid\_base] Logical flag; \code{TRUE} for acids/bases.
+
+\end{description}
+
+\end{Format}
+\HeaderA{strip\_negative\_zero}{Remove negative zeros introduced by rounding}{strip.Rul.negative.Rul.zero}
+%
+\begin{Description}
+Ensures rounded values like -0.00 are displayed as 0.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+strip_negative_zero(x)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{x}] Numeric vector or matrix.
+\end{ldescription}
+\end{Arguments}
+\HeaderA{two\_stage\_optimize\_nutrients}{Two-stage nutrient optimization separating neutral salts from acids/bases}{two.Rul.stage.Rul.optimize.Rul.nutrients}
+%
+\begin{Description}
+Runs an initial NNLS optimization on neutral salts, then uses acids/bases to
+fill remaining deficiencies (when they can affect the off-target nutrients).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+two_stage_optimize_nutrients(
+  nutrient_matrix,
+  target,
+  importance,
+  tol_abs = 0.01,
+  tol_rel = 0.01
+)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{nutrient\_matrix}] Matrix [compound x nutrient] with entries in mol of nutrient per mmol of compound.
+
+\item[\code{target}] Named numeric vector of target concentrations (mmol/L).
+
+\item[\code{importance}] Named numeric vector (-2 to +2) specifying nutrient importance (weights).
+
+\item[\code{tol\_abs}] Absolute tolerance (mmol/L) below which residuals are ignored for acid/base correction.
+
+\item[\code{tol\_rel}] Relative tolerance (fraction of target) below which residuals are ignored for acid/base correction.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A 'nutrient\_optimization\_result' object.
+\end{Value}
+\printindex{}
+\end{document}
