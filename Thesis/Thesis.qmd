@@ -502,7 +502,7 @@ Nutrient Solution Calculator is an Excel™-based tool developed by Luca Incrocc
 
 Another tool is HydroBuddy, a free and open-source software application developed by Daniel Fernández Pinto for the formulation of hydroponic nutrient solutions [@FernandezPinto.2022]. The program calculates the required quantities of fertilizers to achieve specified target nutrient concentrations. It includes a database of commonly used fertilizers whose compositions can be edited or extended by the user and allows the formulation of both direct nutrient solutions and concentrated stock solutions. The software determines the combination of fertilizer salts that best matches the desired nutrient composition through the solution of a system of linear equations and also provides an empirical estimation of the EC.
 
-At present, no dedicated open-source R library is available for transparent, modular nutrient-solution calculation in horticultural applications.
+To the author’s knowledge, no dedicated open-source R library is currently available for transparent, modular nutrient-solution calculation in horticultural applications.
 
 # Material and Methods
 
@@ -929,7 +929,7 @@ converte("SO4", "S")
 It is also possible to specify an explicit quantity to be converted, for example when converting a given mass concentration
 
 ```{r}
-converte("N", "NO3", 210)
+converte("N", "NO3", 14)
 ```
 
 If multiple elements are shared between the source and target formulas, the anchor element E must be specified to avoid ambiguity.
@@ -2279,6 +2279,8 @@ ggplot(plot_df, aes(x = x_mL, y = pH, linetype = model)) +
   )
 ```
 
+
+\FloatBarrier
 ### Performance of EC Calculation
 
 To evaluate EC calculation performance, models were compared against reference calibration EC values for KCl solutions at 25 °C. Electrical conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from @Haynes.2017, which reports values based on primary conductivity standards originally published by @Pratt.2001. In @tbl-kcl-ec-comparison , reference values are compared with NutriCalc EC predictions using both γ activity-correction models (Davies and Debye–Hückel). For comparison, the empirical approach by @Sonneveld.1999 and geochemical computations with PHREEQC [@Parkhurst.2013] are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by @Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.
@@ -2485,7 +2487,7 @@ tbl <- knitr::kable(
   escape = TRUE
 ) |>
   add_header_above(c(" " = 1, "µS cm⁻¹" = ncol(df_print) - 1)) |>
-  kable_styling(latex_options = c("hold_position"), font_size = 9)
+  kable_styling(latex_options = c("HOLD_position"), font_size = 9)
 
 print(tbl)
 ```
