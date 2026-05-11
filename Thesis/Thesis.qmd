@@ -36,11 +36,11 @@ library(kableExtra)
 
 # Abstract {.unnumbered}
 
-Efficient nutrient solution formulation is fundamental to controlled horticultural production, yet in practice it is often based on fixed recipes or iterative manual adjustment. This thesis addresses that limitation through the development of a modular open-source computational framework in R for reproducible nutrient solution design called NutriCalc.
+Efficient nutrient-solution formulation is fundamental to controlled horticultural production, yet in practice it is often based on fixed recipes or iterative manual adjustment. This thesis addresses that limitation through the development of NutriCalc, a modular open-source R framework for reproducible nutrient-solution design.
 
-The central objective was to formalize nutrient formulation as a mathematically defined problem that can be solved transparently under agronomic and chemical constraints. To achieve this, the formulation task was expressed as a constrained linear optimisation problem and solved using non-negative least squares, ensuring physically meaningful fertilizer quantities. The framework combines stoichiometric conversion, unit transformation, charge-balance-based evaluation and estimation of pH and electrical conductivity, thereby linking nutrient targets to key physicochemical properties of the final solution.
+The central objective was to formalise nutrient formulation as a mathematically defined problem under horticultural and chemical constraints. The formulation task was expressed as a constrained linear optimisation problem and solved using non-negative least squares, ensuring non-negative fertilizer quantities. The framework combines stoichiometric conversion, unit transformation, charge-balance-based evaluation and estimation of pH and electrical conductivity, thereby linking nutrient targets to key physicochemical properties of the final solution.
 
-NutriCalc was implemented both as an R package for programmable workflows and as a Shiny-based graphical user interface for interactive use. Overall, the thesis demonstrates that nutrient solution design can be shifted from a recipe-driven practice to a reproducible, optimisation-based and chemically constrained workflow. NutriCalc provides a transparent computational foundation for horticultural research, teaching and applied nutrient management.
+NutriCalc was implemented as both an R package for programmable workflows and a Shiny-based graphical user interface for interactive use. Overall, the thesis demonstrates that nutrient-solution design can be shifted from recipe-driven practice to a reproducible, optimisation-based workflow grounded in solution chemistry. NutriCalc provides a transparent computational foundation for horticultural research, teaching and applied nutrient management.
 
 ------------------------------------------------------------------------
 
@@ -124,11 +124,11 @@ MAE
 
 meq L^-1^
 
-:   Milliequivalents per litre
+:   Milliequivalents per liter
 
 mmol L^-1^
 
-:   Millimoles per litre
+:   Millimoles per liter
 
 N~A~
 
@@ -193,7 +193,9 @@ In practice, however, nutrient solution design remains a complex task. Fertilize
 
 These challenges are particularly relevant in horticultural research, where treatments are often designed to manipulate individual nutrients while keeping other factors as constant as possible. Because ions are chemically coupled through shared salts, electroneutrality and solution chemistry, such designs require computationally explicit methods rather than ad hoc adjustment. Despite this need, no dedicated modular open-source framework in R is currently available for transparent nutrient solution formulation and analysis in horticultural applications.
 
-This thesis addresses that gap through the development of NutriCalc, an open-source computational framework in R for the formulation, analysis and optimisation of nutrient solutions. The work formalizes nutrient formulation as a constrained linear optimisation problem solved using non-negative least squares and extends this workflow through stoichiometric conversion, charge-balance-based evaluation, source-water correction and estimation of pH and electrical conductivity. In addition to the computational backend, the framework is implemented as a Shiny-based graphical user interface to support practical use by researchers and horticultural practitioners. The overarching objective of the thesis is to provide a reproducible, chemically coherent and extensible framework that shifts nutrient solution formulation from a recipe-based practice to a transparent computational workflow.
+This thesis addresses that gap through the development of NutriCalc, an open-source computational framework in R for the formulation, analysis and optimisation of nutrient solutions. The work formalises nutrient formulation as a constrained linear optimisation problem solved using non-negative least squares and extends this workflow through stoichiometric conversion, charge-balance-based evaluation, source-water correction and estimation of pH and electrical conductivity. In addition to the computational backend, the framework is implemented as a Shiny-based graphical user interface to support practical use by researchers and horticultural practitioners. The overarching objective of the thesis is to provide a reproducible, chemically coherent and extensible framework that shifts nutrient solution formulation from a recipe-based practice to a transparent computational workflow.
+
+\newpage
 
 ## Need for transparent and reproducible formulation tools
 
@@ -251,15 +253,15 @@ $$
 
 These discrepancies do not necessarily affect the overall conclusions of the study. However, they demonstrate how small ambiguities in conversion logic can lead to substantial differences in reported nutrient concentrations. The example therefore underlines the need for calculation frameworks in which unit conversions, stoichiometric coefficients, dilution factors and ion contributions are encoded explicitly and reproducibly. This is particularly relevant for integrated production systems, where nutrient streams may be reused across modules and quantitative consistency is required.
 
-## Background and Motivation
+## Background and motivation
 
-Precise nutrient solution formulation is a cornerstone of modern horticultural production, particularly in hydroponic and soilless cultivation systems. This process involves selecting and combining soluble fertilizer salts to deliver specific concentrations of essential elements in desired chemical forms and ratios [@Jones.2014]. While standard formulations were published since the mid-19th century [@Hoagland.1920; @Hoagland.1938; @Knop.1860; @Shive.1915; @Stout.1939] and were meticulously collected by @Hewitt.1966, practitioners frequently need to tailor them to local water quality, crop-specific requirements or available fertilizers, creating a complex and often error-prone challenge [@Resh.2013; @Sonneveld.2009].
+Precise nutrient solution formulation involves selecting and combining soluble fertilizer salts to deliver specific concentrations of essential elements in desired chemical forms and ratios [@Jones.2014]. While standard formulations were published since the mid-19th century [@Hoagland.1920; @Hoagland.1938; @Knop.1860; @Shive.1915; @Stout.1939] and were meticulously collected by @Hewitt.1966, practitioners frequently need to tailor them to local water quality, crop-specific requirements or available fertilizers, creating a complex and often error-prone challenge [@Resh.2013; @Sonneveld.2009].
 
 In plant nutrition experiments, treatments are typically designed to vary individual nutrients while holding others constant (ceteris paribus) to investigate the effect of a single nutrient element. However, due to the interdependencies among ions and their shared presence in various fertilizer salts, such isolation is rarely achievable in practice. Researchers must therefore account for the introduction of accompanying ions, which may affect plant responses and experimental validity.
 
 Creating accurate nutrient solutions under such constraints is time-consuming and sometimes mathematically infeasible, underscoring the need for computational tools that enable efficient, accurate and reproducible formulation under realistic chemical and experimental conditions.
 
-The nutrient formulation problem is inherently mathematical. Many fertilizer salts contribute multiple nutrients (e.g., Ca(NO₃)₂ supplies both calcium and nitrate), leading to an interdependent system. This can be modeled as a system of linear equations:
+The nutrient formulation problem is inherently mathematical. Many fertilizer salts contribute multiple nutrients (e.g., Ca(NO₃)₂ supplies both calcium and nitrate), leading to an interdependent system. This can be modelled as a system of linear equations:
 
 $A·x = b$
 
@@ -271,9 +273,9 @@ Where:
 
 -   b is the vector of target nutrient concentrations.
 
-Due to overlapping contributions and limited degrees of freedom, exact solutions may not exist. Thus, approximate solutions are needed, with the additional constraint that all fertilizer quantities must be non-negative. This motivates the use of non-negative least squares (NNLS) optimisation, which minimizes the squared error between the achieved and target nutrient vectors under the constraint x ≥ 0.
+Due to overlapping contributions and limited degrees of freedom, exact solutions may not exist. Thus, approximate solutions are needed, with the additional constraint that all fertilizer quantities must be non-negative. This motivates the use of non-negative least squares (NNLS) optimisation, which minimises the squared error between the achieved and target nutrient vectors under the constraint x ≥ 0.
 
-Moreover, real-world use requires support for various chemical notations such as conversions between elemental and oxide forms (e.g., P ↔ P₂O₅, S ↔ SO₄²⁻) and integration with commercially available fertilizers labeled in % w/w or expressed in units such as mmol L⁻¹ or mg L⁻¹. Despite the existence of some basic Windows applications and Excel tools, there is currently no open-source, modular and transparent software solution in R that offers this level of flexibility and chemical accuracy for horticultural applications.
+Moreover, real-world use requires support for various chemical notations such as conversions between elemental and oxide forms (e.g., P ↔ P₂O₅, S ↔ SO₄²⁻) and integration with commercially available fertilizers labelled in % w/w or expressed in units such as mmol L⁻¹ or mg L⁻¹. Despite the existence of some basic Windows applications and Excel tools, there is currently no open-source, modular and transparent software solution in R that offers this level of flexibility and chemical accuracy for horticultural applications.
 
 ## Objectives and research questions
 
@@ -349,9 +351,11 @@ Many nutritionally relevant components participate in acid–base equilibria and
 
 where $c_{ij}$ is the concentration of species $j$ belonging to component $i$. Changes in pH redistribute charge among species with different valencies as shown for phosphate in @fig-phosphate-speciation-tight, thereby altering the effective ionic composition of the solution even when total analytical concentrations are held constant. Although pH can be experimentally controlled using buffers or acid–base additions, such control necessarily introduces additional ionic components and therefore does not decouple pH from nutrient composition in a causal sense.
 
+\FloatBarrier
+
 ```{r}
 #| echo: false
-#| fig-cap: Phosphate speciation (percent) as a function of pH.
+#| fig-cap: Phosphate speciation (percent) as a function of pH, calculated from phosphate acid dissociation constants [@Haynes.2017].
 #| label: fig-phosphate-speciation-tight
 #| fig-height: 4.5
 #| fig-width: 7
@@ -443,7 +447,7 @@ The third class treats quantity as an emergent quality through solution-strength
 
 This transformation preserves ion ratios expressed in meq while increasing or decreasing total charge density, ionic strength and osmotic potential. Although composition remains constant at the level of charge ratios, pH and ionic speciation may shift because acid–base equilibria are nonlinear. As a result, solution strength functions as an environmental condition rather than a simple quantitative variable.
 
-Across these three experiment types, causal specificity for individual ion identity typically decreases as the number of inseparable or uncontrolled variables increases. Qualitative substitution experiments offer the highest degree of causal specificity, whereas quantitative salt manipulations and solution-strength series progressively trade causal resolution for ecological or agronomic relevance. These experiment classes are therefore best understood as distinct projections of a chemically constrained ionic system, most transparently described in milliequivalent space. Based on the invariants preserved in meq-space, the resulting classification of nutrient solution experimental designs is summarized in Table \ref{tab:meq-experiment-classes}. Qualitative substitutions preserve total charge equivalents, whereas salt additions and solution-strength series necessarily alter total charge density, EC and osmotic potential.
+Across these three experiment types, causal specificity for individual ion identity typically decreases as the number of inseparable or uncontrolled variables increases. Qualitative substitution experiments offer the highest degree of causal specificity, whereas quantitative salt manipulations and solution-strength series progressively trade causal resolution for ecological or horticultural relevance. These experiment classes are therefore best understood as distinct projections of a chemically constrained ionic system, most transparently described in milliequivalent space. Based on the invariants preserved in meq-space, the resulting classification of nutrient solution experimental designs is summarized in Table \ref{tab:meq-experiment-classes}. Qualitative substitutions preserve total charge equivalents, whereas salt additions and solution-strength series necessarily alter total charge density, EC and osmotic potential.
 
 \begin{table}[htbp]
 \centering
@@ -505,7 +509,7 @@ From a plant nutrition perspective, comparisons between nutrient solutions of di
 
 In hydroponics, nutrients are supplied by dissolving fertilizer salts in water to prepare a nutrient solution [@Resh.2013]. The formulation of such solutions is complicated by the declaration conventions used for commercial fertilizers. Nutrient contents are commonly expressed in oxide form rather than as elemental concentrations or ionic species. Thus, potassium is typically declared as K₂O rather than as K or ionic K⁺, while phosphorus is conventionally declared as P₂O₅ rather than as P or as the pH-dependent phosphate species H₂PO₄⁻, HPO₄²⁻, or PO₄³⁻. Although these conventions are historically established, they introduce an unnecessary level of abstraction and increase the susceptibility of nutrient calculations to error.
 
-A more serious limitation is that fertiliser labels do not necessarily disclose all chemically relevant constituents. Consequently, attempts to reconstruct complete fertiliser compositions in ionic form may fail to account for the complete ionic composition. This can occur, for example, when ions such as chloride are present but are not part of the mandatory nutrient-declaration structure. Under Regulation (EU) 2019/1009, nutrient declaration requirements depend on the product function category. For inorganic fertilisers, declared nutrients may include primary macronutrients, secondary macronutrients and micronutrients and several nutrients may be expressed in oxide rather than elemental forms. Oxide-based declarations such as P₂O₅, K₂O, CaO, MgO, Na₂O and SO₃ must therefore be converted before use in stoichiometric nutrient-solution calculations. Chloride is addressed separately from nutrient declaration; for example, the claim “poor in chloride” may only be used below 30 g kg⁻¹ dry matter [@EuropeanParliament.2019].
+A more serious limitation is that fertilizer labels do not necessarily disclose all chemically relevant constituents. Consequently, attempts to reconstruct complete fertilizer compositions in ionic form may fail to account for the complete ionic composition. This can occur, for example, when ions such as chloride are present but are not part of the mandatory nutrient-declaration structure. Under Regulation (EU) 2019/1009, nutrient declaration requirements depend on the product function category. For inorganic fertilizers, declared nutrients may include primary macronutrients, secondary macronutrients and micronutrients and several nutrients may be expressed in oxide rather than elemental forms. Oxide-based declarations such as P₂O₅, K₂O, CaO, MgO, Na₂O and SO₃ must therefore be converted before use in stoichiometric nutrient-solution calculations. Chloride is addressed separately from nutrient declaration; for example, the claim “poor in chloride” may only be used below 30 g kg⁻¹ dry matter [@EuropeanParliament.2019].
 
 For this reason, the present work was restricted to single salts or mixtures of single salts with chemically defined composition. Such compounds can be represented directly by their molecular formulas, so that molar mass and stoichiometric composition are fully determined by the sum of the constituent elements and their stoichiometric coefficients. This ensures complete compositional transparency and avoids the uncertainty associated with incomplete commercial fertilizer declarations.
 
@@ -533,7 +537,7 @@ Building on this foundation, an R package was developed. The package includes co
 
 The central component of the package was the implementation of the nutrient solution formulation algorithm. This algorithm used nnls::nnls() to solve the system of equations under non-negativity constraints and to quantify deviations between the target and calculated solution in terms of absolute and relative error. The framework also allows users to assign weights to individual nutrients, thereby enabling the exploration of different formulation priorities and trade-offs.
 
-The framework was validated through a series of use cases. These included reproducing historical and crop-specific nutrient solutions, comparing the computed results with values reported in the literature and compiling crop- and author-specific nutrient solutions into a base library. The distribution of anions and cations across different solutions was visualized, for example, by ternary plots for cations (K⁺, Ca²⁺, Mg²⁺) and anions (NO₃⁻, SO₄²⁻, PO₄³⁻), in order to classify nutrient combinations systematically, as proposed by @Steiner.1961.
+The framework was evaluated through a series of reconstruction, benchmark and application use cases. These included reproducing crop-specific nutrient solutions, comparing the computed results with values reported in the literature and compiling crop- and author-specific nutrient solutions into a base library. The distribution of anions and cations across different solutions was visualised, for example, by ternary plots for cations (K⁺, Ca²⁺, Mg²⁺) and anions (NO₃⁻, SO₄²⁻, PO₄³⁻), in order to classify nutrient combinations systematically, as proposed by @Steiner.1961.
 
 \newpage
 
@@ -978,7 +982,7 @@ Thus, each row of $A$ represents the linear contribution of all salts to one nut
 
 `NutriCalc` does not solve the unweighted least-squares problem $\min_{x \ge 0}\lVert Ax - b\rVert_2$. Instead, residuals are rescaled relative to target magnitude and weighted according to user-defined nutrient importance.
 
-Conceptually, the solver minimizes the total weighted squared deviation between achieved and target nutrient concentrations. For nutrients with nonzero targets, deviations are measured relative to the target (i.e. proportional error). For nutrients with zero targets, deviations are measured in absolute concentration units.
+Conceptually, the solver minimises the total weighted squared deviation between achieved and target nutrient concentrations. For nutrients with nonzero targets, deviations are measured relative to the target (i.e. proportional error). For nutrients with zero targets, deviations are measured in absolute concentration units.
 
 This relative scaling is necessary because nutrient concentrations often differ by several orders of magnitude (for example, macronutrients versus micronutrients). Without scaling, nutrients present at large absolute concentrations would dominate the optimisation and prevent meaningful fitting of low-concentration nutrients.
 
@@ -1000,7 +1004,7 @@ Each unit increase in importance multiplies the penalty on deviations by a facto
 
 The weights are incorporated into the least-squares objective using the diagonal matrix $$
 W = \mathrm{diag}\!\left(\sqrt{w_1},\ldots,\sqrt{w_m}\right),
-$$ which scales the residuals before minimization. The optimisation therefore minimizes a weighted sum of squared deviations, where each nutrient contributes proportionally to its assigned importance.
+$$ which scales the residuals before minimization. The optimisation therefore minimises a weighted sum of squared deviations, where each nutrient contributes proportionally to its assigned importance.
 
 #### Target-based scaling of residuals
 
@@ -1027,9 +1031,9 @@ W \left( A_{\mathrm{sub}} x - b/s \right)
 \right\|_2^2 .
 $$
 
-This is equivalent to minimizing a weighted sum of squared scaled residuals. For nutrients with nonzero targets, the optimisation minimizes weighted relative deviations; for nutrients with zero targets, it minimizes weighted absolute deviations. The scaling ensures that all nutrients contribute comparably to the optimisation regardless of their concentration range, while importance weights control how strictly individual targets are enforced.
+This is equivalent to minimizing a weighted sum of squared scaled residuals. For nutrients with nonzero targets, the optimisation minimises weighted relative deviations; for nutrients with zero targets, it minimises weighted absolute deviations. The scaling ensures that all nutrients contribute comparably to the optimisation regardless of their concentration range, while importance weights control how strictly individual targets are enforced.
 
-Operationally, the solver predicts nutrient concentrations from candidate salt amounts, computes deviations from the targets, rescales and weights these deviations according to target magnitude and nutrient importance and determines the non-negative salt combination that minimizes the resulting weighted least-squares objective.
+Operationally, the solver predicts nutrient concentrations from candidate salt amounts, computes deviations from the targets, rescales and weights these deviations according to target magnitude and nutrient importance and determines the non-negative salt combination that minimises the resulting weighted least-squares objective.
 
 ### Interpretation of the solution
 
@@ -1123,9 +1127,9 @@ Accordingly, the two-stage solver acts as a conditional refinement: neutral salt
 
 ### Water quality and input handling
 
-Nutrient formulation was implemented using a target-based optimisation workflow in NutriCalc. Users specify desired final nutrient concentrations as a nutrient target vector. The solver then computes the fertilizer salt additions needed to match this target. This approach is exact only when the initial water matrix is essentially deionized or demineralized water. In practical cultivation systems, however, source water already contains dissolved ions that contribute to the final solution and must therefore be accounted for before fertilizer optimisation.
+Nutrient formulation was implemented using a target-based optimisation workflow in NutriCalc. Users specify desired final nutrient concentrations as a nutrient target vector. The solver then computes the fertilizer salt additions needed to match this target. This approach is exact only when the initial water matrix is essentially deionised or demineralised water. In practical cultivation systems, however, source water already contains dissolved ions that contribute to the final solution and must therefore be accounted for before fertilizer optimisation.
 
-To represent this baseline contribution, water chemistry is modeled as a water vector containing pre-existing ion concentrations. The formulation step uses an adjusted target vector obtained by subtracting the baseline water vector from the desired nutrient target vector. For each nutrient ion $i$, the solver input is defined as:
+To represent this baseline contribution, water chemistry is modelled as a water vector containing pre-existing ion concentrations. The formulation step uses an adjusted target vector obtained by subtracting the baseline water vector from the desired nutrient target vector. For each nutrient ion $i$, the solver input is defined as:
 
 $$
 T_i^{adj} = \max\!\left(T_i^{target} - W_i,\; 0\right)
@@ -1147,7 +1151,7 @@ $$
 T^{adj} = \max\!\left(T^{target} - W^{mix},\; 0\right).
 $$
 
-This enables realistic handling of scenarios such as blending municipal water with deionized water, rainwater, or other process waters before nutrient dosing.
+This enables realistic handling of scenarios such as blending municipal water with deionised water, rainwater, or other process waters before nutrient dosing.
 
 Water quality inputs were derived from publicly available authority datasets where possible. For Berlin, NutriCalc retrieves supplier data and maps it to the internal water-vector representation. In practice, users can query location-specific baseline water data by postal code and optionally modify values to reflect local measurements or temporal variability.
 
@@ -1155,7 +1159,7 @@ Overall, this method ensures that fertilizer optimisation is performed against t
 
 ### Estimation of pH via charge balance
 
-Solution pH is calculated using `ph_from_achieved()` based on the achieved nutrient composition returned by the solver (mmol L$^{-1}$). The calculation is performed as a charge-balance problem in which pH is treated as an unknown variable. The hydrogen ion concentration is determined such that the aqueous solution satisfies electroneutrality, expressed in milliequivalents per litre (meq L$^{-1}$), such that total positive and negative charge are equal [@Appelo.2005].
+Solution pH is calculated using `ph_from_achieved()` based on the achieved nutrient composition returned by the solver (mmol L$^{-1}$). The calculation is performed as a charge-balance problem in which pH is treated as an unknown variable. The hydrogen ion concentration is determined such that the aqueous solution satisfies electroneutrality, expressed in milliequivalents per liter (meq L$^{-1}$), such that total positive and negative charge are equal [@Appelo.2005].
 
 The calculation is formulated as a root-finding problem in which the charge-balance residual is expressed as a function of pH. The root variable is defined as
 
@@ -1330,6 +1334,7 @@ Diffusion coefficients of ionic species at 25 °C were retrieved from @Haynes.20
 
 The osmotic potential is estimated from the calculated EC value using the empirical relationship $\Psi_{\mathrm{osm}} = -36 \cdot \mathrm{EC}$, where $\Psi_{\mathrm{osm}}$ is expressed in kPa and EC in mS cm$^{-1}$. This relationship is given by @George.2012 based on @UnitedStatesSalinityLaboratoryStaff.1954, where it was originally formulated as a relation between osmotic potential and the electrical conductivity of the saturation extract.
 
+\newpage 
 ## Shiny Application Workflow
 
 The Shiny application was developed as an interactive interface to the computational workflow described in the previous sections. The purpose of the following section is therefore not only to document the user interface, but also to make the case-study workflows reproducible by linking the visible input and output elements of the application to the corresponding computational steps.
@@ -1349,7 +1354,7 @@ run_app()
 
 Alternatively, the deployed Shiny application can be accessed online without local installation at https://nutricalc.shinyapps.io/nutricalc-app/.
 
-Once launched, the application opens with the title `NutriCalc 🌿 Nutrient Solution Formulation in Horticultural Sciences`.
+Once launched, the application opens with the title `NutriCalc: Nutrient Solution Formulation in Horticultural Sciences`.
 
 ### Input parameters
 
@@ -1357,7 +1362,7 @@ The left-hand panel of the Shiny graphical user interface (GUI), titled `Nutrien
 
 #### Nutrient Targets
 
-Within the `Nutrient Targets` tab, each nutrient is represented by three user-editable controls: a `Target` input field, a `Water` input field and a `Priority` selector. The `Target` field defines the desired concentration in the final nutrient solution, whereas the `Water` field specifies the concentration contributed by the source water. Input values can be displayed and entered in $\mathrm{mmol\,L^{-1}}$, $\mathrm{\mu mol\,L^{-1}}$, or $\mathrm{mg\,L^{-1}}$. In addition, alkalinity-related water parameters can be entered using the `KS 4.3` and `KB 8.2` fields. The `Priority` control is implemented as a slider ranging from −2 to +2 and specifies the relative importance of each nutrient during optimisation. After unit conversion and water correction, these values define the target vector and weighting used by the optimisation routine.
+Within the `Nutrient Targets` tab, each nutrient is represented by three user-editable controls: a `Target` input field, a `Water` input field and a `Priority` selector. The `Target` field defines the desired concentration in the final nutrient solution, whereas the `Water` field specifies the concentration contributed by the source water. Input values can be displayed and entered in $\mathrm{mmol\,L^{-1}}$, $\mathrm{µmol\,L^{-1}}$, or $\mathrm{mg\,L^{-1}}$. In addition, alkalinity-related water parameters can be entered using the `KS 4.3` and `KB 8.2` fields. The `Priority` control is implemented as a slider ranging from −2 to +2 and specifies the relative importance of each nutrient during optimisation. After unit conversion and water correction, these values define the target vector and weighting used by the optimisation routine.
 
 At the bottom of the panel, several global controls are available for workflow management. The `Set all to 0` button resets all target and water input values to zero, whereas `Reset to defaults` restores the predefined default settings. The `Use acids/bases` option activates the secondary optimisation stage after completion of the initial solver step, thereby allowing the inclusion of acids and bases for further adjustment. Finally, the `Result` button initiates the solver and opens the calculated formulation output.
 
@@ -1365,7 +1370,7 @@ At the bottom of the panel, several global controls are available for workflow m
 
 The `Water` tab is used to define and modify the source-water composition. Mean water-analysis values for Berlin postal code areas (`PLZ`) from @BWB.2026 can be retrieved by entering a valid postal code (in the range from `10115` to `14199`). Retrieved values can be transferred to the `Water` input fields in the `Nutrient Targets` tab or into the water-mixing interface as `Water 1`.
 
-Within the mixing interface, two separate source waters, `Water 1` and `Water 2`, can be defined. Concentrations for both sources can be entered manually. If one of the two sources is left empty, it is assumed to be deionized water. A slider is used to specify the mixing ratio between `Water 1` and `Water 2`. In this way, blends of different water sources, such as tap water, drainage water, rainwater, aquaculture effluent, or other custom nutrient-containing solutions, can be simulated. The resulting mixture can be transferred to the `Water` input fields in the `Nutrient Targets` tab. These inputs define the source-water vector that is incorporated into the final solution and subtracted from the nutrient targets before optimisation.
+Within the mixing interface, two separate source waters, `Water 1` and `Water 2`, can be defined. Concentrations for both sources can be entered manually. If one of the two sources is left empty, it is assumed to be deionised water. A slider is used to specify the mixing ratio between `Water 1` and `Water 2`. In this way, blends of different water sources, such as tap water, drainage water, rainwater, aquaculture effluent, or other custom nutrient-containing solutions, can be simulated. The resulting mixture can be transferred to the `Water` input fields in the `Nutrient Targets` tab. These inputs define the source-water vector that is incorporated into the final solution and subtracted from the nutrient targets before optimisation.
 
 #### Fertilizers
 
@@ -1391,11 +1396,9 @@ The right-hand side of the Shiny graphical user interface (GUI) contains the out
 
 #### Result
 
-The `Result` tab summarises the optimisation output by comparing the calculated nutrient composition with the user-defined target composition. For each nutrient, the table reports the values specified in the `Water` vector, the `Target` vector and the values calculated by the solver in `Achieved`. In addition, a `Final` value is reported, representing the sum of the `Water` contribution and the `Achieved` contribution. The tab therefore links solver output to water contribution, target, achieved and final composition, together with deviation metrics. Concentrations are displayed in $\mathrm{\mu mol\,L^{-1}}$ for values less than or equal to $0.1\ \mathrm{mmol\,L^{-1}}$ and in $\mathrm{mmol\,L^{-1}}$ for values above this threshold.
+The `Result` tab summarises the optimisation output by comparing the calculated nutrient composition with the user-defined target composition. For each nutrient, the table reports the values specified in the `Water` vector, the `Target` vector and the values calculated by the solver in `Achieved`. In addition, a `Final` value is reported, representing the sum of the `Water` contribution and the `Achieved` contribution. The tab therefore links solver output to water contribution, target, achieved and final composition, together with deviation metrics. Concentrations are displayed in $\mathrm{µmol\,L^{-1}}$ for values less than or equal to $0.1\ \mathrm{mmol\,L^{-1}}$ and in $\mathrm{mmol\,L^{-1}}$ for values above this threshold.
 
-Deviation from the target composition is quantified using the error metrics `Abs. Error` and `Pct. Error`, representing the absolute deviation and the relative deviation in percent of `Final` from `Target`, respectively.
-
-To evaluate the overall goodness of fit across all nutrients, deviations are additionally aggregated as squared error terms. Absolute deviations are summarised as the sum of squared errors (`SSE`), whereas relative deviations are summarised as the sum of squared relative errors (`SSRE`).
+Deviation from the target composition is quantified using the error metrics `Abs. Error` and `Pct. Error`, representing the absolute deviation and the relative deviation in percent of `Final` from `Target`, respectively.To evaluate the overall goodness of fit across all nutrients, deviations are additionally aggregated as squared error terms. Absolute deviations are summarised as the sum of squared errors (`SSE`), whereas relative deviations are summarised as the sum of squared relative errors (`SSRE`).
 
 #### pH & EC
 
@@ -1431,11 +1434,11 @@ Three case studies were selected to demonstrate the application of the framework
 
 ### Case Study I: Alternative Hoagland II nutrient solution formulation
 
-In this scenario, a plant scientist needs to prepare a classical Hoagland nutrient solution for an experiment using deionized water. The intended formulation is the macronutrient solution of the "Solution No. 2" according to @Hoagland.1938, consisting of 6 mM KNO₃, 4 mM Ca(NO₃)₂, 1 mM NH₄H₂PO₄ and 2 mM MgSO₄·7H₂O. The scientist requires the solution at several concentration levels corresponding to target EC values of 0.5, 1.0, 1.5, 2.0, 2.5 and 3.0 mS cm⁻¹. However, the standard calcium nitrate salt is unavailable and only calcium ammonium nitrate (CAN; 5Ca(NO₃)₂·NH₄NO₃·10H₂O) is available as a substitute.
+In this scenario, a plant scientist needs to prepare a classical Hoagland nutrient solution for an experiment using deionised water. The intended formulation is the macronutrient solution of the "Solution No. 2" according to @Hoagland.1938, consisting of 6 mM KNO₃, 4 mM Ca(NO₃)₂, 1 mM NH₄H₂PO₄ and 2 mM MgSO₄·7H₂O. The scientist requires the solution at several concentration levels corresponding to target EC values of 0.5, 1.0, 1.5, 2.0, 2.5 and 3.0 mS cm⁻¹. However, the standard calcium nitrate salt is unavailable and only calcium ammonium nitrate (CAN; 5Ca(NO₃)₂·NH₄NO₃·10H₂O) is available as a substitute.
 
 ### Case Study II: Tomato nutrient solution using Berlin-Dahlem water with acid adjustment
 
-In this scenario, a horticultural technician needs to prepare a nutrient solution for tomato cultivation in rockwool using technical-grade fertilizers and tap water from Berlin-Dahlem (postal code 14195) instead of deionized water. The reference formulation is the tomato recipe reported by @Sonneveld.1994. Because the tap water contributes background ions and alkalinity, the two-stage solver is applied with nitric acid permitted in the second stage for acid adjustment. Calculations are performed for the preparation of 500 L nutrient solution and for 18 L of a 50-fold concentrated stock solution separated into A-BAK, B-BAK and micronutrients.
+In this scenario, a horticultural technician needs to prepare a nutrient solution for tomato cultivation in rockwool using technical-grade fertilizers and tap water from Berlin-Dahlem (postal code 14195) instead of deionised water. The reference formulation is the tomato recipe reported by @Sonneveld.1994. Because the tap water contributes background ions and alkalinity, the two-stage solver is applied with nitric acid permitted in the second stage for acid adjustment. Calculations are performed for the preparation of 500 L nutrient solution and for 18 L of a 50-fold concentrated stock solution separated into A-BAK, B-BAK and micronutrients.
 
 ### Case Study III: Nutrient solution with increased sodium concentration for halophytes using mixed water sources
 
@@ -3120,7 +3123,7 @@ Both NutriCalc EC models tended to overestimate the reported values. The Debye�
 
 ## Case Study Results
 
-### Case study I — Experimental scientist: classical solution reconstruction under restricted salt availability (deionized water) and different EC.
+### Case study I — Experimental scientist: classical solution reconstruction under restricted salt availability (deionised water) and different EC.
 
 The macronutrient composition of Hoagland solution No. 2 consists of 14 mmol L⁻¹ NO₃–N, 1 mmol L⁻¹ NH₄–N, 1 mmol L⁻¹ P, 6 mmol L⁻¹ K, 4 mmol L⁻¹ Ca, 2 mmol L⁻¹ Mg and 2 mmol L⁻¹ S. In the absence of Ca(NO₃)₂ three exemplary alternative formulations using the technical salt CAN are shown in Table \ref{tab:tbl-hoagland-comparison}.
 
@@ -3480,18 +3483,36 @@ The results showed that a broad range of published horticultural target solution
 
 ------------------------------------------------------------------------
 
-# References
+\clearpage
+
+# References {.unnumbered}
+
+\begingroup
+\interlinepenalty=10000
+\clubpenalty=10000
+\widowpenalty=10000
 
 ::: {#refs}
 :::
 
-\clearpage
-\restorefrontmatter
+\endgroup
+
 
 
 ------------------------------------------------------------------------
 
-# Appendix {.unnumbered}
+
+\appendix
+\renewcommand{\thetable}{A.\arabic{table}}
+\renewcommand{\thefigure}{A.\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
+# Appendix {-}
+
+
+The appendix provides supplementary material for the evaluation and documentation of NutriCalc. It includes an additional comparison of reported and calculated electrical conductivity values for crop-specific nutrient-solution reconstructions, as well as the function documentation generated with `roxygen2` for the implemented R package. The complete R code is available in the GitHub repository at <https://github.com/diolsa/nutricalc>.
+
 
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_ec_models
