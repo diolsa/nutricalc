@@ -263,15 +263,15 @@ Creating accurate nutrient solutions under such constraints is time-consuming an
 
 The nutrient formulation problem is inherently mathematical. Many fertilizer salts contribute multiple nutrients (e.g., Ca(NO₃)₂ supplies both calcium and nitrate), leading to an interdependent system. This can be modelled as a system of linear equations:
 
-$A·x = b$
+$$
+A \cdot x = b
+$$
 
-Where:
+where:
 
--   A is the nutrient matrix (each row representing a nutrient, each column a fertilizer salt),
-
--   x is the vector of unknown fertilizer quantities,
-
--   b is the vector of target nutrient concentrations.
+-   $A$ is the nutrient matrix, with each row representing a nutrient and each column a fertilizer salt;
+-   $x$ is the vector of unknown fertilizer quantities;
+-   $b$ is the vector of target nutrient concentrations.
 
 Due to overlapping contributions and limited degrees of freedom, exact solutions may not exist. Thus, approximate solutions are needed, with the additional constraint that all fertilizer quantities must be non-negative. This motivates the use of non-negative least squares (NNLS) optimisation, which minimises the squared error between the achieved and target nutrient vectors under the constraint x ≥ 0.
 
@@ -287,7 +287,7 @@ The work was guided by the following research questions:
 
 1.  Can nutrient solution formulation be represented as a reproducible stoichiometric optimisation problem using chemically defined fertilizer compounds?
 
-2.  To what extent can NNLS-based formulation reconstruct published horticultural nutrient solution recipes under non-negativity constraints?
+2.  To what extent can NNLS-based formulation reconstruct published horticultural nutrient solution recipes?
 
 3.  How closely do the implemented pH and EC estimation routines reproduce selected reference systems for phosphate buffering and KCl conductivity?
 
@@ -535,7 +535,7 @@ The development of the computational framework followed a structured development
 
 Building on this foundation, an R package was developed. The package includes core functions for parsing chemical formulas and computing molar masses, as well as for converting between different chemical representations such as oxides and elemental forms (e.g., P₂O₅ to P or SO₄ to S). It also includes tools for transforming concentration units (e.g., from mmol L⁻¹ to mg L⁻¹) using accurate molar-mass calculations. In addition, bidirectional transformations between compound-based and elemental quantities were integrated on the basis of stoichiometric relationships.
 
-The central component of the package was the implementation of the nutrient solution formulation algorithm. This algorithm used nnls::nnls() to solve the system of equations under non-negativity constraints and to quantify deviations between the target and calculated solution in terms of absolute and relative error. The framework also allows users to assign weights to individual nutrients, thereby enabling the exploration of different formulation priorities and trade-offs.
+The central component of the package was the implementation of the nutrient solution formulation algorithm. This algorithm used `nnls()` to solve the system of equations under non-negativity constraints and to quantify deviations between the target and calculated solution in terms of absolute and relative error. The framework also allows users to assign weights to individual nutrients, thereby enabling the exploration of different formulation priorities and trade-offs.
 
 The framework was evaluated through a series of reconstruction, benchmark and application use cases. These included reproducing crop-specific nutrient solutions, comparing the computed results with values reported in the literature and compiling crop- and author-specific nutrient solutions into a base library. The distribution of anions and cations across different solutions was visualised, for example, by ternary plots for cations (K⁺, Ca²⁺, Mg²⁺) and anions (NO₃⁻, SO₄²⁻, PO₄³⁻), in order to classify nutrient combinations systematically, as proposed by @Steiner.1961.
 
@@ -553,7 +553,7 @@ Code development was supported by AI-assisted LLM for debugging and optimisation
 
 ### Built-in recipe datasets
 
-@Hewitt.1966 compiled a large proportion of the nutrient solution formulations used during the first half of the twentieth century. For the present work, selected standard recipes from this compilation were considered, particularly those that remain relevant in contemporary research and horticultural practice. In addition, 38 crop-specific horticultural recipes from @Sonneveld.1994 were included. These recipes were assigned to the three groups `Olericulture`, `Floriculture` and `Fruticulture`. In the original source, @Sonneveld.1994 also classified the formulations into the categories `A`, `B` and `C`, reflecting their practical and experimental suitability for the respective crop. The resulting set of formulations is shown in @tbl-crop-recipes-long-landscape_units.
+@Hewitt.1966 compiled a large proportion of the nutrient solution formulations used during the first half of the twentieth century. For the present work, selected standard recipes from this compilation were considered, particularly those that remain relevant in contemporary research and horticultural practice. In addition, 38 crop-specific horticultural recipes from @Sonneveld.1994 were included. These recipes were assigned to the three groups `Olericulture`, `Floriculture` and `Fruticulture`. In the original source, @Sonneveld.1994 also classified the formulations into categories, reflecting their practical and experimental suitability for the respective crop. The resulting set of formulations is shown in @tbl-crop-recipes-long-landscape_units.
 
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_units
@@ -678,7 +678,7 @@ cat("\\renewcommand{\\arraystretch}{1}\n")
 
 ### Elementary Entities
 
-After the 2019 revision of the International System of Units, the base units are defined by fixed numerical values of fundamental constants [@BIPM.2019]. The mole is the SI unit for the amount of a substance; its symbol is mol. The defining constant is the Avogadro constant, N~A~ Thus:
+After the 2019 revision of the International System of Units, the base units are defined by fixed numerical values of fundamental constants [@BIPM.2019]. The mole is the SI unit for the amount of a substance; its symbol is mol. The defining constant is the Avogadro constant, N~A~. Thus:
 
 \begin{equation} 1\,\mathrm{mol} = 6.02214076 \times 10^{23}\,\text{elementary entities} \end{equation}
 
@@ -887,13 +887,13 @@ The returned value corresponds to a molar mass of 236.146 g mol⁻¹ for Ca(NO�
 
 ### Stoichiometric conversions
 
-Numerically, the official SI unit for the substance concentration is mol m⁻³; however, this unit is equivalent to mmol l⁻¹. Therefore, the following relationships for conversion between mmol l⁻¹ and mg l⁻¹ were applied, following Appelo and Postma [@Appelo.2005]:
+Numerically, the official SI unit for the substance concentration is mol m⁻³; however, this unit is equivalent to mmol L⁻¹. Therefore, the following relationships for conversion between mmol L⁻¹ and mg L⁻¹ were applied, following Appelo and Postma [@Appelo.2005]:
 
 ```{=latex}
 
 \begin{align*}
-\mathrm{mg\ l^{-1}}   &= \mathrm{mmol\ l^{-1}} \times \mathrm{M} \\
-\mathrm{mmol\ l^{-1}} &= \frac{\mathrm{mg\ l^{-1}}}{\mathrm{M}}
+\mathrm{mg\ L^{-1}}   &= \mathrm{mmol\ L^{-1}} \times \mathrm{M} \\
+\mathrm{mmol\ L^{-1}} &= \frac{\mathrm{mg\ L^{-1}}}{\mathrm{M}}
 \end{align*}
 
 \noindent where \begin{align*}
@@ -901,7 +901,7 @@ Numerically, the official SI unit for the substance concentration is mol m⁻³;
 \end{align*}
 ```
 
-Within the library, conversion between mmol l^-1^ and mg l^-1^ as elements can be accomplished with the convert_units() function. When the input is provided as a named numeric vector, the names are interpreted as nutrient identifiers (e.g., `Ca`, `P`, `NO3_N`) and are internally mapped to their corresponding element symbols to select the appropriate molar mass (from element_molar_mass_df) for conversion. For example, converting a complete set of recipe values from mg l⁻¹ to mmol l⁻¹:
+Within the library, conversion between mmol L^-1^ and mg L^-1^ as elements can be accomplished with the `convert_units()` function. When the input is provided as a named numeric vector, the names are interpreted as nutrient identifiers (e.g., `Ca`, `P`, `NO3_N`) and are internally mapped to their corresponding element symbols to select the appropriate molar mass (from element_molar_mass_df) for conversion. For example, converting a complete set of recipe values from mg L⁻¹ to mmol L⁻¹:
 
 ```{r}
 convert_units(c(Ca = 211, P = 46), to = "mmol/L")
@@ -913,8 +913,7 @@ The conversion can also be applied to a single scalar concentration. In this cas
 convert_units(x = 15, element = "N", to = "mg/L")
 ```
 
-
-When concentrations are declared in mg l⁻¹, masses are often reported in oxidized or compound forms (e.g. SO₄ or MgO). To convert between such compound-based representations and their elemental equivalents, the converte() function can be used:
+When concentrations are declared in mg L⁻¹, masses are often reported in oxidized or compound forms (e.g. SO₄ or MgO). To convert between such compound-based representations and their elemental equivalents, the `converte()` function can be used:
 
 ```{=latex}
 \begin{align*}
@@ -1083,7 +1082,7 @@ $$
 \mathrm{SSRE} = \sum_{i=1}^{m} r_i^2 .
 $$
 
-This metric summarises proportional deviations across nutrients and provides a scale-independent measure of solution accuracy. Nutrients with zero target concentration where excluded from relative error metrics.
+This metric summarises proportional deviations across nutrients and provides a scale-independent measure of solution accuracy. Nutrients with zero target concentration were excluded from relative error metrics.
 
 ### Two-stage NNLS solver: separation of neutral salts and acid–base reagents
 
@@ -1209,6 +1208,8 @@ $$
 
 and therefore may differ slightly from $\mathrm{pH}_c$. All calculations assume 25 °C and exclude precipitation reactions and explicit metal–ligand complexation beyond optional fixed-charge chelate terms.
 
+\newpage
+
 ### EC estimation using ionic diffusion coefficients
 
 Electrical conductivity (EC) quantifies the ability of an aqueous solution to transport electrical charge and is therefore determined by the concentration and mobility of dissolved ions. Several approaches exist for estimating EC from chemical composition, ranging from simple empirical relationships to ion-specific physicochemical models.
@@ -1257,14 +1258,12 @@ where EC is expressed in mS cm$^{-1}$.
 
 Although such empirical formulations may improve predictive accuracy within their calibration range, they do not explicitly account for differences in ionic mobility among individual species. Because the ionic species present in solution are known in `NutriCalc`, EC can be estimated mechanistically from their concentration, charge and mobility. The limiting molar ionic conductivity can be related to the diffusion coefficient through the Nernst–Einstein relation [@Kalka.2020]. In `NutriCalc`, this relation is extended by a mobility correction term accounting for non-ideal solution behavior. This method is used in hydrochemical programs such as PHREEQC (up to version 3.8) and AQION 8.7.15 [@Appelo.2010; @Kalka.2020].
 
-\begin{align}
-\label{eq:ec}
+\begin{align*}
 \mathrm{EC}
 =
 \left(\frac{F^2}{R T}\right)
-\sum_{i} D_i z_i^{2}\, (\gamma_i)^{\alpha_i}\, c_i.
-\tag{6}
-\end{align}
+\sum_{i} D_i z_i^{2}\, (\gamma_i)^{\alpha_i}\, c_i,
+\end{align*}
 
 \noindent where
 
@@ -1292,7 +1291,7 @@ The activity of a dissolved species depends not only on its concentration but al
 $$
 I
 =
-\frac{1}{2}\sum_i z_i^2 c_i.
+\frac{1}{2}\sum_i z_i^2 c_i,
 $$
 
 Because the classical Nernst–Einstein relation applies strictly at infinite dilution, a mobility scaling factor is introduced to account empirically for inter-ionic interactions at finite ionic strength as described by @Appelo.2010. The scaling exponent is defined as
@@ -1334,7 +1333,8 @@ Diffusion coefficients of ionic species at 25 °C were retrieved from @Haynes.20
 
 The osmotic potential is estimated from the calculated EC value using the empirical relationship $\Psi_{\mathrm{osm}} = -36 \cdot \mathrm{EC}$, where $\Psi_{\mathrm{osm}}$ is expressed in kPa and EC in mS cm$^{-1}$. This relationship is given by @George.2012 based on @UnitedStatesSalinityLaboratoryStaff.1954, where it was originally formulated as a relation between osmotic potential and the electrical conductivity of the saturation extract.
 
-\newpage 
+\newpage
+
 ## Shiny Application Workflow
 
 The Shiny application was developed as an interactive interface to the computational workflow described in the previous sections. The purpose of the following section is therefore not only to document the user interface, but also to make the case-study workflows reproducible by linking the visible input and output elements of the application to the corresponding computational steps.
@@ -1398,7 +1398,7 @@ The right-hand side of the Shiny graphical user interface (GUI) contains the out
 
 The `Result` tab summarises the optimisation output by comparing the calculated nutrient composition with the user-defined target composition. For each nutrient, the table reports the values specified in the `Water` vector, the `Target` vector and the values calculated by the solver in `Achieved`. In addition, a `Final` value is reported, representing the sum of the `Water` contribution and the `Achieved` contribution. The tab therefore links solver output to water contribution, target, achieved and final composition, together with deviation metrics. Concentrations are displayed in $\mathrm{µmol\,L^{-1}}$ for values less than or equal to $0.1\ \mathrm{mmol\,L^{-1}}$ and in $\mathrm{mmol\,L^{-1}}$ for values above this threshold.
 
-Deviation from the target composition is quantified using the error metrics `Abs. Error` and `Pct. Error`, representing the absolute deviation and the relative deviation in percent of `Final` from `Target`, respectively.To evaluate the overall goodness of fit across all nutrients, deviations are additionally aggregated as squared error terms. Absolute deviations are summarised as the sum of squared errors (`SSE`), whereas relative deviations are summarised as the sum of squared relative errors (`SSRE`).
+Deviation from the target composition is quantified using the error metrics `Abs. Error` and `Pct. Error`, representing the absolute deviation and the relative deviation in percent of `Final` from `Target`, respectively. To evaluate the overall goodness of fit across all nutrients, deviations are additionally aggregated as squared error terms. Absolute deviations are summarised as the sum of squared errors (`SSE`), whereas relative deviations are summarised as the sum of squared relative errors (`SSRE`).
 
 #### pH & EC
 
@@ -1447,7 +1447,6 @@ In this scenario, a horticultural scientist needs to formulate a nutrient soluti
 ------------------------------------------------------------------------
 
 # Results
-
 
 The results are presented in two main parts. The first part evaluates the model performance and plausibility of NutriCalc using crop-specific recipe reconstruction, selected reference-system checks for pH and EC calculations and comparison with a published formulation by @Sonneveld.1994. The second part presents three case studies that demonstrate the application of NutriCalc to specific formulation problems and illustrate its practical applicability across different scenarios.
 
@@ -2373,7 +2372,7 @@ r2 <- function(y, yhat) {
 r2_dav <- r2(ph_wide$pH_ref, ph_wide$pH_davies)
 r2_dh  <- r2(ph_wide$pH_ref, ph_wide$pH_dh)
 
-lab_ref <- "Buffer Reference at 25 °C @Haynes"
+lab_ref <- "Buffer Reference at 25 °C (Haynes, 2017)"
 lab_dav <- sprintf("γ Davies (25 °C), R² = %.3f", r2_dav)
 lab_dh  <- sprintf("γ Debye-Hueckel (25 °C), R² = %.3f", r2_dh)
 
@@ -2422,7 +2421,7 @@ ggplot(plot_df, aes(x = x_mL, y = pH, linetype = model)) +
 
 ### Performance of EC calculation
 
-To evaluate EC calculation performance, models were compared against reference calibration EC values for KCl solutions at 25 °C. Electrical conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from @Haynes.2017, which reports values based on primary conductivity standards originally published by @Pratt.2001. In @tbl-kcl-ec-comparison , reference values are compared with NutriCalc EC predictions using both γ activity-correction models (Davies and Debye–Hückel). For comparison, the empirical approach by @Sonneveld.1999 and geochemical computations with PHREEQC [@Parkhurst.2013] are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by @Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.
+To evaluate EC calculation performance, model predictions were compared against reference electrical-conductivity values for KCl solutions at 25 °C. Electrical-conductivity values for 0.01 and 0.1 mol L⁻¹ KCl were taken from @Haynes.2017, which reports values based on primary conductivity standards originally published by @Pratt.2001. In @tbl-kcl-ec-comparison, these reference values are compared with NutriCalc EC predictions using the Davies and Debye–Hückel activity-coefficient models as reported by @Kalka.2020. For comparison, the empirical approach by @Sonneveld.1999 and geochemical computations with PHREEQC [@Parkhurst.2013] are also shown. PHREEQC and NutriCalc with γ Davies were very close to the values reported by @Haynes.2017 at both concentrations. NutriCalc with γ Debye–Hückel slightly underestimated EC, while the underestimation was larger for the Sonneveld empirical approach.
 
 ```{r}
 #| label: tbl-kcl-ec-comparison
@@ -3117,7 +3116,7 @@ ggplot(
 
 \FloatBarrier
 
-Both NutriCalc EC models tended to overestimate the reported values. The Debye–Hückel model showed a smaller systematic bias and typical error size (ME = +0.08 mS cm⁻¹, MAE = 0.08 mS cm⁻¹) than the Davies model (ME = +0.13 mS cm⁻¹, MAE = 0.13 mS cm⁻¹). The maximum overestimation was +0.21 mS cm⁻¹ for Debye–Hückel and +0.29 mS cm⁻¹ for Davies across all 38 recipes. Thus, the empirical Sonneveld approximation reproduced the reported EC values most closely in absolute terms, whereas the EC models showed a small positive bias under the salts-only reconstruction assumptions. EC values and Deviation for all models are shown in Appendix under @tbl-crop-recipes-long-landscape_ec_models
+Both NutriCalc EC models tended to overestimate the reported values. The Debye–Hückel model showed a smaller systematic bias and typical error size (ME = +0.08 mS cm⁻¹, MAE = 0.08 mS cm⁻¹) than the Davies model (ME = +0.13 mS cm⁻¹, MAE = 0.13 mS cm⁻¹). The maximum overestimation was +0.21 mS cm⁻¹ for Debye–Hückel and +0.29 mS cm⁻¹ for Davies across all 38 recipes. Thus, the empirical Sonneveld approximation reproduced the reported EC values most closely in absolute terms, whereas the EC models showed a small positive bias under the salts-only reconstruction assumptions. EC values and deviations for all models are shown in the Appendix under @tbl-crop-recipes-long-landscape_ec_models.
 
 \newpage
 
@@ -3224,7 +3223,7 @@ cat("\n\\vspace{1.5\\baselineskip}\n")
 
 #### Achieved composition
 
-The target macronutrient composition of Hoagland solution No. 2 was achieved using 0.80 mmol L⁻¹ 5Ca(NO₃)₂·NH₄NO₃·10H₂O, 0.80 mmol L⁻¹ KH₂PO₄, 5.20 mmol L⁻¹ KNO₃, 2.00 mmol L⁻¹ MgSO₄·7H₂O and 0.20 mmol L⁻¹ NH₄H₂PO₄. This is shown as Alternative 3 in Table \ref{tab:tbl-hoagland-comparison}. For the different EC Designs values are shown in Table \ref{tab:tbl-hoagland-ec-series}.
+The target macronutrient composition of Hoagland solution No. 2 was achieved using 0.80 mmol L⁻¹ 5Ca(NO₃)₂·NH₄NO₃·10H₂O, 0.80 mmol L⁻¹ KH₂PO₄, 5.20 mmol L⁻¹ KNO₃, 2.00 mmol L⁻¹ MgSO₄·7H₂O and 0.20 mmol L⁻¹ NH₄H₂PO₄. This is shown as Alternative 3 in Table \ref{tab:tbl-hoagland-comparison}. Values for the different EC designs are shown in Table \ref{tab:tbl-hoagland-ec-series}.
 
 ```{r}
 #| echo: false
@@ -3295,7 +3294,7 @@ The tomato recipe specifies a target composition without Na, Cl, or Si. In the c
 
 The tap water from postal code 14195 had a calculated pH of 7.44 and an EC of 0.86 mS cm⁻¹. Besides the ions considered in the target nutrient composition, it supplied 2.02 mmol L⁻¹ Na⁺ and 1.86 mmol L⁻¹ Cl⁻, contributing 0.09 and 0.13 mS cm⁻¹, respectively, to the total EC. The electroneutral 0.3 mmol L⁻¹ Si present in the tap water did not contribute to the overall EC.
 
-The calculated final nutrient solution had a pH of 5.82. Ionic strength amounted to 34.84 mmol L⁻¹, while the total concentration of charge equivalents was 24.61 meq L⁻¹. The calculated EC was 2.81 mS cm⁻¹ and the osmotic potential was −101.02 kPa. In the final solution, the largest ionic contribution to EC was from NO₃⁻ at 0.89 mS cm⁻¹, followed by K⁺ at 0.58 mS cm⁻¹ and SO₄²⁻ at 0.45 mS cm⁻¹
+The calculated final nutrient solution had a pH of 5.82. Ionic strength amounted to 34.84 mmol L⁻¹, while the total concentration of charge equivalents was 24.61 meq L⁻¹. The calculated EC was 2.81 mS cm⁻¹ and the osmotic potential was −101.02 kPa. In the final solution, the largest ionic contribution to EC was from NO₃⁻ at 0.89 mS cm⁻¹, followed by K⁺ at 0.58 mS cm⁻¹ and SO₄²⁻ at 0.45 mS cm⁻¹.
 
 ### Case study III — Research scientist: nutrient formulation for a novel halophyte (Salicornia) using mixed water sources
 
@@ -3497,10 +3496,7 @@ The results showed that a broad range of published horticultural target solution
 
 \endgroup
 
-
-
 ------------------------------------------------------------------------
-
 
 \appendix
 \renewcommand{\thetable}{A.\arabic{table}}
@@ -3508,11 +3504,9 @@ The results showed that a broad range of published horticultural target solution
 \setcounter{table}{0}
 \setcounter{figure}{0}
 
-# Appendix {-}
-
+# Appendix {.unnumbered}
 
 The appendix provides supplementary material for the evaluation and documentation of NutriCalc. It includes an additional comparison of reported and calculated electrical conductivity values for crop-specific nutrient-solution reconstructions, as well as the function documentation generated with `roxygen2` for the implemented R package. The complete R code is available in the GitHub repository at <https://github.com/diolsa/nutricalc>.
-
 
 ```{r}
 #| label: tbl-crop-recipes-long-landscape_ec_models
