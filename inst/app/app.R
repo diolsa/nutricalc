@@ -1723,7 +1723,7 @@ server <- function(input, output, session) {
       tags$h5("\U0001f3af Delivery vs target"),
       tableOutput("tbl_n"),
       tags$p(strong("\U0001f9ee Total squared absolute error: "), round(res$squared_error, 6)),
-      tags$p(strong("\U0001f4ca Relative squared percentage error (optimized): "), round(res$rel_squared_error, 6)),
+      tags$p(strong("\U0001f4c8 Relative squared error (optimized objective): "), round(res$weighted_rel_squared_error, 6)),
       tags$hr(),
       tags$details(
         tags$summary("Show raw print() output"),
