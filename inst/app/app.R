@@ -258,7 +258,7 @@ water_key_label <- function(key) {
 ui <- fluidPage(
   theme = bs_theme(bootswatch = "flatly"),
   tags$head(tags$style(HTML("
-  body { font-size: 13px; }
+  body { font-size: 13px; background-color: #ffeb3b; }
   .form-group { margin-bottom: 3px; }
   .shiny-input-container { margin-bottom: 3px; }
 
